@@ -1,12 +1,11 @@
 import { FileEntry } from "@app/domain/defines/abookFile"
-import { Metadata } from "@teawithsand/tws-player"
 
 export type AbookId = string
 
 export interface AbookMetadata {
-	title: string
-	authorName: string
-	publishedYear: number | null
+	title: string // empty if not provided
+	authorName: string // empty if not provided
+	publishedYear: number // 0 if not provided, negative for BC years
 }
 
 export interface Abook {
