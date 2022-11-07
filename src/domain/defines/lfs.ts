@@ -1,4 +1,4 @@
 export interface Lfs {
-  id: string;
-  blob: File | Blob;
+	id: string
+	blob: File | Blob
 }
