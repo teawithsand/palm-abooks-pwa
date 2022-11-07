@@ -16,9 +16,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.14.5",
     "@teawithsand/tws-gatsby-plugin": "^0.0.2",
     "@teawithsand/tws-player": "^0.0.1",
-    "@teawithsand/tws-stl": "^0.0.1",
+    "@teawithsand/tws-stl": "^0.0.2",
     "@teawithsand/tws-stl-react": "^0.0.1",
     "babel-plugin-styled-components": "^2.0.7",
     "dexie": "^3.2.2",
@@ -33,6 +34,7 @@
     "gatsby-plugin-zopfli": "^2.0.0",
     "gatsby-source-filesystem": "^4.24.0",
     "gatsby-transformer-sharp": "^4.24.0",
+    "immer": "^9.0.16",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-helmet": "^6.1.0",

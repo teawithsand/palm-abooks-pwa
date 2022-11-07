@@ -2256,6 +2256,19 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
+"@tanstack/query-core@4.14.5":
+  version "4.14.5"
+  resolved "http://verdaccio:4873/@tanstack%2fquery-core/-/query-core-4.14.5.tgz#f8c061a9dd4d7a87f9992db4ddda35c479e93c4a"
+  integrity sha512-Su1AyrPb6xnm7wXTvpN5tt+B7LViYSh9k04vvuc6+eMVH0HkE9ktZTXibRrTvV83BI1KP5MG7v/k90ne/4zQzw==
+
+"@tanstack/react-query@^4.14.5":
+  version "4.14.5"
+  resolved "http://verdaccio:4873/@tanstack%2freact-query/-/react-query-4.14.5.tgz#e2ff6419ee94426ec5e0eecf9bf77efbeb1a0e4b"
+  integrity sha512-CuWl/SxSB0zHhHaTja8LNhy9Vdk+vk9IkW3Oiq3lo4gPnTguHmbUzfjEA1x3RfvPeHfPMuq/pYMSbV+CX4aDQA==
+  dependencies:
+    "@tanstack/query-core" "4.14.5"
+    use-sync-external-store "^1.2.0"
+
 "@teawithsand/tws-gatsby-plugin@^0.0.2":
   version "0.0.2"
   resolved "http://verdaccio:4873/@teawithsand%2ftws-gatsby-plugin/-/tws-gatsby-plugin-0.0.2.tgz#d4d457a1a33f75359dd4da6f222de7e9930c218f"
@@ -2284,6 +2297,11 @@
   version "0.0.1"
   resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.1.tgz#2a4e2096b3736282b9f02e3a650c6ce349850e17"
   integrity sha512-cjQk3cvbVH0i0s40Oi8Z2Z676Dx2QnVpLtGEZSi0I6Zb+WjXuS54pPYRzJMnwJQhos/rQcIvBGM+9ro2FdaAGQ==
+
+"@teawithsand/tws-stl@^0.0.2":
+  version "0.0.2"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.2.tgz#b2ebeb854e67754cc6f9087c2015a8edf8857519"
+  integrity sha512-H7JB1DAeczZOyj0aFSp7qE67E42KQNvsZH3nszzDwTR38LKtOS9cyshN3MKRZBUO5JsoV/a/cStvbhl2PIDV6Q==
 
 "@testing-library/jest-dom@^5.16.5":
   version "5.16.5"
@@ -6820,6 +6838,11 @@ immer@^9.0.15, immer@^9.0.7:
   resolved "https://registry.yarnpkg.com/immer/-/immer-9.0.16.tgz#8e7caab80118c2b54b37ad43e05758cdefad0198"
   integrity sha512-qenGE7CstVm1NrHQbMh8YaSzTZTFNP3zPqr3YU0S0UY441j4bJTg4A2Hh5KAhwgaiU6ZZ1Ar6y/2f4TblnMReQ==
 
+immer@^9.0.16:
+  version "9.0.16"
+  resolved "http://verdaccio:4873/immer/-/immer-9.0.16.tgz#8e7caab80118c2b54b37ad43e05758cdefad0198"
+  integrity sha512-qenGE7CstVm1NrHQbMh8YaSzTZTFNP3zPqr3YU0S0UY441j4bJTg4A2Hh5KAhwgaiU6ZZ1Ar6y/2f4TblnMReQ==
+
 immutable@~3.7.6:
   version "3.7.6"
   resolved "https://registry.yarnpkg.com/immutable/-/immutable-3.7.6.tgz#13b4d3cb12befa15482a26fe1b2ebae640071e4b"
@@ -11271,6 +11294,11 @@ url-parse@^1.5.3:
   dependencies:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
+
+use-sync-external-store@^1.2.0:
+  version "1.2.0"
+  resolved "http://verdaccio:4873/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
+  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
 
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"
