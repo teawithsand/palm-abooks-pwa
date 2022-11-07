@@ -22,6 +22,19 @@ export const AbookDBLock = new MiddlewareKeyedLocks(
 	(key) => "tws-abook-player/" + key
 )
 
+const eqSet = <T>(xs: Set<T>, ys: Set<T>) =>
+	xs.size === ys.size && [...xs].every((x) => ys.has(x))
+const extractAbookInternalFileIds = (abook: Abook): Set<string> =>
+	new Set(
+		abook.entries
+			.map((v) =>
+				v.data.dataType === FileEntryType.INTERNAL_FILE
+					? v.data.internalFileId
+					: undefined
+			)
+			.filter((v) => typeof v === "string")
+	) as Set<string>
+
 export class AbookWriteAccess {
 	private isReleased = false
 
@@ -34,12 +47,17 @@ export class AbookWriteAccess {
 	/**
 	 * Note: user of this function MUST NOT drop locally stored entries
 	 */
-	private innerUpdate = async (mutator: (draft: Draft<Abook>) => void) => {
+	private innerUpdate = async (
+		mutator: (draft: Draft<Abook>) => void,
+		checker?: (oldAbook: Abook, newAbook: Abook) => void
+	) => {
 		this.checkReleased()
 
 		const newAbook = produce(this.abook, (draft) => {
 			mutator(draft)
 		})
+
+		if (checker) checker(this.abook, newAbook)
 
 		await this.db.abooks.put(newAbook)
 
@@ -54,13 +72,7 @@ export class AbookWriteAccess {
 			this.db.abooks,
 			this.db.internalFiles,
 			async () => {
-				const internalEntries = this.abook.entries
-					.map((v) =>
-						v.data.dataType === FileEntryType.INTERNAL_FILE
-							? v.data.internalFileId
-							: undefined
-					)
-					.filter((v) => typeof v === "string")
+				const internalEntries = extractAbookInternalFileIds(this.abook)
 
 				for (const e of internalEntries) {
 					await this.db.internalFiles.delete(
@@ -80,42 +92,15 @@ export class AbookWriteAccess {
 	 * Note: user of this function MUST NOT drop locally stored entries
 	 */
 	update = async (mutator: (draft: Draft<Abook>) => void) => {
-		this.checkReleased()
+		await this.innerUpdate(mutator, (oldAbook, newAbook) => {
+			const oldAbookLocalFiles = extractAbookInternalFileIds(oldAbook)
+			const newAbookLocalFiles = extractAbookInternalFileIds(newAbook)
 
-		const newAbook = produce(this.abook, (draft) => {
-			mutator(draft)
+			if (eqSet(oldAbookLocalFiles, newAbookLocalFiles))
+				throw new Error(
+					`Old and new Abook local file sets have changed during update`
+				)
 		})
-
-		const oldAbookLocalFiles = new Set(
-			this.abook.entries
-				.map((v) =>
-					v.data.dataType === FileEntryType.INTERNAL_FILE
-						? v.data.internalFileId
-						: undefined
-				)
-				.filter((v) => typeof v === "string")
-		)
-		const newAbookLocalFiles = new Set(
-			newAbook.entries
-				.map((v) =>
-					v.data.dataType === FileEntryType.INTERNAL_FILE
-						? v.data.internalFileId
-						: undefined
-				)
-				.filter((v) => typeof v === "string")
-		)
-
-		const eqSet = <T>(xs: Set<T>, ys: Set<T>) =>
-			xs.size === ys.size && [...xs].every((x) => ys.has(x))
-
-		if (eqSet(oldAbookLocalFiles, newAbookLocalFiles))
-			throw new Error(
-				`Old and new Abook local file sets have changed during update`
-			)
-
-		await this.db.abooks.put(newAbook)
-
-		this.abook = newAbook
 	}
 
 	dropFileEntry = async (idx: number) => {
@@ -141,12 +126,12 @@ export class AbookWriteAccess {
 		)
 	}
 
-	appendInternalFile = async (blob: Blob | File, name?: string) => {
+	addInternalFile = async (
+		blob: Blob | File,
+		mutator: (draft: Draft<Abook>, newFileId: string) => void
+	) => {
 		this.checkReleased()
 
-		name = name || (blob instanceof File ? blob.name : name)
-		if (!name)
-			throw new Error("Name was not provided for new internal file")
 		await this.db.transaction(
 			"rw?",
 			this.db.abooks,
@@ -162,21 +147,25 @@ export class AbookWriteAccess {
 					},
 				})
 
-				await this.innerUpdate((draft) => {
-					draft.entries.push({
-						name:
-							name ??
-							throwExpression(new Error("Name must be provided")),
-						cachedData: {
-							disposition: AbookFileDisposition.NOT_LOADED,
-							size: blob.size,
-						},
-						data: {
-							dataType: FileEntryType.INTERNAL_FILE,
-							internalFileId: internalFileId,
-						},
-					})
-				})
+				await this.innerUpdate(
+					(draft) => mutator(draft, internalFileId),
+					(oldAbook, newAbook) => {
+						const oldAbookLocalFiles =
+							extractAbookInternalFileIds(oldAbook)
+						const newAbookLocalFiles =
+							extractAbookInternalFileIds(newAbook)
+
+						if (!newAbookLocalFiles.has(internalFileId))
+							throw new Error("File was not added")
+
+						newAbookLocalFiles.delete(internalFileId)
+
+						if (eqSet(oldAbookLocalFiles, newAbookLocalFiles))
+							throw new Error(
+								`Old and new Abook local file sets have changed during update(except new file id)`
+							)
+					}
+				)
 			}
 		)
 	}
@@ -220,10 +209,10 @@ export class AbookDB extends Dexie {
 		return new AbookWriteAccess(this, abook, releaser)
 	}
 
-    /**
-     * Translates internal file id to blob, if such internal file exists.
-     * Otherwise returns null.
-     */
+	/**
+	 * Translates internal file id to blob, if such internal file exists.
+	 * Otherwise returns null.
+	 */
 	getInternalFileBlob = async (id: string): Promise<Blob | File | null> => {
 		const file = (await this.internalFiles.get(id)) ?? null
 		return file?.blob ?? null
