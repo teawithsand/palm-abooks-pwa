@@ -1,0 +1,36 @@
+{
+  "name": "tws-abook-player",
+  "version": "1.0.0",
+  "private": true,
+  "description": "tws-abook-player",
+  "keywords": [
+    "gatsby"
+  ],
+  "scripts": {
+    "develop": "gatsby develop",
+    "start": "gatsby develop",
+    "build": "gatsby build",
+    "serve": "gatsby serve",
+    "clean": "gatsby clean",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@teawithsand/tws-player": "^0.0.1",
+    "@teawithsand/tws-stl": "^0.0.1",
+    "@teawithsand/tws-stl-react": "^0.0.1",
+    "babel-plugin-styled-components": "^2.0.7",
+    "dexie": "^3.2.2",
+    "gatsby": "^4.24.7",
+    "gatsby-plugin-manifest": "^4.24.0",
+    "gatsby-plugin-styled-components": "^5.24.0",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "styled-components": "^5.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.45",
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
+    "typescript": "^4.8.3"
+  }
+}
