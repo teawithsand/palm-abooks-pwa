@@ -16,15 +16,14 @@ const plugins = customizeDefaultPlugins(
 		makeSelfPlugin({
 			languages: ["en-US"],
 		}),
-	],
-	GatsbyTransformerRemarkPlugins,
+	]
 )
 const config = makeConfig(
 	{
 		title: `Teawithsand's ABook Player PWA`,
 		siteUrl: `https://abook.teawithsand.com`,
 	},
-	plugins,
+	plugins
 )
 
 export default config
