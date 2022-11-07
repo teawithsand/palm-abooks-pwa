@@ -16,6 +16,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@teawithsand/tws-gatsby-plugin": "^0.0.2",
     "@teawithsand/tws-player": "^0.0.1",
     "@teawithsand/tws-stl": "^0.0.1",
     "@teawithsand/tws-stl-react": "^0.0.1",

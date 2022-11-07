@@ -5,12 +5,12 @@ import {
 	makeLayoutPlugin,
 	makeManifestPlugin,
 	makeSelfPlugin,
-} from "tws-gatsby-plugin"
+} from "@teawithsand/tws-gatsby-plugin"
 
 const plugins = customizeDefaultPlugins(
 	[
 		makeManifestPlugin("./src/images/icon.png"),
-		makeLayoutPlugin("./src/Layout.jsx"),
+		// makeLayoutPlugin("./src/Layout.jsx"),
 	],
 	[
 		makeSelfPlugin({
@@ -21,8 +21,8 @@ const plugins = customizeDefaultPlugins(
 )
 const config = makeConfig(
 	{
-		title: `PalmABooks PWA`,
-		siteUrl: `https://pwa.palmabooks.com`,
+		title: `Teawithsand's ABook Player PWA`,
+		siteUrl: `https://abook.teawithsand.com`,
 	},
 	plugins,
 )
