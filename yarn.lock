@@ -1036,7 +1036,7 @@
     core-js-pure "^3.25.1"
     regenerator-runtime "^0.13.10"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.10.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.15.4", "@babel/runtime@^7.17.2", "@babel/runtime@^7.18.0", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.10.0", "@babel/runtime@^7.10.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.15.4", "@babel/runtime@^7.17.2", "@babel/runtime@^7.18.0", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.19.4", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   version "7.20.1"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.20.1.tgz#1148bb33ab252b165a06698fde7576092a78b4a9"
   integrity sha512-mrzLkl6U9YLF8qpqI7TB82PESyEGjm/0Ly91jG575eVxMMlb8fYfOXFZIJ8XfLrJZQbm7dlKry2bJmXBUEkdFg==
@@ -2303,6 +2303,13 @@
     "@tanstack/query-core" "4.14.5"
     use-sync-external-store "^1.2.0"
 
+"@teawithsand/jsmediatags@^3.9.1008":
+  version "3.9.1008"
+  resolved "http://verdaccio:4873/@teawithsand%2fjsmediatags/-/jsmediatags-3.9.1008.tgz#f9152ee3684adfe201a794a47fc7290d5b16d757"
+  integrity sha512-8wo9ENGu23uoKDDB/juk3bt2w4t1gHAymEouKKOC8mFvlWvf6F8aUOKnXYNsUN9ngguzWVEWXI+Q8JEUFFHyDQ==
+  dependencies:
+    xhr2 "^0.1.4"
+
 "@teawithsand/tws-gatsby-plugin@^0.0.2":
   version "0.0.2"
   resolved "http://verdaccio:4873/@teawithsand%2ftws-gatsby-plugin/-/tws-gatsby-plugin-0.0.2.tgz#d4d457a1a33f75359dd4da6f222de7e9930c218f"
@@ -2311,14 +2318,14 @@
     "@svgr/webpack" "^6.5.1"
     tsconfig-paths-webpack-plugin "^3.5.2"
 
-"@teawithsand/tws-player@^0.0.1":
-  version "0.0.1"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.0.1.tgz#ab59ffaa5760325c45811bcaddf06744eaf49ff5"
-  integrity sha512-o27xMxyAOPyW/B+wmnGmmvbqHHprAFuB+ccA0v0I6UkUawQQ13FjxGVyIDJjHUx/PqzIQcqQib/aSZfclkwCCg==
+"@teawithsand/tws-player@^0.0.3":
+  version "0.0.3"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.0.3.tgz#f0d3391e5be459af76ed447702fb846faaff8f53"
+  integrity sha512-zMjey7Z4bKkGAXf/ImMO3flOwDyianXRWU76SQXsQTBoG5JcuS1TbEgy/+86RYvJp/aebw64wS/YVvwLBr5dCQ==
   dependencies:
-    "@teawithsand/tws-stl" "^0.0.1"
+    "@teawithsand/jsmediatags" "^3.9.1008"
+    "@teawithsand/tws-stl" "^0.0.2"
     immer "^9.0.15"
-    jsmediatags "^3.9.7"
 
 "@teawithsand/tws-stl-react@^0.0.1":
   version "0.0.1"
@@ -2326,11 +2333,6 @@
   integrity sha512-lecF4hC9l5OWZfnXseU1zab84EnwLwhtTdCrJ1ohY3M7yoddF8LgZ37LnlEAw/Js398aEivb+OnbryQ8Dq9/6w==
   dependencies:
     react-error-boundary "^3.1.4"
-
-"@teawithsand/tws-stl@^0.0.1":
-  version "0.0.1"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.1.tgz#2a4e2096b3736282b9f02e3a650c6ce349850e17"
-  integrity sha512-cjQk3cvbVH0i0s40Oi8Z2Z676Dx2QnVpLtGEZSi0I6Zb+WjXuS54pPYRzJMnwJQhos/rQcIvBGM+9ro2FdaAGQ==
 
 "@teawithsand/tws-stl@^0.0.2":
   version "0.0.2"
@@ -5756,6 +5758,18 @@ filter-obj@^1.1.0:
   resolved "https://registry.yarnpkg.com/filter-obj/-/filter-obj-1.1.0.tgz#9b311112bc6c6127a16e016c6c5d7f19e0805c5b"
   integrity sha512-8rXg1ZnX7xzy2NGDVkBVaAy+lSlPNwad13BtgSlLuxfIslyt5Vg64U7tFcCt4WS1R0hvtnQybT/IyCkGZ3DpXQ==
 
+final-form-arrays@^3.0.2:
+  version "3.0.2"
+  resolved "http://verdaccio:4873/final-form-arrays/-/final-form-arrays-3.0.2.tgz#9f3bef778dec61432357744eb6f3abef7e7f3847"
+  integrity sha512-TfO8aZNz3RrsZCDx8GHMQcyztDNpGxSSi9w4wpSNKlmv2PfFWVVM8P7Yj5tj4n0OWax+x5YwTLhT5BnqSlCi+w==
+
+final-form@^4.20.7:
+  version "4.20.7"
+  resolved "http://verdaccio:4873/final-form/-/final-form-4.20.7.tgz#e7e2eb5fd952951d4fe6153d46043da2d68b207e"
+  integrity sha512-ii3X9wNfyBYFnDPunYN5jh1/HAvtOZ9aJI/TVk0MB86hZuOeYkb+W5L3icgwW9WWNztZR6MDU3En6eoZTUoFPg==
+  dependencies:
+    "@babel/runtime" "^7.10.0"
+
 finalhandler@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/finalhandler/-/finalhandler-1.2.0.tgz#7d23fe5731b207b4640e4fcd00aec1f9207a7b32"
@@ -7926,13 +7940,6 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha512-uZz5UnB7u4T9LvwmFqXii7pZSouaRPorGs5who1Ip7VO0wxanFvBL7GkM6dTHlgX+jhBApRetaWpnDabOeTcnA==
 
-jsmediatags@^3.9.7:
-  version "3.9.7"
-  resolved "http://verdaccio:4873/jsmediatags/-/jsmediatags-3.9.7.tgz#808c6713b5ccb9712a4dc4b2149a0cb253c641a2"
-  integrity sha512-xCAO8C3li3t5hYkXqn8iv8zQQUB4T1QqRN2aSONHMls21ICdEvXi4xtb6W70/fAFYSDwMHd32hIqvo4YuXoNcQ==
-  dependencies:
-    xhr2 "^0.1.4"
-
 json-buffer@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/json-buffer/-/json-buffer-3.0.0.tgz#5b1f397afc75d677bde8bcfc0e47e1f9a3d9a898"
@@ -9782,6 +9789,20 @@ react-fast-compare@^3.1.1:
   version "3.2.0"
   resolved "http://verdaccio:4873/react-fast-compare/-/react-fast-compare-3.2.0.tgz#641a9da81b6a6320f270e89724fb45a0b39e43bb"
   integrity sha512-rtGImPZ0YyLrscKI9xTpV8psd6I8VAtjKCzQDlzyDvqJA8XOW78TXYQwNRNd8g8JZnDu8q9Fu/1v4HPAVwVdHA==
+
+react-final-form-arrays@^3.1.4:
+  version "3.1.4"
+  resolved "http://verdaccio:4873/react-final-form-arrays/-/react-final-form-arrays-3.1.4.tgz#2744941d8fd200fc648481022e515588f60bbac3"
+  integrity sha512-siVFAolUAe29rMR6u8VwepoysUcUdh6MLV2OWnCtKpsPRUdT9VUgECjAPaVMAH2GROZNiVB9On1H9MMrm9gdpg==
+  dependencies:
+    "@babel/runtime" "^7.19.4"
+
+react-final-form@^6.5.9:
+  version "6.5.9"
+  resolved "http://verdaccio:4873/react-final-form/-/react-final-form-6.5.9.tgz#644797d4c122801b37b58a76c87761547411190b"
+  integrity sha512-x3XYvozolECp3nIjly+4QqxdjSSWfcnpGEL5K8OBT6xmGrq5kBqbA6+/tOqoom9NwqIPPbxPNsOViFlbKgowbA==
+  dependencies:
+    "@babel/runtime" "^7.15.4"
 
 react-helmet@^6.1.0:
   version "6.1.0"
