@@ -5,13 +5,13 @@
 		"noImplicitAny": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
-		"target": "ES5",
+		"target": "ES2020",
 		"sourceMap": true,
 		"jsx": "react",
 		"allowJs": true,
 		"baseUrl": "./src",
 		"paths": {
-			"@app/*": ["*"],
+			"@app/*": ["*"]
 		},
 		"resolveJsonModule": true,
 		"experimentalDecorators": true,
