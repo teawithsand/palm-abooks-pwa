@@ -10,7 +10,7 @@ import {
 const plugins = customizeDefaultPlugins(
 	[
 		makeManifestPlugin("./src/images/icon.png"),
-		// makeLayoutPlugin("./src/Layout.jsx"),
+		makeLayoutPlugin("./src/Layout.tsx"),
 	],
 	[
 		makeSelfPlugin({
