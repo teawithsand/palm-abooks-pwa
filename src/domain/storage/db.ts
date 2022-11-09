@@ -168,7 +168,8 @@ export class AbookWriteAccess {
 	}
 
 	private checkReleased = () => {
-		// TODO: check here
+		if (this.isReleased)
+			throw new Error(`Abook access for ${this.abook.id} was released`)
 	}
 
 	release = () => {
@@ -230,7 +231,7 @@ export class AbookDb extends Dexie {
 	/**
 	 * Translates internal file id to blob, if such internal file exists.
 	 * Otherwise returns null.
-	 * 
+	 *
 	 * TODO(teawithsand): use caching resolver instead. It was already implemented in tws-player.
 	 */
 	getInternalFileBlob = async (id: string): Promise<Blob | File | null> => {
