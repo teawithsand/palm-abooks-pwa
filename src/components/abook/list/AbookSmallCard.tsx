@@ -9,6 +9,8 @@ import {
 } from "@app/domain/defines/abookFile"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import { useAppManager } from "@app/domain/managers/app"
+import { useAppPaths } from "@app/paths"
+import { Link } from "gatsby"
 
 const Card = styled.div`
 	border: 1px solid rgba(0, 0, 0, 0.125);
@@ -22,8 +24,9 @@ const Card = styled.div`
 `
 
 // TODO(teawithsand): remove it as now it became obsolete
-const CardImageContainer = styled.div`
+const CardImageContainer = styled(Link)`
 	overflow: hidden;
+	display: block;
 	grid-row: 1;
 	grid-column: 1;
 `
@@ -65,6 +68,7 @@ export const AbookSmallCard = (props: { abook: Abook }) => {
 	const { metadata } = abook
 	const app = useAppManager()
 	const name = abook.metadata.title
+	const { abookShowPath } = useAppPaths()
 
 	const musicEntries = useMemo(
 		() =>
@@ -139,7 +143,7 @@ export const AbookSmallCard = (props: { abook: Abook }) => {
 
 	return (
 		<Card>
-			<CardImageContainer>
+			<CardImageContainer to={abookShowPath(abook.id)}>
 				<CardImage src={imageUrl} />
 			</CardImageContainer>
 			<CardRightPanel>

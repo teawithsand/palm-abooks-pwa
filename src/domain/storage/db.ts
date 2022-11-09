@@ -41,6 +41,10 @@ export class AbookWriteAccess {
 		private readonly releaser: () => void
 	) {}
 
+	getAbook = (): Abook => {
+		return { ...this.abook }
+	}
+
 	/**
 	 * Note: user of this function MUST NOT drop locally stored entries
 	 */

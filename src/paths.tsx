@@ -18,7 +18,8 @@ const paths: AppPaths = {
 	abookAddLocalPath: "/abook/local-add",
 	abookListPath: "/abook/list",
 	abookShowPath: (id: string) => {
-		return `/store/abook/show?id=${encodeURIComponent(id)}`
+		// try using hash instead, so it works better with cache
+		return `/abook/show?id=${encodeURIComponent(id)}` 
 	},
 	abookManagementPath: "/store/abook",
 	playerPath: "/player",
