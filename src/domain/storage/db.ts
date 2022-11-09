@@ -1,10 +1,7 @@
 import { Abook, AbookId } from "@app/domain/defines/abook"
 import Dexie, { Table } from "dexie"
 
-import {
-	AbookFileDisposition,
-	FileEntryType,
-} from "@app/domain/defines/abookFile"
+import { FileEntryType } from "@app/domain/defines/abookFile"
 import {
 	InternalFile,
 	InternalFileOwnerDataType,
@@ -17,7 +14,7 @@ import {
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
 
-export const AbookDBLock = new MiddlewareKeyedLocks(
+export const AbookDbLock = new MiddlewareKeyedLocks(
 	GLOBAL_WEB_KEYED_LOCKS,
 	(key) => "tws-abook-player/" + key
 )
@@ -39,7 +36,7 @@ export class AbookWriteAccess {
 	private isReleased = false
 
 	constructor(
-		private readonly db: AbookDB,
+		private readonly db: AbookDb,
 		private abook: Abook,
 		private readonly releaser: () => void
 	) {}
@@ -96,7 +93,7 @@ export class AbookWriteAccess {
 			const oldAbookLocalFiles = extractAbookInternalFileIds(oldAbook)
 			const newAbookLocalFiles = extractAbookInternalFileIds(newAbook)
 
-			if (eqSet(oldAbookLocalFiles, newAbookLocalFiles))
+			if (!eqSet(oldAbookLocalFiles, newAbookLocalFiles))
 				throw new Error(
 					`Old and new Abook local file sets have changed during update`
 				)
@@ -160,7 +157,7 @@ export class AbookWriteAccess {
 
 						newAbookLocalFiles.delete(internalFileId)
 
-						if (eqSet(oldAbookLocalFiles, newAbookLocalFiles))
+						if (!eqSet(oldAbookLocalFiles, newAbookLocalFiles))
 							throw new Error(
 								`Old and new Abook local file sets have changed during update(except new file id)`
 							)
@@ -180,21 +177,42 @@ export class AbookWriteAccess {
 	}
 }
 
-export class AbookDB extends Dexie {
+export class AbookDb extends Dexie {
 	abooks!: Table<Abook, string>
 	internalFiles!: Table<InternalFile, string>
 
-	public readonly locks = AbookDBLock
+	public readonly locks = AbookDbLock
 
-	private constructor() {
+	constructor() {
 		super("tws-abook/abook-db")
+		this.init()
+	}
+
+	private init = () => {
 		this.version(1).stores({
 			abooks: "id",
-			fileEntries: "id,ownerType,ownerId,[ownerType+ownerId]",
+			internalFiles: "id,ownerType,ownerId,[ownerType+ownerId]",
 		})
 	}
 
-	public static readonly instance = new AbookDB()
+	createAbook = async (abook: Abook) => {
+		await this.abooks.add(abook)
+	}
+
+	readAbook = async (id: AbookId): Promise<Abook | null> => {
+		return (await this.abooks.where("id").equals(id).first()) ?? null
+	}
+
+	listAbooks = async (
+		offset: number = 0,
+		limit?: number
+	): Promise<Abook[]> => {
+		let q = this.abooks.offset(offset)
+		if (typeof limit === "number" || typeof limit === "bigint") {
+			q = q.limit(limit)
+		}
+		return await q.toArray()
+	}
 
 	abookWriteAccess = async (id: AbookId): Promise<AbookWriteAccess> => {
 		const abook = await this.abooks.get(id)
@@ -212,9 +230,23 @@ export class AbookDB extends Dexie {
 	/**
 	 * Translates internal file id to blob, if such internal file exists.
 	 * Otherwise returns null.
+	 * 
+	 * TODO(teawithsand): use caching resolver instead. It was already implemented in tws-player.
 	 */
 	getInternalFileBlob = async (id: string): Promise<Blob | File | null> => {
 		const file = (await this.internalFiles.get(id)) ?? null
 		return file?.blob ?? null
+	}
+
+	clear = async () => {
+		await this.transaction(
+			"rw?",
+			this.abooks,
+			this.internalFiles,
+			async () => {
+				await this.abooks.clear()
+				await this.internalFiles.clear()
+			}
+		)
 	}
 }

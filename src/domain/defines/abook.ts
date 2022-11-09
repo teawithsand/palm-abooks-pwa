@@ -1,11 +1,15 @@
 import { FileEntry } from "@app/domain/defines/abookFile"
+import { TimestampMs } from "@teawithsand/tws-stl"
 
 export type AbookId = string
 
 export interface AbookMetadata {
 	title: string // empty if not provided
 	authorName: string // empty if not provided
+	description: string // empty if not provided; entered by user directly
 	publishedYear: number // 0 if not provided, negative for BC years
+	addedAt: TimestampMs
+	lastPlayedAt: TimestampMs // defaults to 0
 }
 
 export interface Abook {
@@ -20,4 +24,6 @@ export interface Abook {
 export interface AbookSavedPosition {
 	fileName: string
 	fileOffset: number
+
+	totalOffset: number
 }

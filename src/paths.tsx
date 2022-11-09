@@ -15,8 +15,8 @@ export interface AppPaths extends Paths {
 
 const paths: AppPaths = {
 	homePath: "/",
-	abookAddLocalPath: "/store/abook/local-add",
-	abookListPath: "/store/abook/list",
+	abookAddLocalPath: "/abook/local-add",
+	abookListPath: "/abook/list",
 	abookShowPath: (id: string) => {
 		return `/store/abook/show?id=${encodeURIComponent(id)}`
 	},

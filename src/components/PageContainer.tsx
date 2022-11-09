@@ -1,7 +1,13 @@
 import { Navbar } from "@app/components/Navbar"
-import { DialogBoundary } from "@teawithsand/tws-stl-react"
+import {
+	DialogBoundary,
+	ErrorBoundary,
+	LoadingSpinner,
+} from "@teawithsand/tws-stl-react"
 import { ProvideFixedLanguage } from "@teawithsand/tws-trans"
-import React, { ReactNode } from "react"
+import React, { ReactNode, Suspense } from "react"
+import { Container } from "react-bootstrap"
+import styled from "styled-components"
 
 const PageBody = (props: { children?: ReactNode }) => {
 	return (
@@ -12,12 +18,46 @@ const PageBody = (props: { children?: ReactNode }) => {
 	)
 }
 
-export const PageContainer = (props: { children?: ReactNode }) => {
+export type PageContainerOptions = {
+	container?: boolean
+	title: string
+}
+
+const PageTitle = styled.h1`
+	margin-top: 1.5em;
+	text-align: center;
+`
+export const PageContainer = (props: {
+	children?: ReactNode
+	options?: PageContainerOptions
+}) => {
+	const { options } = props
+
+	let inner = props.children
+	if (options) {
+		inner = options.title ? (
+			<>
+				<PageTitle>{options.title}</PageTitle>
+				<div>{inner}</div>
+			</>
+		) : (
+			inner
+		)
+		inner =
+			options.container ?? true ? <Container>{inner}</Container> : inner
+	}
+
 	return (
 		<>
 			<ProvideFixedLanguage language="en-US">
 				<DialogBoundary>
-					<PageBody>{props.children}</PageBody>
+					<PageBody>
+						<ErrorBoundary fallback={<>An error occurred</>}>
+							<Suspense fallback={<>Loading...</>}>
+								{inner}
+							</Suspense>
+						</ErrorBoundary>
+					</PageBody>
 				</DialogBoundary>
 			</ProvideFixedLanguage>
 		</>
