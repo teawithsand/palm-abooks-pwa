@@ -4,7 +4,20 @@ import { Button, Form, Table } from "react-bootstrap"
 import { Field as FinalField } from "react-final-form"
 import { FieldArray } from "react-final-form-arrays"
 
-const abookFilesMimesAndExtensions = ["mp3", "audio/mpeg"]
+const abookFilesMimesAndExtensions = [
+	".mp3",
+	"audio/mpeg",
+	
+	".jpg",
+	".jpeg",
+	"image/jpeg",
+	".png",
+	"image/png",
+	".gif",
+	"image/gif",
+	".webp",
+	"image/webp",
+]
 
 export const FilesFinalField = (props: { label?: string; name: string }) => {
 	const { name, label } = props
