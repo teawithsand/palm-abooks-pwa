@@ -1,113 +1,108 @@
-import React, { useEffect, useMemo, useState } from "react"
+import { AbookFileList } from "@app/components/abook/view/AbookFileList"
 import { Abook } from "@app/domain/defines/abook"
+import { useAbookShowData } from "@app/domain/defines/abookShowData"
 import { useAppManager } from "@app/domain/managers/app"
-import {
-	FileEntryDisposition,
-	FileEntryType,
-} from "@app/domain/defines/abookFile"
-import { getFileEntryDisposition } from "@app/domain/storage/disposition"
-import { MetadataBag } from "@teawithsand/tws-player"
+import { formatDurationSeconds } from "@teawithsand/tws-stl"
+import { breakpointMediaDown, BREAKPOINT_SM } from "@teawithsand/tws-stl-react"
+import React from "react"
 import styled from "styled-components"
 
 const Grid = styled.div`
 	display: grid;
+	grid-auto-flow: row;
+	gap: 1em;
+`
+
+const Header = styled.div`
+	display: grid;
+	grid-auto-flow: column;
+	width: 100%;
+
+	grid-template-columns: minmax(0, auto) min-content;
+
+	@media ${breakpointMediaDown(BREAKPOINT_SM)} {
+		grid-auto-flow: row;
+		grid-template-columns: auto;
+	}
+
+	gap: 0.5em;
 `
 
 const CoverImage = styled.img`
 	object-fit: cover;
-	max-height: 50vh;
-	max-width: 50vw;
+
+	width: 300px;
+	height: 300px;
+
+	@media ${breakpointMediaDown(BREAKPOINT_SM)} {
+		width: auto;
+		height: auto;
+		grid-row: 1;
+	}
+
+	border: 1px solid rgba(0, 0, 0, 0.125);
+	border-radius: 10px;
 `
 
 const InfoList = styled.ul`
 	padding: 0;
 	margin: 0;
 	list-style: none;
+
+	flex-grow: 1;
+	width: 100%;
+	height: 100%;
+
+	display: grid;
+	grid-auto-flow: row;
+	height: fit-content;
+
+	border-radius: 10px;
+	overflow: hidden;
+
+	li {
+		font-size: 1.25em;
+		padding: 0.5rem;
+	}
+
+	li:first-child {
+		font-size: 1.75em;
+		font-weight: bold;
+	}
+
+	li:nth-child(2n) {
+		background-color: rgba(0, 0, 0, 0.125);
+	}
+
+	li:nth-child(2n + 1) {
+		background-color: rgba(0, 0, 0, 0.25);
+	}
+
+	li:last-child {
+		display: block;
+	}
 `
+
+const TitleRow = styled.li``
 
 export const AbookView = (props: { abook: Abook }) => {
 	const { abook } = props
 	const { metadata } = abook
-	const app = useAppManager()
 
-	const musicEntries = useMemo(
-		() =>
-			abook.entries.filter(
-				(e) => getFileEntryDisposition(e) === FileEntryDisposition.MUSIC
-			),
-		[abook.entries]
-	)
-
-	const cachedMetadataBag = useMemo(
-		() =>
-			new MetadataBag(musicEntries.map((e) => e.metadata.musicMetadata)),
-		[musicEntries]
-	)
-
-	const imageEntry = useMemo(() => {
-		const candidates = abook.entries.filter(
-			(e) => getFileEntryDisposition(e) === FileEntryDisposition.IMAGE
-		)
-
-		const local = candidates.find(
-			(c) => c.data.dataType === FileEntryType.INTERNAL_FILE
-		)
-		if (local) return local
-
-		const any = candidates.length > 0 ? candidates[0] : null
-		return any
-	}, [abook.entries])
-
-	const duration =
-		(musicEntries.length > 0
-			? cachedMetadataBag.getDurationToIndex(
-					musicEntries.length - 1,
-					true
-			  )
-			: 0) ?? 0
-
-	const [imageUrl, setImageUrl] = useState("http://placekitten.com/300/300") // default image here
-
-	// TODO(teawithsand): make this code less bloated via external helper hooks like useBlob
-	useEffect(() => {
-		if (!imageEntry) return
-		if (imageEntry.data.dataType === FileEntryType.URL)
-			setImageUrl(imageEntry.data.url)
-
-		let isValid = true
-		let url: string | null = null
-
-		if (imageEntry.data.dataType === FileEntryType.INTERNAL_FILE) {
-			const id = imageEntry.data.internalFileId
-			const p = async () => {
-				const blob = await app.abookDb.getInternalFileBlob(id)
-				if (!blob) return
-
-				const innerUrl = URL.createObjectURL(blob)
-				if (isValid) {
-					url = innerUrl
-					setImageUrl(innerUrl)
-				} else {
-					URL.revokeObjectURL(innerUrl)
-				}
-			}
-
-			p()
-		}
-
-		return () => {
-			if (typeof url === "string") URL.revokeObjectURL(url)
-			isValid = false
-		}
-	}, [app, imageEntry])
+	const { coverUrl, musicEntries, duration } = useAbookShowData(abook)
 
 	return (
 		<Grid>
-			<CoverImage src={imageUrl} alt="Abook cover image" />
-			<InfoList>
-				<li>{metadata.title}</li>
-				<li>{metadata.authorName}</li>
-			</InfoList>
+			<Header>
+				<InfoList>
+					<TitleRow>Title: {metadata.title}</TitleRow>
+					<li>Author name: {metadata.authorName || "-"}</li>
+					<li>Duration: {formatDurationSeconds(duration)}</li>
+					<li>Music files: {musicEntries.length}</li>
+				</InfoList>
+				<CoverImage src={coverUrl} alt="Abook cover image" />
+			</Header>
+			<AbookFileList entries={abook.entries} />
 		</Grid>
 	)
 }

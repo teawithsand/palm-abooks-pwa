@@ -3,6 +3,7 @@
         "abooks",
         "Dexie",
         "immer",
+        "Millis",
         "tanstack"
     ]
 }

@@ -1,4 +1,8 @@
+import { useAppManager } from "@app/domain/managers/app"
+import { useQuery } from "@tanstack/react-query"
 import { MetadataLoadingResult } from "@teawithsand/tws-player"
+import { generateUUID } from "@teawithsand/tws-stl"
+import { useEffect, useState } from "react"
 
 export type FileEntryId = string
 
@@ -39,4 +43,45 @@ export type FileEntry = {
 	metadata: FileEntryMetadata
 
 	data: FileEntryData
+}
+
+export const useFileEntryUrl = (entry: FileEntry): string | null => {
+	const app = useAppManager()
+
+	if (entry.data.dataType === FileEntryType.URL) {
+		return entry.data.url
+	}
+
+	const [url, setUrl] = useState<string | null>(null) // default image here
+
+	// TODO(teawithsand): make this code less bloated via external helper hooks like useBlob
+	useEffect(() => {
+		let isValid = true
+		let url: string | null = null
+
+		if (entry.data.dataType === FileEntryType.INTERNAL_FILE) {
+			const id = entry.data.internalFileId
+			const p = async () => {
+				const blob = await app.abookDb.getInternalFileBlob(id)
+				if (!blob) return
+
+				const innerUrl = URL.createObjectURL(blob)
+				if (isValid) {
+					url = innerUrl
+					setUrl(innerUrl)
+				} else {
+					URL.revokeObjectURL(innerUrl)
+				}
+			}
+
+			p()
+		}
+
+		return () => {
+			if (typeof url === "string") URL.revokeObjectURL(url)
+			isValid = false
+		}
+	}, [app, entry])
+
+	return url
 }

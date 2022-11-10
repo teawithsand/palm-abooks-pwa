@@ -3,6 +3,8 @@ import React, { ReactNode } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 import { SSRProvider } from "react-bootstrap"
+import { DndProvider } from "react-dnd"
+import { HTML5Backend } from "react-dnd-html5-backend"
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -21,9 +23,11 @@ const queryClient = new QueryClient({
 const InnerLayout = (props: { children: ReactNode }) => {
 	return (
 		<SSRProvider>
-			<QueryClientProvider client={queryClient}>
-				{props.children}
-			</QueryClientProvider>
+			<DndProvider backend={HTML5Backend}>
+				<QueryClientProvider client={queryClient}>
+					{props.children}
+				</QueryClientProvider>
+			</DndProvider>
 		</SSRProvider>
 	)
 }
