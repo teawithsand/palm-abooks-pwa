@@ -126,7 +126,7 @@ const ActionsList = styled.div`
 export const AbookView = (props: { abook: Abook }) => {
 	const { abook } = props
 	const { metadata } = abook
-	const { abookEditMetadataPath } = useAppPaths()
+	const { abookEditMetadataPath,  abookDeletePath } = useAppPaths()
 	const { coverUrl, musicEntries, duration } = useAbookShowData(abook)
 
 	return (
@@ -146,9 +146,11 @@ export const AbookView = (props: { abook: Abook }) => {
 					<LinkContainer to={abookEditMetadataPath(abook.id)}>
 						<Button href="#">Edit metadata</Button>
 					</LinkContainer>
+					<LinkContainer to={abookDeletePath(abook.id)}>
 					<Button href="#" variant="danger" onClick={() => {}}>
 						Delete
 					</Button>
+					</LinkContainer>
 				</ActionsList>
 			</Header>
 			<AbookFileList entries={abook.entries} />

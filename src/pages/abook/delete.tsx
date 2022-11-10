@@ -1,4 +1,4 @@
-import { AbookMetadataEdit } from "@app/components/abook/edit/AbookMetadataEdit"
+import { AbookDelete } from "@app/components/abook/edit/AbookDelete"
 import { PageContainer } from "@app/components/PageContainer"
 import { useAbookId } from "@app/components/util/useAbookId"
 import { useAppManager } from "@app/domain/managers/app"
@@ -19,7 +19,7 @@ const InnerPage = () => {
 	})
 
 	return (
-		<AbookMetadataEdit
+		<AbookDelete
 			abook={
 				result.data ?? throwExpression(new Error(`Unreachable code`))
 			}
@@ -27,11 +27,11 @@ const InnerPage = () => {
 	)
 }
 
-const EditAbookMetadataPage = () => {
+const DeleteAbookPage = () => {
 	return (
 		<PageContainer
 			options={{
-				title: "Abook edition",
+				title: "Abook delete",
 			}}
 		>
 			<InnerPage />
@@ -39,4 +39,4 @@ const EditAbookMetadataPage = () => {
 	)
 }
 
-export default EditAbookMetadataPage
+export default DeleteAbookPage

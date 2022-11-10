@@ -11,6 +11,7 @@ export interface AppPaths extends Paths {
 	abookManagementPath: string
 	abookShowPath: (id: string) => string
 	abookEditMetadataPath: (id: string) => string
+	abookDeletePath: (id: string) => string
 	playerPath: string
 }
 
@@ -24,6 +25,9 @@ const paths: AppPaths = {
 	},
 	abookEditMetadataPath: (id: string) => {
 		return `/abook/edit-metadata?id=${encodeURIComponent(id)}`
+	},
+	abookDeletePath: (id: string) => {
+		return `/abook/delete?id=${encodeURIComponent(id)}`
 	},
 	abookManagementPath: "/store/abook",
 	playerPath: "/player",
