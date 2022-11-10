@@ -1,3 +1,4 @@
+import { Footer } from "@app/components/Footer"
 import { Navbar } from "@app/components/Navbar"
 import {
 	DialogBoundary,
@@ -14,6 +15,7 @@ const PageBody = (props: { children?: ReactNode }) => {
 		<>
 			<Navbar />
 			{props.children}
+			<Footer />
 		</>
 	)
 }

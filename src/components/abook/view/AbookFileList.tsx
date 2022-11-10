@@ -22,6 +22,7 @@ const Item = styled.div`
 export const AbookFileList = (props: {
 	entries: FileEntry[]
 	onEntriesReorder?: undefined | ((newEntries: FileEntry[]) => void)
+	onEntryDeleteConfirmed?: (e: FileEntry, i: number) => void
 }) => {
 	const { entries, onEntriesReorder } = props
 

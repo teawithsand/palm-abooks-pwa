@@ -1,4 +1,4 @@
-import { AbookView } from "@app/components/abook/view/AbookView"
+import { AbookMetadataEdit } from "@app/components/abook/edit/AbookMetadataEdit"
 import { PageContainer } from "@app/components/PageContainer"
 import { useAbookId } from "@app/components/util/useAbookId"
 import { useAppManager } from "@app/domain/managers/app"
@@ -19,7 +19,7 @@ const InnerPage = () => {
 	})
 
 	return (
-		<AbookView
+		<AbookMetadataEdit
 			abook={
 				result.data ?? throwExpression(new Error(`Unreachable code`))
 			}
@@ -27,7 +27,7 @@ const InnerPage = () => {
 	)
 }
 
-const ShowAbookPage = () => {
+const EditAbookMetadataPage = () => {
 	return (
 		<PageContainer
 			options={{
@@ -39,4 +39,4 @@ const ShowAbookPage = () => {
 	)
 }
 
-export default ShowAbookPage
+export default EditAbookMetadataPage

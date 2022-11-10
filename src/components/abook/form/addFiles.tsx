@@ -1,36 +1,24 @@
 import { FilesFinalField } from "@app/components/util/FilesFinalField"
-import {
-	AbookFormMetadataFields,
-	AbookMetadataFormData,
-} from "@app/components/abook/form/editMetadata"
 import arrayMutators from "final-form-arrays"
 import React, { useMemo } from "react"
 import { Button, Form } from "react-bootstrap"
 import { Form as FinalForm } from "react-final-form"
 
-export type AbookFormCreateData = {
+export type AbookFormAddFilesData = {
 	files: File[]
-} & AbookMetadataFormData
+}
 
-export const AbookFormCreate = (props: {
-	initialData?: AbookFormCreateData
-	onSubmit: (data: AbookFormCreateData) => Promise<void>
+export const AbookFormAddFiles = (props: {
+	onSubmit: (data: AbookFormAddFilesData) => Promise<void>
 }) => {
-	const initialValues: AbookFormCreateData = useMemo(
+	const initialValues: AbookFormAddFilesData = useMemo(
 		() => ({
-			description: "",
-			title: "",
-			author: "",
-
-			...(props.initialData ?? {}),
-			// files should be unset always, as they are problematic when it comes to file field.
-			// Aside from that: for now there is no good reason for passing any files here
 			files: [],
 		}),
-		[props.initialData]
+		[]
 	)
 	return (
-		<FinalForm<AbookFormCreateData>
+		<FinalForm<AbookFormAddFilesData>
 			onSubmit={(values: any) =>
 				props.onSubmit({
 					...values,
@@ -42,7 +30,6 @@ export const AbookFormCreate = (props: {
 			initialValues={initialValues}
 			render={({ handleSubmit, submitting, pristine }) => (
 				<Form onSubmit={handleSubmit}>
-					<AbookFormMetadataFields />
 					<FilesFinalField name="files" />
 
 					<Button
