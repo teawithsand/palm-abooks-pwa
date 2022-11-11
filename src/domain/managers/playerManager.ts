@@ -10,6 +10,7 @@ import {
 	DefaultStickyEventBus,
 	MediaSessionApiHelper,
 	MediaSessionEventType,
+	StickyEventBus,
 	StickySubscribable,
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
@@ -38,9 +39,9 @@ const emptySourceProvider = new MapPlayerSourceProvider<PlayableEntry>(
 export class PlayerManager {
 	private readonly innerPlayerConfigBus =
 		new DefaultStickyEventBus<PlayerManagerConfig>({
-			isPlayingWhenReady: false,
+			isPlayingWhenReady: true,
 			preservePitchForSpeed: false,
-			speed: 1,
+			speed: 1.3,
 			userVolume: 1,
 		})
 
@@ -49,23 +50,26 @@ export class PlayerManager {
 	}
 
 	private readonly mediaSessionManager = MediaSessionApiHelper.instance
-	private readonly player = new Player<PlayableEntry, string>(
-		new MapPlayerSourceProvider<PlayableEntry>([], (s) => s.id),
-		new PlayableEntryPlayerSourceResolver(this.db)
-	)
+	private readonly player: Player<PlayableEntry, string>
 
-	private readonly innerPlayerStateBus =
-		new DefaultStickyEventBus<PlayerManagerState>({
-			config: this.innerPlayerConfigBus.lastEvent,
-			innerState: this.player.stateBus.lastEvent,
-			sources: [],
-		})
+	private readonly innerPlayerStateBus: StickyEventBus<PlayerManagerState>
 
 	public get playerStateBus(): StickySubscribable<PlayerManagerState> {
 		return this.innerPlayerStateBus
 	}
 
-	constructor(private readonly db: AbookDb) {
+	constructor(db: AbookDb) {
+		this.player = new Player<PlayableEntry, string>(
+			new MapPlayerSourceProvider<PlayableEntry>([], (s) => s.id),
+			new PlayableEntryPlayerSourceResolver(db)
+		)
+		this.innerPlayerStateBus =
+			new DefaultStickyEventBus<PlayerManagerState>({
+				config: this.innerPlayerConfigBus.lastEvent,
+				innerState: this.player.stateBus.lastEvent,
+				sources: [],
+			})
+
 		this.mediaSessionManager.setSupportedActions(["play", "pause"])
 		this.mediaSessionManager.eventBus.addSubscriber((event) => {
 			if (event.type === MediaSessionEventType.PAUSE) {
@@ -92,7 +96,7 @@ export class PlayerManager {
 		this.player.stateBus.addSubscriber((state) => {
 			this.mediaSessionManager.setPositionState({
 				duration: state.duration,
-				playbackRate: state.config.speed,
+				playbackRate: state.config.speed || 1, // TODO(teawithsand): debug why during init it can be zero
 				position: state.position ?? 0,
 			})
 
@@ -113,22 +117,37 @@ export class PlayerManager {
 			)
 		})
 
-		this.innerPlayerConfigBus.addSubscriber((config) => {
+		const syncConfigToPlayer = (config: PlayerManagerConfig) => {
 			this.player.mutateConfig((draft) => {
 				draft.isPlayingWhenReady = config.isPlayingWhenReady
 				draft.speed = config.speed
 				draft.volume = config.userVolume
 				draft.preservePitchForSpeed = config.preservePitchForSpeed
 			})
+		}
+
+		this.innerPlayerConfigBus.addSubscriber((config) => {
+			syncConfigToPlayer(config)
+		})
+		syncConfigToPlayer(this.innerPlayerConfigBus.lastEvent)
+
+		this.player.stateBus.addSubscriber((state) => {
+			const element = (this.player as any).element
+			element.muted = false
+			element.volume = 1
+			console.log(element)
+
+			const { playerError, sourceError } = state
+			if (playerError || sourceError)
+				console.error("player errors", { playerError, sourceError })
+			console.log("state", state)
 		})
 	}
 
 	setSources = (sources: PlayableEntry[]) => {
+		this.player.setSourceProvider(emptySourceProvider)
+
 		if (sources.length === 0) {
-			this.player.setSourceProvider(emptySourceProvider)
-			this.player.mutateConfig((draft) => {
-				draft.currentSourceKey = null
-			})
 		} else {
 			const src = new MapPlayerSourceProvider(sources, (s) => s.id)
 			this.player.setSourceProvider(src)

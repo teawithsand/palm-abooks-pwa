@@ -64,7 +64,7 @@ export class FileEntryPlayerSourceResolver extends BasePlayerSourceResolver<File
 }
 
 export class PlayableEntryPlayerSourceResolver extends BasePlayerSourceResolver<PlayableEntry> {
-	constructor(public readonly database: AbookDb) {
+	constructor(private readonly database: AbookDb) {
 		super()
 	}
 

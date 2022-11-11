@@ -1,5 +1,5 @@
 import { Abook } from "@app/domain/defines/abook"
-import { FileEntry, FileEntryDisposition } from "@app/domain/defines/abookFile"
+import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 import {
 	PlayableEntry,
 	PlayableEntryType,
