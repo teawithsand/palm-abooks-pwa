@@ -19,7 +19,7 @@ export enum FileEntryDisposition {
 }
 
 export type FileEntryMetadata = {
-	name: string
+	name: string // file name or something like that
 	size: number // negative if not known
 	mime: string // empty if not known
 
