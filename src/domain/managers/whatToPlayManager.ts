@@ -1,23 +1,46 @@
 import { Abook } from "@app/domain/defines/abook"
-import { FileEntry } from "@app/domain/defines/abookFile"
-import { DefaultStickyEventBus, StickySubscribable } from "@teawithsand/tws-stl"
+import { FileEntry, FileEntryDisposition } from "@app/domain/defines/abookFile"
+import {
+	PlayableEntry,
+	PlayableEntryType,
+} from "@app/domain/defines/player/playableEntry"
+import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
+import { getFileEntryDisposition } from "@app/domain/storage/disposition"
+import { MetadataBag } from "@teawithsand/tws-player"
+import {
+	DefaultEventBus,
+	DefaultStickyEventBus,
+	StickySubscribable,
+} from "@teawithsand/tws-stl"
+import { Unsubscribe } from "final-form"
+import produce from "immer"
 
 export enum WhatToPlayDataType {
 	ABOOK = 1,
 	USER_PROVIDED_ENTRIES = 2,
 }
 
-export type WhatToPlayData =
+export type WhatToPlayData = {
+	entries: PlayableEntry[]
+	metadata: MetadataBag
+} & (
 	| {
 			type: WhatToPlayDataType.ABOOK
 			abook: Abook
 	  }
 	| {
 			type: WhatToPlayDataType.USER_PROVIDED_ENTRIES
-			entires: FileEntry[]
+			userProvidedEntries: PlayableEntry[]
 	  }
+)
 
 export class WhatToPlayManager {
+	// TODO(teawithsand): make this manager responsible for metadata loading + storing
+	//  once it was loaded for abook or some other target
+	//  for now storing can be omitted as we load metadata while adding files
+
+	constructor(private readonly metadataHelper: MetadataLoadHelper) {}
+
 	private innerBus: DefaultStickyEventBus<WhatToPlayData | null> =
 		new DefaultStickyEventBus(null)
 
@@ -25,16 +48,65 @@ export class WhatToPlayManager {
 		return this.innerBus
 	}
 
+	private currentWhatToPlayDataTemplate: WhatToPlayData | null = null
+
+	private cancelBus = new DefaultEventBus<undefined>()
+
 	unset = () => {
+		this.currentWhatToPlayDataTemplate = null
 		this.innerBus.emitEvent(null)
 	}
 
-	setAbook = (abook: Abook) => {
-		this.innerBus.emitEvent({
-			type: WhatToPlayDataType.ABOOK,
-			abook,
+	private setTemplate = (data: WhatToPlayData) => {
+		this.currentWhatToPlayDataTemplate = data
+
+		const loading = this.metadataHelper.makeLoading(data.entries)
+		data.metadata = loading.bus.lastEvent.bag
+
+		this.innerBus.emitEvent(this.currentWhatToPlayDataTemplate)
+		let cancelled = false
+
+		// TODO(teawithsand): implement cancelling if source gets changed
+		loading.bus.addSubscriber((state) => {
+			if (cancelled) return
+			if (this.currentWhatToPlayDataTemplate === data) {
+				this.innerBus.emitEvent(
+					produce(this.currentWhatToPlayDataTemplate, (draft) => {
+						draft.metadata = state.bag
+					})
+				)
+			}
+		})
+
+		let cancelSub: Unsubscribe | null = null
+		cancelSub = this.cancelBus.addSubscriber(() => {
+			loading.cancel()
+			cancelled = true
+			if (cancelSub) {
+				cancelSub()
+				cancelSub = null
+			}
 		})
 	}
 
-	constructor() {}
+	setAbook = (abook: Abook) => {
+		this.cancelBus.emitEvent(undefined)
+
+		const musicEntries = abook.entries.filter(
+			(e) => getFileEntryDisposition(e) === FileEntryDisposition.MUSIC
+		)
+
+		this.setTemplate({
+			type: WhatToPlayDataType.ABOOK,
+			abook,
+			metadata: new MetadataBag(
+				musicEntries.map((e) => e.metadata.musicMetadata)
+			),
+			entries: musicEntries.map((e) => ({
+				type: PlayableEntryType.FILE_ENTRY,
+				entry: e,
+				id: e.id,
+			})),
+		})
+	}
 }

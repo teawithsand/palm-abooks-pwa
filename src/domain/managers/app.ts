@@ -1,16 +1,8 @@
-import { FileEntry } from "@app/domain/defines/abookFile"
-import { FileEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
-import {
-	WhatToPlayDataType,
-	WhatToPlayManager,
-} from "@app/domain/managers/whatToPlayManager"
+import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
+import { PlayerManager } from "@app/domain/managers/playerManager"
+import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
+import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
 import { AbookDb } from "@app/domain/storage/db"
-import { MapPlayerSourceProvider, Player } from "@teawithsand/tws-player"
-
-const emptySourceProvider = new MapPlayerSourceProvider<FileEntry>(
-	[],
-	(s) => s.id
-)
 
 export class AppManager {
 	/**
@@ -19,24 +11,18 @@ export class AppManager {
 	 */
 	public static readonly instance: AppManager = new AppManager()
 
-	public readonly whatToPlayManager = new WhatToPlayManager()
 	public readonly abookDb: AbookDb = new AbookDb()
-	public readonly player = new Player(
-		new MapPlayerSourceProvider<FileEntry>([], (s) => s.id),
-		new FileEntryPlayerSourceResolver(this.abookDb)
+	public readonly whatToPlayManager = new WhatToPlayManager(
+		new MetadataLoadHelper(
+			new PlayableEntryPlayerSourceResolver(this.abookDb)
+		)
 	)
+
+	public readonly playerManager = new PlayerManager(this.abookDb)
 
 	private constructor() {
 		this.whatToPlayManager.bus.addSubscriber((data) => {
-			if (!data) {
-				this.player.setSourceProvider(emptySourceProvider)
-			} else if (data.type === WhatToPlayDataType.ABOOK) {
-				this.player.setSourceProvider(
-					new MapPlayerSourceProvider(data.abook.entries, (s) => s.id)
-				)
-			} else if (data.type === WhatToPlayDataType.USER_PROVIDED_ENTRIES) {
-				throw new Error("NIY")
-			}
+			this.playerManager.setSources(data?.entries ?? [])
 		})
 	}
 }
