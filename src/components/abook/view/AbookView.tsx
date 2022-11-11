@@ -2,10 +2,12 @@ import { AbookFormAddFiles } from "@app/components/abook/form/addFiles"
 import { AbookFileList } from "@app/components/abook/view/AbookFileList"
 import { Abook } from "@app/domain/defines/abook"
 import { useAbookShowData } from "@app/domain/defines/abookShowData"
+import { useAppManager } from "@app/domain/managers/app"
 import { useAppPaths } from "@app/paths"
 import { LinkContainer } from "@app/util/LinkContainer"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import { breakpointMediaDown, BREAKPOINT_SM } from "@teawithsand/tws-stl-react"
+import { navigate } from "gatsby"
 import React from "react"
 import { Button } from "react-bootstrap"
 import styled from "styled-components"
@@ -126,8 +128,9 @@ const ActionsList = styled.div`
 export const AbookView = (props: { abook: Abook }) => {
 	const { abook } = props
 	const { metadata } = abook
-	const { abookEditMetadataPath,  abookDeletePath } = useAppPaths()
+	const { abookEditMetadataPath, abookDeletePath, playerPath } = useAppPaths()
 	const { coverUrl, musicEntries, duration } = useAbookShowData(abook)
+	const app = useAppManager()
 
 	return (
 		<Grid>
@@ -146,10 +149,19 @@ export const AbookView = (props: { abook: Abook }) => {
 					<LinkContainer to={abookEditMetadataPath(abook.id)}>
 						<Button href="#">Edit metadata</Button>
 					</LinkContainer>
-					<LinkContainer to={abookDeletePath(abook.id)}>
-					<Button href="#" variant="danger" onClick={() => {}}>
-						Delete
+					<Button
+						variant="success"
+						onClick={() => {
+							app.whatToPlayManager.setAbook(abook)
+							navigate(playerPath)
+						}}
+					>
+						Play
 					</Button>
+					<LinkContainer to={abookDeletePath(abook.id)}>
+						<Button href="#" variant="danger" onClick={() => {}}>
+							Delete
+						</Button>
 					</LinkContainer>
 				</ActionsList>
 			</Header>
