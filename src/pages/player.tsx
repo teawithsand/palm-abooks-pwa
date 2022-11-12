@@ -1,8 +1,6 @@
 import { PageContainer } from "@app/components/PageContainer"
-import {
-	PlayerEntriesDisplay,
-	usePlayerEntriesDisplayData,
-} from "@app/components/player/PlayerEntriesDisplay"
+import { PlayerEntriesList } from "@app/components/player/list/PlayerEntriesList"
+import { usePlayerEntriesDisplayData } from "@app/components/player/list/types"
 import { useAppManager } from "@app/domain/managers/app"
 import { useStickySubscribable } from "@teawithsand/tws-stl-react"
 import React from "react"
@@ -13,13 +11,16 @@ const PlayerPage = () => {
 
 	const playerEntriesDisplayData = usePlayerEntriesDisplayData()
 	return (
-		<PageContainer>
-			<div>Player stuff goes here</div>
-			<div>
-				{playerEntriesDisplayData ? (
-					<PlayerEntriesDisplay {...playerEntriesDisplayData} />
-				) : "Nothing to play :("}
-			</div>
+		<PageContainer
+			options={{
+				title: "",
+			}}
+		>
+			{playerEntriesDisplayData ? (
+				<PlayerEntriesList {...playerEntriesDisplayData} />
+			) : (
+				"Nothing to play :("
+			)}
 		</PageContainer>
 	)
 }
