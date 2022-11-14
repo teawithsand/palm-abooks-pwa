@@ -1,7 +1,11 @@
 import { PlayableEntry } from "@app/domain/defines/player/playableEntry"
 import { useAppManager } from "@app/domain/managers/app"
+import { PlayableEntriesBag } from "@app/domain/managers/playableEntriesBag"
 import { PlayerManagerState } from "@app/domain/managers/playerManager"
-import { WhatToPlayData } from "@app/domain/managers/whatToPlayManager"
+import {
+	WhatToPlayData,
+	WhatToPlayDataType,
+} from "@app/domain/managers/whatToPlayManager"
 import { useValidValue } from "@app/util/useBoolMemo"
 import {
 	MetadataBag,
@@ -53,22 +57,28 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 	const playerManagerState = useStickySubscribable(
 		app.playerManager.playerStateBus
 	)
-	const whatToPlayData = useStickySubscribable(app.whatToPlayManager.bus)
+	// This bypass with ?? is required, since we want to use react hook
+	// but wy can't inject early return, which would cause calling less of them in other render call
+	const whatToPlayData: WhatToPlayData = useStickySubscribable(
+		app.whatToPlayManager.bus
+	) ?? {
+		type: WhatToPlayDataType.USER_PROVIDED_ENTRIES,
+		entriesBag: new PlayableEntriesBag([]),
+		metadata: new MetadataBag([]),
+		userProvidedEntries: [],
+		entries: [],
+	}
 
 	const lastValidPositionRef = useRef<UiPlayerPositionData | null>(null)
-
-	if (!whatToPlayData || whatToPlayData.entriesBag.length === 0) return null
 
 	const provider = playerManagerState.innerState.config.sourceProvider
 	const currentEntryId = playerManagerState.innerState.config.sourceKey
 	const currentEntryIndex = useMemo(
 		() =>
 			currentEntryId !== null
-				? whatToPlayData.entries.findIndex(
-						(e) => e.id === currentEntryId
-				  )
+				? whatToPlayData?.entriesBag?.findIndexById(currentEntryId)
 				: null,
-		[currentEntryId, whatToPlayData.entries]
+		[currentEntryId, whatToPlayData?.entriesBag]
 	)
 
 	const nextSourceId = useMemo(
@@ -81,17 +91,20 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 		[provider, currentEntryId]
 	)
 
-	if (currentEntryIndex === null || currentEntryIndex < 0) return null
-
 	const currentMetadataEntry = (() => {
-		const r = whatToPlayData.metadata.getResult(currentEntryIndex)
+		const r =
+			currentEntryIndex !== null
+				? whatToPlayData.metadata.getResult(currentEntryIndex)
+				: null
 		if (!r || r.type !== MetadataLoadingResultType.OK) return null
 
 		return r.metadata
 	})()
 
 	const globalPositionUpToCurrentEntry = useMemo(() => {
-		return whatToPlayData.metadata.getDurationToIndex(currentEntryIndex)
+		return currentEntryIndex !== null
+			? whatToPlayData.metadata.getDurationToIndex(currentEntryIndex)
+			: null
 	}, [whatToPlayData.metadata, currentEntryIndex])
 
 	const currentGlobalDuration = useMemo(() => {
@@ -101,6 +114,15 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 			true
 		)
 	}, [whatToPlayData.metadata])
+
+	if (
+		currentEntryIndex === null ||
+		currentEntryIndex === undefined ||
+		currentEntryIndex < 0 ||
+		!whatToPlayData ||
+		whatToPlayData.entriesBag.length === 0
+	)
+		return null
 
 	const currentPosition: UiPlayerPositionData = {
 		currentEntryId,
