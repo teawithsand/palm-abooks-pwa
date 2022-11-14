@@ -3,6 +3,8 @@
         "abooks",
         "Dexie",
         "immer",
+        "localforage",
+        "LOCALSTORAGE",
         "Millis",
         "tanstack"
     ]

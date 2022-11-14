@@ -1,3 +1,4 @@
+import { ConfigManager } from "@app/domain/managers/config"
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import { PlayerManager } from "@app/domain/managers/playerManager"
@@ -19,6 +20,7 @@ export class AppManager {
 		)
 	)
 
+	public readonly configManager = new ConfigManager()
 	public readonly playerManager = new PlayerManager(this.abookDb)
 	public readonly playerActionsManager = new PlayerActionManager(
 		this.playerManager,
@@ -27,7 +29,7 @@ export class AppManager {
 
 	private constructor() {
 		this.whatToPlayManager.bus.addSubscriber((data) => {
-			this.playerManager.setSources(data?.entries ?? [])
+			this.playerManager.setSources(data?.entriesBag.entries ?? [])
 		})
 	}
 }
