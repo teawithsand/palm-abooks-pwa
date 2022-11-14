@@ -2359,6 +2359,11 @@
   resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.3.tgz#7d9df41090c71aacb55ba8b45e8c2f49757c25ec"
   integrity sha512-obdhU2z6Gs/okRMoHDxtCUmPY2SM8G0VY2DQp7dcXz11DjbsWp63vNbhBZy8SN8rtiwYjJmFx5rASvwIamEzTA==
 
+"@teawithsand/tws-stl@^0.0.4":
+  version "0.0.4"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.4.tgz#ae090f8a29e00e7fe660e66df1325f655d27c9f8"
+  integrity sha512-RiUKxhZFkXxudc0JqkKamwhNIrfAZly3tqSjgdV9ZQJ2ZTK2B8fC/BGfE2mE2jKif/hgiyJCGrjUNCPOLUiPJw==
+
 "@teawithsand/tws-trans@^0.0.2":
   version "0.0.2"
   resolved "http://verdaccio:4873/@teawithsand%2ftws-trans/-/tws-trans-0.0.2.tgz#ae3b9179f65228d6af7e65acffa3e17edff83c5b"
