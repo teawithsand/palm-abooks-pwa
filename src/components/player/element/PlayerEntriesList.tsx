@@ -1,5 +1,6 @@
-import { PlayerEntriesDisplayCallbacks, PlayerEntriesDisplayData } from "@app/components/player/list/types"
 import { PlayableEntryType } from "@app/domain/defines/player/playableEntry"
+import { useAppManager } from "@app/domain/managers/app"
+import { useUiPlayerData } from "@app/domain/ui/player"
 import { MetadataLoadingResultType } from "@teawithsand/tws-player"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import React from "react"
@@ -9,7 +10,7 @@ type RowAttrs = {
 	$isPlaying: boolean
 	$clickable: boolean
 }
-const Row = styled.tr.attrs<RowAttrs>(({ $isPlaying, $clickable }) => ({
+const Row = styled.li.attrs<RowAttrs>(({ $isPlaying, $clickable }) => ({
 	style: {
 		fontWeight: $isPlaying ? "bold" : "normal",
 		//backgroundColor: $isPlaying ? "rgba(rgb(51, 153, 255) 0.25)" : undefined,
@@ -78,30 +79,23 @@ const InvisibleInline = styled.span`
 `
 
 // TODO(teawithsand): make this list base for reordering files stuff in abook view
-export const PlayerEntriesList = (
-	props: PlayerEntriesDisplayData & PlayerEntriesDisplayCallbacks
-) => {
-	const { whatToPlayData, jumpToEntry, metadataBag, currentPosition } = props
+export const PlayerEntriesList = () => {
+	const ui = useUiPlayerData()
+	const actions = useAppManager().playerActionsManager
 
-	const onClickFactory = (i: number) => {
-		if (!jumpToEntry) return undefined
-
-		return () => {
-			jumpToEntry(whatToPlayData.entries[i].id)
-		}
-	}
+	if (!ui) return <List></List>
 
 	// TODO(teawithsand): make this more performant by adding intermediate level component for row
 	return (
 		<List>
-			{whatToPlayData.entries.map((entry, index) => {
+			{ui.entries.map((entry, index) => {
 				let name = `Entry #${entry.id}`
 
-				const isPlaying = entry.id === props.currentEntryId
+				const isPlaying = entry.id === ui.currentPosition.currentEntryId
 
 				let duration: number | null = null
 
-				const metadata = metadataBag.getResult(index)
+				const metadata = ui.metadataBag.getResult(index)
 				if (
 					metadata &&
 					metadata.type === MetadataLoadingResultType.OK &&
@@ -133,7 +127,7 @@ export const PlayerEntriesList = (
 				// Hack: calculate padding for these entries, so that we
 				// do not have to use grid or table to have numbers in list aligned
 				const padding = "0".repeat(
-					whatToPlayData.entries.length.toString().length -
+					ui.entries.length.toString().length -
 						(index + 1).toString().length
 				)
 
@@ -143,10 +137,10 @@ export const PlayerEntriesList = (
 					isPlaying &&
 					duration !== null &&
 					duration >= 0 &&
-					currentPosition !== null
+					ui.currentPosition.currentEntryPosition !== null
 				) {
 					bottomInfoProgress = `(${formatDurationSeconds(
-						currentPosition
+						ui.currentPosition.currentEntryPosition
 					)} / ${formatDurationSeconds(duration)})`
 				} else if (duration !== null && duration >= 0) {
 					bottomInfoProgress = `(${formatDurationSeconds(duration)})`
@@ -156,8 +150,10 @@ export const PlayerEntriesList = (
 					<Row
 						key={index}
 						$isPlaying={isPlaying}
-						onClick={onClickFactory(index)}
-						$clickable={!!jumpToEntry}
+						onClick={() => {
+							actions.jump(entry.id)
+						}}
+						$clickable={true}
 					>
 						<OrdinalNumber>
 							<span>

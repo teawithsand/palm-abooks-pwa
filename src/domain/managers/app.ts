@@ -1,4 +1,5 @@
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
+import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import { PlayerManager } from "@app/domain/managers/playerManager"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
@@ -19,6 +20,10 @@ export class AppManager {
 	)
 
 	public readonly playerManager = new PlayerManager(this.abookDb)
+	public readonly playerActionsManager = new PlayerActionManager(
+		this.playerManager,
+		this.whatToPlayManager
+	)
 
 	private constructor() {
 		this.whatToPlayManager.bus.addSubscriber((data) => {

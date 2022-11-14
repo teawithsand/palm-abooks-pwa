@@ -5,6 +5,7 @@ import {
 	PlayableEntryType,
 } from "@app/domain/defines/player/playableEntry"
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
+import { PlayableEntriesBag } from "@app/domain/managers/playableEntriesBag"
 import { getFileEntryDisposition } from "@app/domain/storage/disposition"
 import { MetadataBag } from "@teawithsand/tws-player"
 import {
@@ -21,7 +22,11 @@ export enum WhatToPlayDataType {
 }
 
 export type WhatToPlayData = {
+	/**
+	 * @deprecated use entries bag instead
+	 */
 	entries: PlayableEntry[]
+	entriesBag: PlayableEntriesBag
 	metadata: MetadataBag
 } & (
 	| {
@@ -96,17 +101,20 @@ export class WhatToPlayManager {
 			(e) => getFileEntryDisposition(e) === FileEntryDisposition.MUSIC
 		)
 
+		const entries: PlayableEntry[] = musicEntries.map((e) => ({
+			type: PlayableEntryType.FILE_ENTRY,
+			entry: e,
+			id: e.id,
+		}))
+
 		this.setTemplate({
 			type: WhatToPlayDataType.ABOOK,
 			abook,
 			metadata: new MetadataBag(
 				musicEntries.map((e) => e.metadata.musicMetadata)
 			),
-			entries: musicEntries.map((e) => ({
-				type: PlayableEntryType.FILE_ENTRY,
-				entry: e,
-				id: e.id,
-			})),
+			entries,
+			entriesBag: new PlayableEntriesBag(entries),
 		})
 	}
 }
