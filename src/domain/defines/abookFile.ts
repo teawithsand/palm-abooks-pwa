@@ -1,7 +1,5 @@
 import { useAppManager } from "@app/domain/managers/app"
-import { useQuery } from "@tanstack/react-query"
 import { MetadataLoadingResult } from "@teawithsand/tws-player"
-import { generateUUID } from "@teawithsand/tws-stl"
 import { useEffect, useState } from "react"
 
 export type FileEntryId = string
@@ -19,9 +17,13 @@ export enum FileEntryDisposition {
 }
 
 export type FileEntryMetadata = {
-	name: string // file name or something like that
-	size: number // negative if not known
-	mime: string // empty if not known
+	/**
+	 * File name or something like that. Does not have to be unique(although it should).
+	 * Has to identify file for user.
+	 */
+	name: string
+	size: number | null // null if not known
+	mime: string | null // null or empty if not known
 
 	disposition: FileEntryDisposition | null // used to override guessed disposition from mime
 

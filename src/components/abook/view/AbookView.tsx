@@ -1,6 +1,7 @@
 import { AbookFormAddFiles } from "@app/components/abook/form/addFiles"
 import { AbookFileList } from "@app/components/abook/view/AbookFileList"
 import { Abook } from "@app/domain/defines/abook"
+import { FileEntry } from "@app/domain/defines/abookFile"
 import { useAbookShowData } from "@app/domain/defines/abookShowData"
 import { useAppManager } from "@app/domain/managers/app"
 import { useAppPaths } from "@app/paths"
@@ -8,7 +9,7 @@ import { LinkContainer } from "@app/util/LinkContainer"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import { breakpointMediaDown, BREAKPOINT_SM } from "@teawithsand/tws-stl-react"
 import { navigate } from "gatsby"
-import React from "react"
+import React, { useState } from "react"
 import { Button } from "react-bootstrap"
 import styled from "styled-components"
 
@@ -121,14 +122,22 @@ const ActionsList = styled.div`
 	gap: 1em;
 
 	& > * {
-		flex: 1 1 0;
+		flex: 0 1 32%;
 	}
 `
 
-export const AbookView = (props: { abook: Abook }) => {
+export const AbookView = (props: {
+	abook: Abook
+	onEntriesReorder?: (newEntries: FileEntry[]) => void
+}) => {
 	const { abook } = props
 	const { metadata } = abook
-	const { abookEditMetadataPath, abookDeletePath, playerPath } = useAppPaths()
+	const {
+		abookEditMetadataPath,
+		abookDeletePath,
+		abookReorderEntriesPath,
+		playerPath,
+	} = useAppPaths()
 	const { coverUrl, musicEntries, duration } = useAbookShowData(abook)
 	const app = useAppManager()
 
@@ -162,6 +171,9 @@ export const AbookView = (props: { abook: Abook }) => {
 						<Button href="#" variant="danger" onClick={() => {}}>
 							Delete
 						</Button>
+					</LinkContainer>
+					<LinkContainer to={abookReorderEntriesPath(abook.id)}>
+						<Button href="#">Reorder entries</Button>
 					</LinkContainer>
 				</ActionsList>
 			</Header>

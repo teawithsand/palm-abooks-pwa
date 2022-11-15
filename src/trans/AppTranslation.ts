@@ -1,3 +1,4 @@
+import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 import AppTranslationEN_US from "@app/trans/AppTranslationEN_US"
 import {
 	createTranslatorContext,
@@ -14,6 +15,9 @@ export interface AppTranslation {
 	info: CommonTranslationInfo
 	error: {
 		unknown: string
+	}
+	abook: {
+		formatFileEntryDisposition: (disposition: FileEntryDisposition) => string
 	}
 	navbar: {
 		pageTitle: string
