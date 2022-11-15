@@ -2333,13 +2333,13 @@
     "@svgr/webpack" "^6.5.1"
     tsconfig-paths-webpack-plugin "^3.5.2"
 
-"@teawithsand/tws-player@^0.0.8":
-  version "0.0.8"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.0.8.tgz#497c45de6419283c93d316b2d21b38089e6bc589"
-  integrity sha512-AHs27u3GL1teTQAqCWFV8Ix3h1P+egHJ81iMvNHWCzae36BcCqJE57ihTGL1tQLrxMSMJysoZ+4LTTFTbGpDVw==
+"@teawithsand/tws-player@^0.0.9":
+  version "0.0.9"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.0.9.tgz#71e58f49e747f56b86f246fb7368917a9c558a42"
+  integrity sha512-gTYY2WPDfQYD9G6eJHp35A/AjLZ0p/ri/9zKDEd0wokSfuJGI8+WM0EbH3APrjXu0cHlAVCYERxG1fl1oqufzg==
   dependencies:
     "@teawithsand/jsmediatags" "^3.9.1008"
-    "@teawithsand/tws-stl" "^0.0.3"
+    "@teawithsand/tws-stl" "^0.0.4"
     immer "^9.0.15"
 
 "@teawithsand/tws-stl-react@^0.0.1":
@@ -2353,11 +2353,6 @@
   version "0.0.2"
   resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.2.tgz#b2ebeb854e67754cc6f9087c2015a8edf8857519"
   integrity sha512-H7JB1DAeczZOyj0aFSp7qE67E42KQNvsZH3nszzDwTR38LKtOS9cyshN3MKRZBUO5JsoV/a/cStvbhl2PIDV6Q==
-
-"@teawithsand/tws-stl@^0.0.3":
-  version "0.0.3"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.3.tgz#7d9df41090c71aacb55ba8b45e8c2f49757c25ec"
-  integrity sha512-obdhU2z6Gs/okRMoHDxtCUmPY2SM8G0VY2DQp7dcXz11DjbsWp63vNbhBZy8SN8rtiwYjJmFx5rASvwIamEzTA==
 
 "@teawithsand/tws-stl@^0.0.4":
   version "0.0.4"

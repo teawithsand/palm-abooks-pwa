@@ -5,6 +5,7 @@ import {
 	MapPlayerSourceProvider,
 	Player,
 	PlayerConfig,
+	PlayerConfigFileEndHandlingMode,
 	PlayerState,
 } from "@teawithsand/tws-player"
 import {
