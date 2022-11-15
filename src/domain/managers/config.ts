@@ -8,6 +8,7 @@ import {
 	MutexLockAdapter,
 	StickyEventBus,
 } from "@teawithsand/tws-stl"
+import produce, { Draft } from "immer"
 import localforage, { LOCALSTORAGE } from "localforage"
 
 const globalPlayerConfigKey = "global-player-config"
@@ -116,5 +117,20 @@ export class ConfigManager {
 		})
 	}
 
+	/**
+	 * Requests immediate save of all configs.
+	 */
 	saveConfigs = async () => await this.configSynchronizer()
+
+	/**
+	 * Requests GlobalPlayerConfig update in atomic manner.
+	 * It should be automatically saved ASAP.
+	 */
+	updateGlobalPlayerConfig = (
+		mutator: (draft: Draft<GlobalPlayerConfig>) => void
+	) => {
+		this.globalPlayerConfigBus.emitEvent(
+			produce(this.globalPlayerConfigBus.lastEvent, mutator)
+		)
+	}
 }
