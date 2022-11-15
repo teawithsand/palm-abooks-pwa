@@ -2,7 +2,6 @@ import { PlayerManager } from "@app/domain/managers/playerManager"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
 import { isTimeNumber } from "@teawithsand/tws-player"
 import {
-	formatDurationSeconds,
 	MediaSessionApiHelper,
 	MediaSessionEventType,
 	throwExpression,
@@ -145,8 +144,16 @@ export class PlayerActionManager {
 				.sourceProvider
 
 		this.playerManager.mutateConfig((draft) => {
-			draft.sourceKey = provider.getPrevSourceKey(draft.sourceKey)
-			draft.seekPosition = null
+			const prevFileKey = provider.getPrevSourceKey(draft.sourceKey)
+
+			// TODO(teawithsand): instead consider using behavior provided by sourceProvider.
+			// maybe seek to position zero if PSK is equal to CSK
+			if (prevFileKey) {
+				draft.sourceKey = prevFileKey
+				draft.seekPosition = null
+			} else {
+				draft.seekPosition = 0 
+			}
 		})
 	}
 
