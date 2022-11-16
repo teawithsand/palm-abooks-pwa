@@ -1,9 +1,29 @@
 import React from "react"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
 type ParentProps = {
 	$spacing: string | undefined
 }
+
+export const strippedListStyles = (paddingTopBottom = "") => css`
+	> *:nth-child(2n) {
+		background-color: rgba(0, 0, 0, 0.125);
+	}
+
+	border: 1px solid rgba(0, 0, 0, 0.125);
+	border-radius: 5px;
+
+	> * {
+		padding-top: ${paddingTopBottom};
+		padding-bottom: ${paddingTopBottom};
+	}
+	> *:first-child {
+		padding-top: 0;
+	}
+	> *:last-child {
+		padding-bottom: 0;
+	}
+`
 
 const Parent = styled.ol<ParentProps>`
 	padding: 0;

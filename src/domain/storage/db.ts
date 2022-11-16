@@ -104,25 +104,48 @@ export class AbookWriteAccess {
 		})
 	}
 
-	dropFileEntry = async (idx: number) => {
-		const entry =
-			this.abook.entries[idx] ??
-			throwExpression(new Error(`No file entry with index ${idx}`))
+	dropFileEntries = async (...indexes: number[]) => {
+		const min = indexes.reduce((a, b) => Math.min(a, b))
+		const max = indexes.reduce((a, b) => Math.max(a, b))
+		if (min < 0 || max >= this.abook.entries.length)
+			throw new Error(
+				`No file entry with index ${max} or index ${min} < 0`
+			)
+
+		const indexSet = new Set(indexes)
+
+		const targetEntriesIdSet = new Set(
+			this.abook.entries
+				.filter((_, i) => !indexSet.has(i))
+				.map((v) => v.id)
+		)
+		const removedEntriesIdSet = this.abook.entries
+			.filter((v) => !targetEntriesIdSet.has(v.id))
+			.map((v) => v.id)
 
 		await this.db.transaction(
 			"rw?",
 			this.db.abooks,
 			this.db.internalFiles,
 			async () => {
-				if (entry.data.dataType === FileEntryType.INTERNAL_FILE) {
-					await this.db.internalFiles.delete(
-						entry.data.internalFileId
+				for (const id of removedEntriesIdSet) {
+					const entryIndex = this.abook.entries.findIndex(
+						(e) => e.id === id
 					)
-				}
+					if (entryIndex < 0) throw new Error("Unreachable code")
 
-				await this.innerUpdate((draft) => {
-					draft.entries.splice(idx, 1)
-				})
+					const entry = this.abook.entries[entryIndex]
+
+					if (entry.data.dataType === FileEntryType.INTERNAL_FILE) {
+						await this.db.internalFiles.delete(
+							entry.data.internalFileId
+						)
+					}
+
+					await this.innerUpdate((draft) => {
+						draft.entries.splice(entryIndex, 1)
+					})
+				}
 			}
 		)
 	}

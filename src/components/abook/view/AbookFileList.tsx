@@ -36,11 +36,14 @@ const OrdinalNumber = styled.div`
 	justify-items: center;
 	align-items: center;
 	padding-left: 0.3em;
+	padding-right: 0.3em;
 `
 
 const TopInfo = styled.div`
 	grid-row: 1;
 	grid-column: 2;
+
+	word-break: break-all;
 `
 
 const BottomInfo = styled.div`
@@ -116,6 +119,7 @@ export const AbookFileList = (props: {
 					const { item, index, isDragging, onRef } = props
 					return (
 						<AbookFileEntryDisplay
+							key={index}
 							onRef={onRef}
 							entry={item}
 							index={index}
@@ -131,6 +135,7 @@ export const AbookFileList = (props: {
 			<Parent>
 				{entries.map((item, index) => (
 					<AbookFileEntryDisplay
+						key={index}
 						entry={item}
 						index={index}
 						length={entries.length}

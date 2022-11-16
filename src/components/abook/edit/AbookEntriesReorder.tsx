@@ -23,7 +23,7 @@ const MyForm = styled(Form)`
 
 export const AbookEntriesReorder = (props: { abook: Abook }) => {
 	// TODO(teawithsand): prevent concurrent modification of same abook.
-	//  add some kind of barrier component, which utilizes weblocks
+	//  add some kind of barrier component, which utilizes web locks
 
 	const { abook } = props
 	const { abookShowPath } = useAppPaths()
@@ -40,7 +40,6 @@ export const AbookEntriesReorder = (props: { abook: Abook }) => {
 		<Grid>
 			<FinalForm
 				onSubmit={async (values: any) => {
-					console.log("Submitted that bitch")
 					if (
 						!reorderedEntries ||
 						reorderedEntries.length !== abook.entries.length

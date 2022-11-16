@@ -13,6 +13,8 @@ export interface AppPaths extends Paths {
 	abookEditMetadataPath: (id: string) => string
 	abookDeletePath: (id: string) => string
 	abookReorderEntriesPath: (id: string) => string
+	abookLocalEntriesAddPath: (id: string) => string
+	abookEntriesDeletePath: (id: string) => string
 
 	playerPath: string
 }
@@ -33,6 +35,12 @@ const paths: AppPaths = {
 	},
 	abookReorderEntriesPath: (id: string) => {
 		return `/abook/reorder-entries?id=${encodeURIComponent(id)}`
+	},
+	abookLocalEntriesAddPath: (id: string) => {
+		return `/abook/local-entries-add?id=${encodeURIComponent(id)}`
+	},
+	abookEntriesDeletePath: (id: string) => {
+		return `/abook/entries-delete?id=${encodeURIComponent(id)}`
 	},
 
 	abookManagementPath: "/store/abook",

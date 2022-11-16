@@ -1,3 +1,4 @@
+import { AbookLocalCreate } from "@app/components/abook/edit/AbookLocalCreate"
 import { AbookFormCreate } from "@app/components/abook/form/create"
 import { PageContainer } from "@app/components/PageContainer"
 import { Abook } from "@app/domain/defines/abook"
@@ -34,107 +35,7 @@ const AddLocalAbookPage = () => {
 				title: "Add Abook from local device",
 			}}
 		>
-			<AbookFormCreate
-				onSubmit={async (data) => {
-					const id = generateUUID()
-
-					// TODO(teawithsand): for sake of simplicity load metadata of music files eagerly
-					// it does not really matter if I do so for local files, as it's really fast for these
-
-					const loader = new DefaultMetadataLoader(
-						new FilePlayerSourceResolver()
-					)
-
-					const abook: Abook = {
-						id,
-						position: null,
-
-						metadata: {
-							addedAt: getNowTimestamp(),
-							authorName: data.author,
-							title: data.title,
-							description: data.description,
-							lastPlayedAt: 0 as TimestampMs,
-							publishedYear: 0,
-						},
-
-						entries: [],
-					}
-					const metadataMap: Map<number, MetadataLoadingResult> =
-						new Map()
-
-					let i = 0
-					for (const f of data.files) {
-						try {
-							if (
-								guessFileDisposition(f) !==
-								FileEntryDisposition.MUSIC
-							)
-								continue
-
-							let result: MetadataLoadingResult
-							try {
-								const metadata = await loader.loadMetadata(f)
-								result = {
-									type: MetadataLoadingResultType.OK,
-									metadata,
-								}
-							} catch (e) {
-								result = {
-									type: MetadataLoadingResultType.ERROR,
-									error: String(e) || "Unknown error",
-								}
-							}
-
-							metadataMap.set(i, result)
-						} finally {
-							i++
-						}
-					}
-
-					await app.abookDb.createAbook(abook)
-					const abookAccess = await app.abookDb.abookWriteAccess(
-						abook.id
-					)
-
-					try {
-						let i = 0
-						for (const f of data.files) {
-							try {
-								await abookAccess.addInternalFile(
-									f,
-									(draft, newFileId) => {
-										const entry: FileEntry = {
-											id: generateUUID(),
-											metadata: {
-												name: f.name,
-												mime: f.type,
-												size: f.size,
-												disposition: null, // this is for overrides, by default use dynamic disposition
-												musicMetadata:
-													metadataMap.get(i) ?? null,
-											},
-											data: {
-												dataType:
-													FileEntryType.INTERNAL_FILE,
-												internalFileId: newFileId,
-											},
-										}
-
-										draft.entries.push(entry)
-									}
-								)
-							} finally {
-								i++
-							}
-						}
-					} finally {
-						abookAccess.release()
-					}
-
-					navigate(abookShowPath(id))
-				}}
-			/>
+			<AbookLocalCreate />
 		</PageContainer>
 	)
 }

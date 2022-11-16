@@ -9,7 +9,7 @@ import { LinkContainer } from "@app/util/LinkContainer"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import { breakpointMediaDown, BREAKPOINT_SM } from "@teawithsand/tws-stl-react"
 import { navigate } from "gatsby"
-import React, { useState } from "react"
+import React from "react"
 import { Button } from "react-bootstrap"
 import styled from "styled-components"
 
@@ -122,7 +122,7 @@ const ActionsList = styled.div`
 	gap: 1em;
 
 	& > * {
-		flex: 0 1 32%;
+		flex: 1 1;
 	}
 `
 
@@ -136,6 +136,8 @@ export const AbookView = (props: {
 		abookEditMetadataPath,
 		abookDeletePath,
 		abookReorderEntriesPath,
+		abookLocalEntriesAddPath,
+		abookEntriesDeletePath,
 		playerPath,
 	} = useAppPaths()
 	const { coverUrl, musicEntries, duration } = useAbookShowData(abook)
@@ -173,7 +175,17 @@ export const AbookView = (props: {
 						</Button>
 					</LinkContainer>
 					<LinkContainer to={abookReorderEntriesPath(abook.id)}>
-						<Button href="#">Reorder entries</Button>
+						<Button href="#">Reorder files</Button>
+					</LinkContainer>
+					<LinkContainer to={abookLocalEntriesAddPath(abook.id)}>
+						<Button variant="success" href="#">
+							Add files from local machine
+						</Button>
+					</LinkContainer>
+					<LinkContainer to={abookEntriesDeletePath(abook.id)}>
+						<Button variant="danger" href="#">
+							Remove some entries
+						</Button>
 					</LinkContainer>
 				</ActionsList>
 			</Header>
