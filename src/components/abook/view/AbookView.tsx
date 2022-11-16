@@ -7,7 +7,7 @@ import { useAppManager } from "@app/domain/managers/app"
 import { useAppPaths } from "@app/paths"
 import { LinkContainer } from "@app/util/LinkContainer"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
-import { breakpointMediaDown, BREAKPOINT_SM } from "@teawithsand/tws-stl-react"
+import { breakpointMediaDown, BREAKPOINT_MD, BREAKPOINT_SM } from "@teawithsand/tws-stl-react"
 import { navigate } from "gatsby"
 import React from "react"
 import { Button } from "react-bootstrap"
@@ -122,7 +122,11 @@ const ActionsList = styled.div`
 	gap: 1em;
 
 	& > * {
-		flex: 1 1;
+		flex: 1 0 32%;
+
+		@media ${breakpointMediaDown(BREAKPOINT_MD)} {
+			flex: 1 0 100%;
+		}
 	}
 `
 
@@ -190,12 +194,6 @@ export const AbookView = (props: {
 				</ActionsList>
 			</Header>
 			<AbookFileList entries={abook.entries} />
-			<AbookFormAddFiles
-				onSubmit={async (d) => {
-					// + here invalidate react-query in order to trigger abook reload
-					// do nothing
-				}}
-			/>
 		</Grid>
 	)
 }
