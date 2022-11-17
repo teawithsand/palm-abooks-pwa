@@ -1,4 +1,6 @@
+import { useAppManager } from "@app/domain/managers/app"
 import { formatFileSize } from "@teawithsand/tws-stl"
+import { useStickySubscribable } from "@teawithsand/tws-stl-react"
 import React from "react"
 import { Button, Form, Table } from "react-bootstrap"
 import { Field as FinalField } from "react-final-form"
@@ -7,7 +9,7 @@ import { FieldArray } from "react-final-form-arrays"
 const abookFilesMimesAndExtensions = [
 	".mp3",
 	"audio/mpeg",
-	
+
 	".jpg",
 	".jpeg",
 	"image/jpeg",
@@ -21,6 +23,9 @@ const abookFilesMimesAndExtensions = [
 
 export const FilesFinalField = (props: { label?: string; name: string }) => {
 	const { name, label } = props
+	const app = useAppManager()
+	const stats = useStickySubscribable(app.storageSizeManager.storageStatsBus)
+
 	return (
 		<>
 			<Form.Group className="mb-3">
@@ -77,7 +82,6 @@ export const FilesFinalField = (props: { label?: string; name: string }) => {
 										<td>No.</td>
 										<td>Name</td>
 										<td>Size</td>
-										<td>Role</td>
 										<td>Operations</td>
 									</tr>
 								</thead>
@@ -87,7 +91,6 @@ export const FilesFinalField = (props: { label?: string; name: string }) => {
 											<td>{i + 1}</td>
 											<td>{f.name}</td>
 											<td>{formatFileSize(f.size)}</td>
-											<td>Audio</td>
 											<td>
 												<Button
 													variant="danger"
@@ -110,6 +113,15 @@ export const FilesFinalField = (props: { label?: string; name: string }) => {
 										.reduce((pv, cv) => pv + cv, 0)
 								)}
 							</h3>
+							{stats.usageData ? (
+								<div>
+									Current space left:{" "}
+									{formatFileSize(
+										stats.usageData.max -
+											stats.usageData.used
+									)}
+								</div>
+							) : null}
 						</>
 					)
 				}}
