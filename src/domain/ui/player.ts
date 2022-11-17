@@ -115,15 +115,6 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 		)
 	}, [whatToPlayData.metadata])
 
-	if (
-		currentEntryIndex === null ||
-		currentEntryIndex === undefined ||
-		currentEntryIndex < 0 ||
-		!whatToPlayData ||
-		whatToPlayData.entriesBag.length === 0
-	)
-		return null
-
 	const currentPosition: UiPlayerPositionData = {
 		currentEntryId,
 		currentEntryIndex,
@@ -156,7 +147,7 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 
 	return {
 		metadataBag: whatToPlayData.metadata,
-		entries: whatToPlayData.entries,
+		entries: whatToPlayData.entriesBag.entries,
 
 		isPlaying: playerManagerState.innerState.config.isPlayingWhenReady,
 		isSeeking: playerManagerState.innerState.isSeeking,
