@@ -13,6 +13,7 @@ import {
 	throwExpression,
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
+import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
 
 export const AbookDbLock = new MiddlewareKeyedLocks(
 	GLOBAL_WEB_KEYED_LOCKS,
@@ -41,7 +42,7 @@ export class AbookWriteAccess {
 		private readonly releaser: () => void
 	) {}
 
-	getAbook = (): Abook => {
+	getAbook = (): Readonly<Abook> => {
 		return { ...this.abook }
 	}
 
@@ -61,8 +62,9 @@ export class AbookWriteAccess {
 		if (checker) checker(this.abook, newAbook)
 
 		await this.db.abooks.put(newAbook)
-
 		this.abook = newAbook
+
+		this.db.onStorageModified()
 	}
 
 	delete = async () => {
@@ -86,6 +88,7 @@ export class AbookWriteAccess {
 			}
 		)
 
+		this.db.onStorageModified()
 		this.release()
 	}
 
@@ -148,6 +151,8 @@ export class AbookWriteAccess {
 				}
 			}
 		)
+
+		this.db.onStorageModified()
 	}
 
 	addInternalFile = async (
@@ -192,6 +197,8 @@ export class AbookWriteAccess {
 				)
 			}
 		)
+
+		this.db.onStorageModified()
 	}
 
 	private checkReleased = () => {
@@ -211,7 +218,7 @@ export class AbookDb extends Dexie {
 
 	public readonly locks = AbookDbLock
 
-	constructor() {
+	constructor(private readonly storageSizeManager: StorageSizeManager) {
 		super("tws-abook/abook-db")
 		this.init()
 	}
@@ -223,8 +230,18 @@ export class AbookDb extends Dexie {
 		})
 	}
 
+	/**
+	 * Reserved for internal usage.
+	 * Should not be modified.
+	 * May be removed any moment.
+	 */
+	public onStorageModified = () => {
+		this.storageSizeManager.requestStatsUpdate()
+	}
+
 	createAbook = async (abook: Abook) => {
 		await this.abooks.add(abook)
+		this.onStorageModified()
 	}
 
 	readAbook = async (id: AbookId): Promise<Abook | null> => {

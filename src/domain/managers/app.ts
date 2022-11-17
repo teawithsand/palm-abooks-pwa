@@ -3,6 +3,7 @@ import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import { PlayerManager } from "@app/domain/managers/playerManager"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
+import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
 import { AbookDb } from "@app/domain/storage/db"
 
@@ -12,8 +13,8 @@ export class AppManager {
 	 * Use `useAppManager` hook instead.
 	 */
 	public static readonly instance: AppManager = new AppManager()
-
-	public readonly abookDb: AbookDb = new AbookDb()
+	public readonly storageSizeManager = new StorageSizeManager()
+	public readonly abookDb: AbookDb = new AbookDb(this.storageSizeManager)
 	public readonly whatToPlayManager = new WhatToPlayManager(
 		new MetadataLoadHelper(
 			new PlayableEntryPlayerSourceResolver(this.abookDb)
