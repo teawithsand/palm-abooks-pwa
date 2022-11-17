@@ -62,6 +62,8 @@ export class StorageSizeManager {
 	}
 
 	constructor() {
+		this.requestStatsUpdate() // initialize data once app starts
+
 		// periodically update stats
 		setInterval(() => {
 			this.requestStatsUpdate()
