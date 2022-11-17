@@ -54,12 +54,17 @@ export class StorageSizeManager {
 			if (success) {
 				// do update + check if request really succeeded
 				return (await this.requestStatsUpdate()).isPersistent
-			}else{
+			} else {
 				return false
 			}
 		}
 		return true
 	}
 
-	constructor() {}
+	constructor() {
+		// periodically update stats
+		setInterval(() => {
+			this.requestStatsUpdate()
+		}, 60000)
+	}
 }
