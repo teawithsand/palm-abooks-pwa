@@ -19,6 +19,7 @@ export const Navbar = () => {
 		abookListPath: listABookPath,
 		abookAddLocalPath: localAddABookPath,
 		playerPath,
+		storageInfoPath,
 	} = useAppPaths()
 
 	return (
@@ -86,6 +87,17 @@ export const Navbar = () => {
 							>
 								{translations.playerDropdown.playLocal}
 							</NavDropdown.Item>
+						</NavDropdown>
+
+						<NavDropdown
+							title={"Misc"}
+							align={"end"}
+						>
+							<LinkContainer to={storageInfoPath}>
+								<NavDropdown.Item>
+									Storage info
+								</NavDropdown.Item>
+							</LinkContainer>
 						</NavDropdown>
 					</Nav>
 				</Bar.Collapse>

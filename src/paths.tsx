@@ -9,6 +9,7 @@ export interface AppPaths extends Paths {
 	abookAddLocalPath: string
 	abookListPath: string
 	abookManagementPath: string
+	storageInfoPath: string
 	abookShowPath: (id: string) => string
 	abookEditMetadataPath: (id: string) => string
 	abookDeletePath: (id: string) => string
@@ -23,6 +24,7 @@ const paths: AppPaths = {
 	homePath: "/",
 	abookAddLocalPath: "/abook/local-add",
 	abookListPath: "/abook/list",
+	storageInfoPath: "/storage",
 	abookShowPath: (id: string) => {
 		// try using hash instead, so it works better with cache
 		return `/abook/show?id=${encodeURIComponent(id)}`
