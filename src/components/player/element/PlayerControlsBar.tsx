@@ -4,11 +4,15 @@ import React from "react"
 import styled from "styled-components"
 
 import FastForward from "@app/components/player/icons/fast-forward.svg"
-import Pause from "@app/components/player/icons/pause.svg"
-import Play from "@app/components/player/icons/play.svg"
+import InnerPause from "@app/components/player/icons/pause.svg"
+import InnerPlay from "@app/components/player/icons/play.svg"
 import Skip from "@app/components/player/icons/skip.svg"
 
 import { breakpointMediaDown, BREAKPOINT_MD } from "@teawithsand/tws-stl-react"
+
+const Play = styled(InnerPlay)``
+
+const Pause = styled(InnerPause)``
 
 const Prev = styled(Skip)`
 	rotate: 180deg;
@@ -27,7 +31,6 @@ const Bar = styled.div`
 
 	overflow: hidden;
 	width: 100%;
-	height: fit-content;
 
 	justify-items: center;
 
@@ -35,17 +38,17 @@ const Bar = styled.div`
 		// TODO(teawithsand): ensure nice display on mobile devices
 		cursor: pointer;
 
-		height: 10vh;
+		height: 100%;
+		min-height: 50px;
+		max-height: 10vh;
+
 		@media ${breakpointMediaDown(BREAKPOINT_MD)} {
-			height: auto;
+			max-height: 20vh;
 		}
 
 		* {
 			transition: fill 0.5s ease;
 			fill: black;
-		}
-		&:hover * {
-			fill: blue;
 		}
 	}
 `

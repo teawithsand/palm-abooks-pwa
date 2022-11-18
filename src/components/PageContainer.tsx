@@ -23,6 +23,7 @@ const PageBody = (props: { children?: ReactNode }) => {
 export type PageContainerOptions = {
 	container?: boolean
 	title: string
+	noBody?: boolean
 }
 
 const PageTitle = styled.h1`
@@ -49,19 +50,35 @@ export const PageContainer = (props: {
 			options.container ?? true ? <Container>{inner}</Container> : inner
 	}
 
-	return (
-		<>
-			<ProvideFixedLanguage language="en-US">
-				<DialogBoundary>
-					<PageBody>
+	if (props.options?.noBody) {
+		return (
+			<>
+				<ProvideFixedLanguage language="en-US">
+					<DialogBoundary>
 						<ErrorBoundary fallback={<>An error occurred</>}>
-							<Suspense fallback={<>Loading...</>}>
+							<Suspense fallback={<LoadingSpinner />}>
 								{inner}
 							</Suspense>
 						</ErrorBoundary>
-					</PageBody>
-				</DialogBoundary>
-			</ProvideFixedLanguage>
-		</>
-	)
+					</DialogBoundary>
+				</ProvideFixedLanguage>
+			</>
+		)
+	} else {
+		return (
+			<>
+				<ProvideFixedLanguage language="en-US">
+					<DialogBoundary>
+						<PageBody>
+							<ErrorBoundary fallback={<>An error occurred</>}>
+								<Suspense fallback={<LoadingSpinner />}>
+									{inner}
+								</Suspense>
+							</ErrorBoundary>
+						</PageBody>
+					</DialogBoundary>
+				</ProvideFixedLanguage>
+			</>
+		)
+	}
 }

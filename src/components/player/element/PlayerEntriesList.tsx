@@ -42,6 +42,9 @@ const List = styled.ul`
 
 	border: 1px solid rgba(0, 0, 0, 0.125);
 	border-radius: 5px;
+
+	width: 100%;
+	height: fit-content;
 `
 
 const OrdinalNumber = styled.div`

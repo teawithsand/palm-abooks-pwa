@@ -6,7 +6,8 @@ const PlayerPage = () => {
 	return (
 		<PageContainer
 			options={{
-				title: "",
+				noBody: false,
+				title: ""
 			}}
 		>
 			<PlayerMusicUi />

@@ -28,7 +28,7 @@ export const ConstSizeNumber = (
 	// Hack: calculate padding for these entries, so that we
 	// do not have to use grid or table to have numbers in list aligned
 	const padding = "0".repeat(
-		targetLength.toString().length - props.n.toString().length
+		Math.max(targetLength.toString().length - props.n.toString().length, 0)
 	)
 
 	return (

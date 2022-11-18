@@ -7,7 +7,7 @@ const Bar = styled.div`
 	display: grid;
 
 	grid-template-rows: auto;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: auto 1fr auto;
 	width: 100%;
 `
 
@@ -17,6 +17,10 @@ const Left = styled.div`
 
 const Right = styled.div`
 	text-align: right;
+`
+
+const Middle = styled.div`
+	text-align: center;
 `
 
 export const PlayerGlobalProgressDisplay = () => {
@@ -33,6 +37,13 @@ export const PlayerGlobalProgressDisplay = () => {
 					? formatDurationSeconds(position)
 					: formatDurationSeconds(0)}
 			</Left>
+			<Middle>
+				{duration
+					? `Played ${Math.floor(
+							(position / duration) * 100
+					  )}% overall ${formatDurationSeconds(duration - position)} left`
+					: null}
+			</Middle>
 			<Right>
 				{duration !== null
 					? formatDurationSeconds(duration)
