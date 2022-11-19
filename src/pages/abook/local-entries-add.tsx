@@ -2,6 +2,7 @@ import { AbookLocalFilesAdd } from "@app/components/abook/edit/AbookLocalFilesAd
 import { PageContainer } from "@app/components/PageContainer"
 import { useAbookId } from "@app/components/util/useAbookId"
 import { useAppManager } from "@app/domain/managers/app"
+import { wrapLocationProvider } from "@app/util/useLocation"
 import { useQuery } from "@tanstack/react-query"
 import { throwExpression } from "@teawithsand/tws-stl"
 import React from "react"
@@ -29,14 +30,10 @@ const InnerPage = () => {
 
 const AbookLocalFilesAddPage = () => {
 	return (
-		<PageContainer
-			options={{
-				title: "Add abook files from local machine",
-			}}
-		>
+		<PageContainer title="Add local files to existing Abook">
 			<InnerPage />
 		</PageContainer>
 	)
 }
 
-export default AbookLocalFilesAddPage
+export default wrapLocationProvider(AbookLocalFilesAddPage)

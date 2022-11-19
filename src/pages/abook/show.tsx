@@ -2,6 +2,7 @@ import { AbookView } from "@app/components/abook/view/AbookView"
 import { PageContainer } from "@app/components/PageContainer"
 import { useAbookId } from "@app/components/util/useAbookId"
 import { useAppManager } from "@app/domain/managers/app"
+import { wrapLocationProvider } from "@app/util/useLocation"
 import { useQuery } from "@tanstack/react-query"
 import { throwExpression } from "@teawithsand/tws-stl"
 import React from "react"
@@ -29,14 +30,10 @@ const InnerPage = () => {
 
 const ShowAbookPage = () => {
 	return (
-		<PageContainer
-			options={{
-				title: "Abook display",
-			}}
-		>
+		<PageContainer title="Abook view">
 			<InnerPage />
 		</PageContainer>
 	)
 }
 
-export default ShowAbookPage
+export default wrapLocationProvider(ShowAbookPage)

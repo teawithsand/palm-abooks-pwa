@@ -142,7 +142,7 @@ export const AbookView = (props: {
 		abookReorderEntriesPath,
 		abookLocalEntriesAddPath,
 		abookEntriesDeletePath,
-		playerPath,
+		playerUiPath: playerPath,
 	} = useAppPaths()
 	const { coverUrl, musicEntries, duration } = useAbookShowData(abook)
 	const app = useAppManager()

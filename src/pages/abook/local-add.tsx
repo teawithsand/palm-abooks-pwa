@@ -12,6 +12,7 @@ import { FilePlayerSourceResolver } from "@app/domain/managers/resolver"
 import { guessFileDisposition } from "@app/domain/storage/disposition"
 import { useAppPaths } from "@app/paths"
 import { useNavigate } from "@app/util/navigate"
+import { wrapLocationProvider } from "@app/util/useLocation"
 import {
 	DefaultMetadataLoader,
 	MetadataLoadingResult,
@@ -30,14 +31,10 @@ const AddLocalAbookPage = () => {
 	const app = useAppManager()
 
 	return (
-		<PageContainer
-			options={{
-				title: "Add Abook from local device",
-			}}
-		>
+		<PageContainer title="Add Abook from local device">
 			<AbookLocalCreate />
 		</PageContainer>
 	)
 }
 
-export default AddLocalAbookPage
+export default wrapLocationProvider(AddLocalAbookPage)

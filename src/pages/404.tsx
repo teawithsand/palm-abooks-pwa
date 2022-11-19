@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Link, HeadFC } from "gatsby"
+import { wrapLocationProvider } from "@app/util/useLocation"
 
 const pageStyles = {
 	color: "#232129",
@@ -45,6 +46,6 @@ const NotFoundPage = () => {
 	)
 }
 
-export default NotFoundPage
+export default wrapLocationProvider(NotFoundPage)
 
 export const Head: HeadFC = () => <title>Not found</title>

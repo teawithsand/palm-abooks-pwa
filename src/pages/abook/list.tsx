@@ -1,6 +1,7 @@
 import { AbookList } from "@app/components/abook/list/AbookList"
 import { PageContainer } from "@app/components/PageContainer"
 import { useAppManager } from "@app/domain/managers/app"
+import { wrapLocationProvider } from "@app/util/useLocation"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 
@@ -15,14 +16,10 @@ const InnerPage = () => {
 
 const ListAbookPage = () => {
 	return (
-		<PageContainer
-			options={{
-				title: "Abook list",
-			}}
-		>
+		<PageContainer title="Abook list">
 			<InnerPage />
 		</PageContainer>
 	)
 }
 
-export default ListAbookPage
+export default wrapLocationProvider(ListAbookPage)

@@ -1,5 +1,6 @@
 import { PageContainer } from "@app/components/PageContainer"
 import { useAppManager } from "@app/domain/managers/app"
+import { wrapLocationProvider } from "@app/util/useLocation"
 import React from "react"
 import { Button } from "react-bootstrap"
 import styled from "styled-components"
@@ -15,11 +16,7 @@ const DebugPage = () => {
 	const app = useAppManager()
 
 	return (
-		<PageContainer
-			options={{
-				title: "Debug stuff",
-			}}
-		>
+		<PageContainer title="Debug stuff">
 			<Grid>
 				<Button
 					onClick={() => {
@@ -33,4 +30,4 @@ const DebugPage = () => {
 	)
 }
 
-export default DebugPage
+export default wrapLocationProvider(DebugPage)

@@ -6,7 +6,6 @@ import {
 	WhatToPlayData,
 	WhatToPlayDataType,
 } from "@app/domain/managers/whatToPlayManager"
-import { useValidValue } from "@app/util/useBoolMemo"
 import {
 	MetadataBag,
 	MetadataLoadingResultType,
@@ -18,6 +17,7 @@ import { useMemo, useRef } from "react"
 export type UiPlayerPositionData = {
 	currentEntryIndex: number | null
 	currentEntryId: string | null
+	entry: PlayableEntry | null
 
 	currentEntryDuration: number | null
 	currentEntryPosition: number | null
@@ -33,6 +33,8 @@ export type UiPlayerPositionData = {
 
 export type UiPlayerData = {
 	metadataBag: MetadataBag
+	entriesBag: PlayableEntriesBag
+
 	/**
 	 * Note: order of these is determined by source rather than this array.
 	 *
@@ -118,6 +120,9 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 	const currentPosition: UiPlayerPositionData = {
 		currentEntryId,
 		currentEntryIndex,
+		entry: currentEntryId
+			? whatToPlayData.entriesBag.findById(currentEntryId)
+			: null,
 		nextSourceId,
 		prevSourceId,
 
@@ -148,6 +153,7 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 	return {
 		metadataBag: whatToPlayData.metadata,
 		entries: whatToPlayData.entriesBag.entries,
+		entriesBag: whatToPlayData.entriesBag,
 
 		isPlaying: playerManagerState.innerState.config.isPlayingWhenReady,
 		isSeeking: playerManagerState.innerState.isSeeking,

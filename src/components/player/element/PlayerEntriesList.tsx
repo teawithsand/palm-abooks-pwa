@@ -1,4 +1,7 @@
-import { PlayableEntryType } from "@app/domain/defines/player/playableEntry"
+import {
+	PlayableEntry,
+	PlayableEntryType,
+} from "@app/domain/defines/player/playableEntry"
 import { useAppManager } from "@app/domain/managers/app"
 import { useUiPlayerData } from "@app/domain/ui/player"
 import { MetadataLoadingResultType } from "@teawithsand/tws-player"
@@ -82,9 +85,16 @@ const InvisibleInline = styled.span`
 `
 
 // TODO(teawithsand): make this list base for reordering files stuff in abook view
-export const PlayerEntriesList = () => {
+export const PlayerEntriesList = (props: {
+	onEntryClick?: (id: string, e: PlayableEntry) => void
+}) => {
 	const ui = useUiPlayerData()
 	const actions = useAppManager().playerActionsManager
+	const {
+		onEntryClick = (id) => {
+			actions.jump(id)
+		},
+	} = props
 
 	if (!ui) return <List></List>
 
@@ -154,7 +164,7 @@ export const PlayerEntriesList = () => {
 						key={index}
 						$isPlaying={isPlaying}
 						onClick={() => {
-							actions.jump(entry.id)
+							onEntryClick(entry.id, entry)
 						}}
 						$clickable={true}
 					>

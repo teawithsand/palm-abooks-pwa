@@ -10,7 +10,10 @@ const ToEndPaginator = styled.span`
 	margin-left: auto;
 `
 
-export const Navbar = () => {
+export const Navbar = (props: {
+	style?: React.CSSProperties
+	className?: string
+}) => {
 	const translations = useAppTranslationSelector((s) => s.navbar)
 
 	const navigate = useNavigate()
@@ -18,12 +21,20 @@ export const Navbar = () => {
 		homePath,
 		abookListPath: listABookPath,
 		abookAddLocalPath: localAddABookPath,
-		playerPath,
+		playerUiPath: playerPath,
 		storageInfoPath,
+		playerPlaylistPath,
 	} = useAppPaths()
 
 	return (
-		<Bar collapseOnSelect expand="lg" bg="dark" variant="dark">
+		<Bar
+			collapseOnSelect
+			expand="lg"
+			bg="dark"
+			variant="dark"
+			style={props.style}
+			className={props.className}
+		>
 			<Container fluid={true}>
 				<LinkContainer to={"/"}>
 					<Bar.Brand href="#">{translations.pageTitle}</Bar.Brand>
@@ -81,18 +92,22 @@ export const Navbar = () => {
 
 							<NavDropdown.Item
 								onClick={() => {
-									// TODO(teawithsand): maybe apply some more actions here
 									navigate(playerPath)
 								}}
 							>
 								{translations.playerDropdown.playLocal}
 							</NavDropdown.Item>
+
+							<NavDropdown.Item
+								onClick={() => {
+									navigate(playerPlaylistPath)
+								}}
+							>
+								Playlist
+							</NavDropdown.Item>
 						</NavDropdown>
 
-						<NavDropdown
-							title={"Misc"}
-							align={"end"}
-						>
+						<NavDropdown title={"Misc"} align={"end"}>
 							<LinkContainer to={storageInfoPath}>
 								<NavDropdown.Item>
 									Storage info

@@ -6,6 +6,9 @@ const FooterBar = styled.footer`
 	padding-bottom: 3em;
 `
 
-export const Footer = () => {
-	return <FooterBar></FooterBar>
+export const Footer = (props: {
+	className?: string
+	style?: React.CSSProperties
+}) => {
+	return <FooterBar {...props}></FooterBar>
 }

@@ -12,23 +12,19 @@ const Container = styled.div`
 	display: grid;
 	grid-auto-flow: row;
 
-	// grid-template-rows: 1fr auto auto auto auto auto auto;
-
-	height: calc(100vh - 56px);
+	height: 100%;
 `
 
 export const PlayerMusicUi = () => {
 	return (
-		<>
-			<Container>
-				<PlayerCoverDisplay />
-				<PlayerFileInfoDisplay />
-				<PlayerLocalProgressBar />
-				<PlayerLocalProgressDisplay />
-				<PlayerGlobalProgressBar />
-				<PlayerGlobalProgressDisplay />
-				<PlayerControlsBar />
-			</Container>
-		</>
+		<Container>
+			<PlayerCoverDisplay />
+			<PlayerFileInfoDisplay />
+			<PlayerLocalProgressBar />
+			<PlayerLocalProgressDisplay />
+			<PlayerGlobalProgressBar />
+			<PlayerGlobalProgressDisplay />
+			<PlayerControlsBar />
+		</Container>
 	)
 }

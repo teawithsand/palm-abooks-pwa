@@ -1,18 +1,14 @@
-import { PageContainer } from "@app/components/PageContainer"
-import { PlayerMusicUi } from "@app/components/player/PlayerMusicUi"
+import { PageContainer, PageContainerType } from "@app/components/PageContainer"
+import { PlayerMusicUi } from "@app/components/player/PlayerUi"
+import { wrapLocationProvider } from "@app/util/useLocation"
 import React from "react"
 
 const PlayerPage = () => {
 	return (
-		<PageContainer
-			options={{
-				noBody: false,
-				title: ""
-			}}
-		>
+		<PageContainer type={PageContainerType.FIXED_HEIGHT} hasFooter={false}>
 			<PlayerMusicUi />
 		</PageContainer>
 	)
 }
 
-export default PlayerPage
+export default wrapLocationProvider(PlayerPage)
