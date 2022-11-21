@@ -3,6 +3,10 @@ import {
 	INIT_GLOBAL_PLAYER_CONFIG,
 } from "@app/domain/defines/config/config"
 import {
+	INIT_PERSISTENT_GLOBAL_PLAYER_STATE,
+	PersistentGlobalPlayerState,
+} from "@app/domain/defines/config/state"
+import {
 	DefaultStickyEventBus,
 	Lock,
 	MutexLockAdapter,
@@ -10,8 +14,6 @@ import {
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
 import localforage, { LOCALSTORAGE } from "localforage"
-
-const globalPlayerConfigKey = "global-player-config"
 
 const forage = localforage.createInstance({
 	name: "palm-abooks-pwa/forage",
@@ -68,25 +70,23 @@ function objectEquals(x: any, y: any): boolean {
 	)
 }
 
-export class ConfigManager {
-	public readonly globalPlayerConfigBus: StickyEventBus<GlobalPlayerConfig>
+export class GenericConfigManager<T> {
+	public readonly bus: StickyEventBus<T>
 	private configSynchronizer: () => Promise<void>
 
-	constructor() {
-		this.globalPlayerConfigBus = new DefaultStickyEventBus(
-			forage.getItem(globalPlayerConfigKey) ?? INIT_GLOBAL_PLAYER_CONFIG
+	constructor(key: string, initialValue: T) {
+		this.bus = new DefaultStickyEventBus(
+			(forage.getItem(key) as T) ?? initialValue
 		)
 
-		let prevConfig = this.globalPlayerConfigBus.lastEvent
+		let prevConfig = this.bus.lastEvent
 
 		let modified = false
 		const mutex = new Lock(new MutexLockAdapter())
-		const syncConfig = async (
-			cfg: GlobalPlayerConfig = this.globalPlayerConfigBus.lastEvent
-		) => {
+		const syncConfig = async (cfg: T = this.bus.lastEvent) => {
 			await mutex.withLock(async () => {
 				if (modified) {
-					forage.setItem(globalPlayerConfigKey, cfg)
+					forage.setItem(key, cfg)
 					modified = false
 				}
 			})
@@ -109,7 +109,7 @@ export class ConfigManager {
 			syncConfig() // sync config if user changed page. Reasonable I guess
 		})
 
-		this.globalPlayerConfigBus.addSubscriber((config) => {
+		this.bus.addSubscriber((config) => {
 			if (!objectEquals(prevConfig, config)) {
 				modified = true // this subscriber is responsible for setting this flag
 				startWatcher()
@@ -118,19 +118,34 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Requests immediate save of all configs.
+	 * Requests immediate save of config.
 	 */
-	saveConfigs = async () => await this.configSynchronizer()
+	save = async () => await this.configSynchronizer()
 
 	/**
-	 * Requests GlobalPlayerConfig update in atomic manner.
+	 * Requests config update in atomic manner.
 	 * It should be automatically saved ASAP.
 	 */
-	updateGlobalPlayerConfig = (
-		mutator: (draft: Draft<GlobalPlayerConfig>) => void
-	) => {
-		this.globalPlayerConfigBus.emitEvent(
-			produce(this.globalPlayerConfigBus.lastEvent, mutator)
+	update = (mutator: (draft: Draft<T>) => void) => {
+		this.bus.emitEvent(produce(this.bus.lastEvent, mutator))
+	}
+}
+
+export class ConfigManager {
+	public readonly globalPlayerConfig =
+		new GenericConfigManager<GlobalPlayerConfig>(
+			"global-player-config",
+			INIT_GLOBAL_PLAYER_CONFIG
 		)
+
+	public readonly globalPersistentPlayerState =
+		new GenericConfigManager<PersistentGlobalPlayerState>(
+			"persistent-player-state",
+			INIT_PERSISTENT_GLOBAL_PLAYER_STATE
+		)
+
+	saveAll = async () => {
+		await this.globalPlayerConfig.save()
+		await this.globalPersistentPlayerState.save()
 	}
 }
