@@ -1,5 +1,5 @@
 import { PlayableEntryType } from "@app/domain/defines/player/playableEntry"
-import { WhatToPlayDataType } from "@app/domain/managers/whatToPlayManager"
+import { WhatToPlayDataType } from "@app/domain/defines/whatToPlay/data"
 import { useUiPlayerData } from "@app/domain/ui/player"
 import React from "react"
 import styled from "styled-components"

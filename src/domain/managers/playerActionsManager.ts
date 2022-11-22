@@ -1,3 +1,6 @@
+import { whatToPlaySourceLocatorToLastPlayedSource } from "@app/domain/defines/config/state"
+import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
+import { ConfigManager } from "@app/domain/managers/config"
 import { PlayerManager } from "@app/domain/managers/playerManager"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
 import { isTimeNumber } from "@teawithsand/tws-player"
@@ -15,7 +18,8 @@ import {
 export class PlayerActionManager {
 	constructor(
 		private readonly playerManager: PlayerManager,
-		private readonly whatToPlayManager: WhatToPlayManager
+		private readonly whatToPlayManager: WhatToPlayManager,
+		private readonly configManager: ConfigManager
 	) {
 		this.initMediaSession()
 	}
@@ -50,6 +54,7 @@ export class PlayerActionManager {
 			draft.seekPosition = posMillis
 		})
 	}
+
 	public localRelativeSeek = (deltaMillis: number) => {
 		if (isFinite(deltaMillis)) return
 
@@ -132,10 +137,11 @@ export class PlayerActionManager {
 	}
 
 	public jumpForward = () => {
-		// TODO(teawithsand): NIY
+		this.localRelativeSeek(10 * 1000)
 	}
+	
 	public jumpBackward = () => {
-		// TODO(teawithsand): NIY
+		this.localRelativeSeek(-10 * 1000)
 	}
 
 	public prevFile = () => {
@@ -152,7 +158,7 @@ export class PlayerActionManager {
 				draft.sourceKey = prevFileKey
 				draft.seekPosition = null
 			} else {
-				draft.seekPosition = 0 
+				draft.seekPosition = 0
 			}
 		})
 	}
@@ -170,10 +176,27 @@ export class PlayerActionManager {
 	}
 
 	public setSpeed = (speed: number) => {
-		// TODO(teawithsand): NIY
+		if (!isFinite(speed) || speed <= 0 || speed >= 10) return
+
+		this.playerManager.mutateConfig((draft) => {
+			draft.speed = speed
+		})
+		this.configManager.globalPlayerConfig.update((draft) => {
+			draft.speed = speed
+		})
 	}
 
 	public setSleep = (sleepData: null) => {
 		// TODO(teawithsand): NIY
+	}
+
+	public setWhatToPlayLocator = (locator: WhatToPlayLocator | null) => {
+		this.whatToPlayManager.setLocator(locator)
+		this.configManager.globalPersistentPlayerState.update((draft) => {
+			draft.lastPlayed = locator
+				? whatToPlaySourceLocatorToLastPlayedSource(locator)
+				: null
+		})
+		this.configManager.globalPersistentPlayerState.save()
 	}
 }

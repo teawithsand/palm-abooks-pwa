@@ -7,10 +7,10 @@ import {
 	PersistentGlobalPlayerState,
 } from "@app/domain/defines/config/state"
 import {
-	DefaultStickyEventBus,
+	EmptyStickyEventBus,
 	Lock,
 	MutexLockAdapter,
-	StickyEventBus,
+	StickySubscribable,
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
 import localforage, { LOCALSTORAGE } from "localforage"
@@ -70,20 +70,46 @@ function objectEquals(x: any, y: any): boolean {
 	)
 }
 
-export class GenericConfigManager<T> {
-	public readonly bus: StickyEventBus<T>
+export class GenericConfigManager<T extends {}> {
+	public readonly innerBus: EmptyStickyEventBus<T>
+	public get bus(): StickySubscribable<T | undefined> {
+		return this.innerBus
+	}
+
 	private configSynchronizer: () => Promise<void>
 
+	public readonly loadedPromise: Promise<void>
+	public readonly busPromise: Promise<StickySubscribable<T>>
+
 	constructor(key: string, initialValue: T) {
-		this.bus = new DefaultStickyEventBus(
-			(forage.getItem(key) as T) ?? initialValue
-		)
+		this.innerBus = new EmptyStickyEventBus<T>()
 
 		let prevConfig = this.bus.lastEvent
 
 		let modified = false
 		const mutex = new Lock(new MutexLockAdapter())
-		const syncConfig = async (cfg: T = this.bus.lastEvent) => {
+
+		const loadedPromise = mutex.withLock(async () => {
+			this.innerBus.emitEvent(
+				(await forage.getItem<T>(key)) ?? initialValue
+			)
+		})
+		this.loadedPromise = loadedPromise
+
+		this.busPromise = (async () => {
+			await loadedPromise
+
+			if (this.bus.lastEvent === undefined)
+				throw new Error(
+					"Last event must not be undefine by now; unreachable code"
+				)
+
+			return this.bus as StickySubscribable<T> // do this casting, as we are sure that bus has event by now
+		})()
+
+		const syncConfig = async (cfg: T | undefined = this.bus.lastEvent) => {
+			if (cfg === undefined || !modified) return
+
 			await mutex.withLock(async () => {
 				if (modified) {
 					forage.setItem(key, cfg)
@@ -127,7 +153,14 @@ export class GenericConfigManager<T> {
 	 * It should be automatically saved ASAP.
 	 */
 	update = (mutator: (draft: Draft<T>) => void) => {
-		this.bus.emitEvent(produce(this.bus.lastEvent, mutator))
+		const cfg = this.bus.lastEvent
+		if (cfg !== undefined) {
+			this.innerBus.emitEvent(produce(cfg, mutator))
+		} else {
+			throw new Error(
+				`Config not loaded yet. Can't modify it. Consider waiting for it using bus.`
+			)
+		}
 	}
 }
 
@@ -144,7 +177,13 @@ export class ConfigManager {
 			INIT_PERSISTENT_GLOBAL_PLAYER_STATE
 		)
 
+	public readonly loadedPromise = Promise.all([
+		this.globalPlayerConfig.loadedPromise,
+		this.globalPersistentPlayerState.loadedPromise,
+	])
+
 	saveAll = async () => {
+		await this.loadedPromise
 		await this.globalPlayerConfig.save()
 		await this.globalPersistentPlayerState.save()
 	}

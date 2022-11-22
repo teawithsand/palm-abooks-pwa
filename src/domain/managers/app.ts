@@ -1,9 +1,11 @@
+import { lastPlayedSourceToWhatToPlaySourceLocator } from "@app/domain/defines/config/state"
 import { ConfigManager } from "@app/domain/managers/config"
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import { PlayerManager } from "@app/domain/managers/playerManager"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
+import { WhatToPlayLocatorResolverImpl } from "@app/domain/managers/whatToPlayLocatorResolver"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
 import { AbookDb } from "@app/domain/storage/db"
 
@@ -18,20 +20,47 @@ export class AppManager {
 	public readonly whatToPlayManager = new WhatToPlayManager(
 		new MetadataLoadHelper(
 			new PlayableEntryPlayerSourceResolver(this.abookDb)
-		)
+		),
+		new WhatToPlayLocatorResolverImpl(this.abookDb)
 	)
 
 	public readonly configManager = new ConfigManager()
-	public readonly playerManager = new PlayerManager(this.abookDb)
+	public readonly playerManager = new PlayerManager(
+		this.abookDb,
+		this.configManager
+	)
 	public readonly playerActionsManager = new PlayerActionManager(
 		this.playerManager,
-		this.whatToPlayManager
+		this.whatToPlayManager,
+		this.configManager
 	)
+
+	public readonly initPromise = Promise.all([
+		this.configManager.loadedPromise,
+	])
 
 	private constructor() {
 		this.whatToPlayManager.bus.addSubscriber((data) => {
 			this.playerManager.setSources(data?.entriesBag.entries ?? [])
 		})
+
+		this.configManager.globalPersistentPlayerState.bus.addSubscriber(
+			(config, canceler) => {
+				if (config !== undefined) {
+					try {
+						if (config.lastPlayed) {
+							this.whatToPlayManager.setLocator(
+								lastPlayedSourceToWhatToPlaySourceLocator(
+									config.lastPlayed
+								)
+							)
+						}
+					} finally {
+						canceler()
+					}
+				}
+			}
+		)
 	}
 }
 

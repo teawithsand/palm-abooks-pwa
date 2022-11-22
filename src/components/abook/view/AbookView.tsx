@@ -1,13 +1,17 @@
-import { AbookFormAddFiles } from "@app/components/abook/form/addFiles"
 import { AbookFileList } from "@app/components/abook/view/AbookFileList"
 import { Abook } from "@app/domain/defines/abook"
 import { FileEntry } from "@app/domain/defines/abookFile"
 import { useAbookShowData } from "@app/domain/defines/abookShowData"
+import { WhatToPlayLocatorType } from "@app/domain/defines/whatToPlay/locator"
 import { useAppManager } from "@app/domain/managers/app"
 import { useAppPaths } from "@app/paths"
 import { LinkContainer } from "@app/util/LinkContainer"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
-import { breakpointMediaDown, BREAKPOINT_MD, BREAKPOINT_SM } from "@teawithsand/tws-stl-react"
+import {
+	breakpointMediaDown,
+	BREAKPOINT_MD,
+	BREAKPOINT_SM,
+} from "@teawithsand/tws-stl-react"
 import { navigate } from "gatsby"
 import React from "react"
 import { Button } from "react-bootstrap"
@@ -167,7 +171,10 @@ export const AbookView = (props: {
 					<Button
 						variant="success"
 						onClick={() => {
-							app.whatToPlayManager.setAbook(abook)
+							app.playerActionsManager.setWhatToPlayLocator({
+								type: WhatToPlayLocatorType.ABOOK,
+								abook,
+							})
 							navigate(playerPath)
 						}}
 					>
