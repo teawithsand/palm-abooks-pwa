@@ -1,11 +1,8 @@
 import { PlayableEntry } from "@app/domain/defines/player/playableEntry"
+import { WhatToPlayData, WhatToPlayDataType } from "@app/domain/defines/whatToPlay/data"
 import { useAppManager } from "@app/domain/managers/app"
 import { PlayableEntriesBag } from "@app/domain/managers/playableEntriesBag"
 import { PlayerManagerState } from "@app/domain/managers/playerManager"
-import {
-	WhatToPlayData,
-	WhatToPlayDataType,
-} from "@app/domain/managers/whatToPlayManager"
 import {
 	MetadataBag,
 	MetadataLoadingResultType,
@@ -67,7 +64,6 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 		type: WhatToPlayDataType.USER_PROVIDED_ENTRIES,
 		entriesBag: new PlayableEntriesBag([]),
 		metadata: new MetadataBag([]),
-		userProvidedEntries: [],
 		entries: [],
 	}
 

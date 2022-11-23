@@ -1,7 +1,7 @@
 import { ConstSizeNumber } from "@app/components/util/ConstSizeNumber"
 import { List } from "@app/components/util/List"
 import { FileEntry } from "@app/domain/defines/abookFile"
-import { makeFileEntryShowData } from "@app/domain/defines/fileEntryShowData"
+import { makeFileEntryShowData } from "@app/domain/ui/fileEntry"
 import { useAppTranslationSelector } from "@app/trans/AppTranslation"
 import {
 	formatDurationSeconds,

@@ -5,6 +5,7 @@ import {
 } from "@app/domain/defines/abookFile"
 import { getFileEntryDisposition } from "@app/domain/storage/disposition"
 import { Metadata, MetadataLoadingResultType } from "@teawithsand/tws-player"
+import { useMemo } from "react"
 
 export type FileEntryShowData = {
 	id: string
@@ -34,3 +35,6 @@ export const makeFileEntryShowData = (e: FileEntry): FileEntryShowData => {
 		size: e.metadata.size,
 	}
 }
+
+export const useFileEntryShowData = (e: FileEntry) =>
+	useMemo(() => makeFileEntryShowData(e), [e])

@@ -1,6 +1,10 @@
 import { Abook } from "@app/domain/defines/abook"
-import { useAbookShowData } from "@app/domain/defines/abookShowData"
 import { useAppManager } from "@app/domain/managers/app"
+import {
+	DEFAULT_IMAGE_COVER_URL,
+	useAbookShowData,
+	useImageFileEntryUrl,
+} from "@app/domain/ui/abook"
 import { useAppPaths } from "@app/paths"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import { Link } from "gatsby"
@@ -65,7 +69,10 @@ export const AbookSmallCard = (props: { abook: Abook }) => {
 	const name = abook.metadata.title
 	const { abookShowPath } = useAppPaths()
 
-	const { coverUrl, musicEntries, duration } = useAbookShowData(abook)
+	const { imageEntries, musicEntries, duration } = useAbookShowData(abook)
+
+	const coverUrl =
+		useImageFileEntryUrl(imageEntries) || DEFAULT_IMAGE_COVER_URL
 
 	return (
 		<Card>

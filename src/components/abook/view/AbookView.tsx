@@ -1,9 +1,13 @@
 import { AbookFileList } from "@app/components/abook/view/AbookFileList"
 import { Abook } from "@app/domain/defines/abook"
 import { FileEntry } from "@app/domain/defines/abookFile"
-import { useAbookShowData } from "@app/domain/defines/abookShowData"
 import { WhatToPlayLocatorType } from "@app/domain/defines/whatToPlay/locator"
 import { useAppManager } from "@app/domain/managers/app"
+import {
+	DEFAULT_IMAGE_COVER_URL,
+	useAbookShowData,
+	useImageFileEntryUrl,
+} from "@app/domain/ui/abook"
 import { useAppPaths } from "@app/paths"
 import { LinkContainer } from "@app/util/LinkContainer"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
@@ -148,8 +152,11 @@ export const AbookView = (props: {
 		abookEntriesDeletePath,
 		playerUiPath: playerPath,
 	} = useAppPaths()
-	const { coverUrl, musicEntries, duration } = useAbookShowData(abook)
+	const { imageEntries, musicEntries, duration } = useAbookShowData(abook)
 	const app = useAppManager()
+
+	const coverUrl =
+		useImageFileEntryUrl(imageEntries) || DEFAULT_IMAGE_COVER_URL
 
 	return (
 		<Grid>
