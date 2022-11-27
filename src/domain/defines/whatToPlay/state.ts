@@ -12,17 +12,18 @@ export type WhatToPlayState =
 	| {
 			type: WhatToPlayStateType.IDLE
 	  }
-	| {
-			type: WhatToPlayStateType.LOADING
-            locator: WhatToPlayLocator
-	  }
-	| {
-			type: WhatToPlayStateType.LOADED
-            locator: WhatToPlayLocator
-            data: WhatToPlayData
-	  }
-	| {
-			type: WhatToPlayStateType.ERROR
-            locator: WhatToPlayLocator
-            error: any
-	  }
+	| ({
+			locator: WhatToPlayLocator
+	  } & (
+			| {
+					type: WhatToPlayStateType.LOADING
+			  }
+			| {
+					type: WhatToPlayStateType.LOADED
+					data: WhatToPlayData
+			  }
+			| {
+					type: WhatToPlayStateType.ERROR
+					error: any
+			  }
+	  ))

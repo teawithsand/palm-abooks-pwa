@@ -40,6 +40,7 @@ export class WhatToPlayLocatorResolverImpl
 
 		return {
 			type: WhatToPlayDataType.ABOOK,
+			id: generateUUID(),
 			abook,
 			metadata: new MetadataBag(
 				musicEntries.map((e) => e.metadata.musicMetadata)
@@ -90,6 +91,7 @@ export class WhatToPlayLocatorResolverImpl
 
 			return {
 				type: WhatToPlayDataType.USER_PROVIDED_ENTRIES,
+				id: generateUUID(),
 				metadata: new MetadataBag(new Array(entries.length).fill(null)),
 				entries,
 				entriesBag: new PlayableEntriesBag(entries),

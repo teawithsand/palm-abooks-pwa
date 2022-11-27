@@ -1,4 +1,5 @@
 import { whatToPlaySourceLocatorToLastPlayedSource } from "@app/domain/defines/config/state"
+import { SeekData } from "@app/domain/defines/seek"
 import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { ConfigManager } from "@app/domain/managers/config"
 import { PlayerManager } from "@app/domain/managers/playerManager"
@@ -14,6 +15,8 @@ import {
 // TODO(teawithsand): hook this manager everywhere player's needed
 
 // TODO(teawithsand): put position loading somewhere, so that player UI is disabled BEFORE position load happens
+
+// TODO(teawithsand): implement seek data here
 
 export class PlayerActionManager {
 	constructor(
@@ -46,6 +49,8 @@ export class PlayerActionManager {
 			// TODO(teawithsand): here support for the rest of events
 		})
 	}
+
+	public seek = (seekData: SeekData) => {}
 
 	public localSeek = (posMillis: number) => {
 		if (!isTimeNumber(posMillis)) return
@@ -139,7 +144,7 @@ export class PlayerActionManager {
 	public jumpForward = () => {
 		this.localRelativeSeek(10 * 1000)
 	}
-	
+
 	public jumpBackward = () => {
 		this.localRelativeSeek(-10 * 1000)
 	}

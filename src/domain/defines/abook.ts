@@ -1,4 +1,5 @@
 import { FileEntry } from "@app/domain/defines/abookFile"
+import { PositionVariants } from "@app/domain/defines/position"
 import { TimestampMs } from "@teawithsand/tws-stl"
 
 export type AbookId = string
@@ -16,14 +17,7 @@ export interface Abook {
 	id: AbookId
 	metadata: AbookMetadata
 
-	position: AbookSavedPosition | null
+	position: PositionVariants | null
 
 	entries: FileEntry[]
-}
-
-export interface AbookSavedPosition {
-	fileName: string
-	fileOffset: number
-
-	totalOffset: number
 }

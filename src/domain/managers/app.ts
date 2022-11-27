@@ -1,8 +1,11 @@
 import { lastPlayedSourceToWhatToPlaySourceLocator } from "@app/domain/defines/config/state"
 import { ConfigManager } from "@app/domain/managers/config"
+import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import { PlayerManager } from "@app/domain/managers/playerManager"
+import { PositionLoadingManager } from "@app/domain/managers/position/positionLoadingManager"
+import { PositionSavingManager } from "@app/domain/managers/position/positionSavingManager"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
 import { WhatToPlayLocatorResolverImpl } from "@app/domain/managers/whatToPlayLocatorResolver"
@@ -15,6 +18,7 @@ export class AppManager {
 	 * Use `useAppManager` hook instead.
 	 */
 	public static readonly instance: AppManager = new AppManager()
+	public readonly globalEventsManager = new GlobalEventsManager()
 	public readonly storageSizeManager = new StorageSizeManager()
 	public readonly abookDb: AbookDb = new AbookDb(this.storageSizeManager)
 	public readonly whatToPlayManager = new WhatToPlayManager(
@@ -33,6 +37,16 @@ export class AppManager {
 		this.playerManager,
 		this.whatToPlayManager,
 		this.configManager
+	)
+	public readonly positionLoadingManager = new PositionLoadingManager(
+		this.whatToPlayManager,
+		this.playerActionsManager
+	)
+	public readonly positionSavingManager = new PositionSavingManager(
+		this.abookDb,
+		this.whatToPlayManager,
+		this.playerManager,
+		this.positionLoadingManager
 	)
 
 	public readonly initPromise = Promise.all([
