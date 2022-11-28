@@ -1,5 +1,5 @@
 import { whatToPlaySourceLocatorToLastPlayedSource } from "@app/domain/defines/config/state"
-import { SeekData } from "@app/domain/defines/seek"
+import { SeekData, SeekType } from "@app/domain/defines/seek"
 import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { ConfigManager } from "@app/domain/managers/config"
 import { PlayerManager } from "@app/domain/managers/playerManager"
@@ -50,7 +50,19 @@ export class PlayerActionManager {
 		})
 	}
 
-	public seek = (seekData: SeekData) => {}
+	public seek = (seekData: SeekData) => {
+		if (seekData.type === SeekType.ABSOLUTE_IN_FILE) {
+			this.localSeek(seekData.positionMs)
+		} else if (seekData.type === SeekType.ABSOLUTE_TO_FILE) {
+			this.jump(seekData.playableEntryId, seekData.positionMs)
+		} else if (seekData.type === SeekType.RELATIVE_GLOBAL) {
+			this.globalRelativeSeek(seekData.positionDeltaMs)
+		} else if (seekData.type === SeekType.RELATIVE_IN_FILE) {
+			this.localRelativeSeek(seekData.positionDeltaMs)
+		} else if (seekData.type === SeekType.ABSOLUTE_GLOBAL) {
+			this.globalSeek(seekData.positionMs)
+		}
+	}
 
 	public localSeek = (posMillis: number) => {
 		if (!isTimeNumber(posMillis)) return

@@ -47,6 +47,10 @@ export class WhatToPlayLocatorResolverImpl
 			),
 			entries,
 			entriesBag: new PlayableEntriesBag(entries),
+			locator: {
+				type: WhatToPlayLocatorType.ABOOK_ID,
+				id: abook.id,
+			},
 		}
 	}
 
@@ -95,6 +99,7 @@ export class WhatToPlayLocatorResolverImpl
 				metadata: new MetadataBag(new Array(entries.length).fill(null)),
 				entries,
 				entriesBag: new PlayableEntriesBag(entries),
+				locator,
 			}
 		} else {
 			throw new Error(`Invalid locator ${locator}`)

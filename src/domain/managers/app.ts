@@ -1,6 +1,7 @@
 import { lastPlayedSourceToWhatToPlaySourceLocator } from "@app/domain/defines/config/state"
 import { ConfigManager } from "@app/domain/managers/config"
 import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
+import { JumpBackAfterPauseManager } from "@app/domain/managers/jumpBackAfterPause"
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import { PlayerManager } from "@app/domain/managers/playerManager"
@@ -33,15 +34,25 @@ export class AppManager {
 		this.abookDb,
 		this.configManager
 	)
+
 	public readonly playerActionsManager = new PlayerActionManager(
 		this.playerManager,
 		this.whatToPlayManager,
 		this.configManager
 	)
+
+	public readonly jumpBackAfterPauseManager = new JumpBackAfterPauseManager(
+		this.whatToPlayManager,
+		this.playerManager
+	)
+
 	public readonly positionLoadingManager = new PositionLoadingManager(
 		this.whatToPlayManager,
-		this.playerActionsManager
+		this.playerManager,
+		this.playerActionsManager,
+		this.jumpBackAfterPauseManager
 	)
+
 	public readonly positionSavingManager = new PositionSavingManager(
 		this.abookDb,
 		this.whatToPlayManager,

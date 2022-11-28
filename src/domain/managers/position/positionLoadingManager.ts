@@ -10,8 +10,14 @@ import {
 	WhatToPlayDataType,
 } from "@app/domain/defines/whatToPlay/data"
 import { WhatToPlayStateType } from "@app/domain/defines/whatToPlay/state"
+import { JumpBackAfterPauseManager } from "@app/domain/managers/jumpBackAfterPause"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
+import {
+	PlayerManager,
+	PlayerManagerState,
+} from "@app/domain/managers/playerManager"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
+import { isTimeNumber } from "@teawithsand/tws-player"
 import { DefaultStickyEventBus, StickySubscribable } from "@teawithsand/tws-stl"
 
 export enum PositionLoadingManagerStateType {
@@ -43,10 +49,23 @@ export class PositionLoadingManager {
 		return this.innerBus
 	}
 
+	private waitingForPositionLoad = false
+	private isPlayerReady = false
+
+	private checkIsPlayerReady = (playerManagerState: PlayerManagerState) => {
+		return false
+	}
+
 	constructor(
 		wtpManager: WhatToPlayManager,
-		private readonly playerActions: PlayerActionManager
+		playerManager: PlayerManager,
+		private readonly playerActions: PlayerActionManager,
+		private readonly jumpBackAfterPauseManager: JumpBackAfterPauseManager
 	) {
+		playerManager.playerStateBus.addSubscriber((state) => {
+			this.isPlayerReady = this.checkIsPlayerReady(state)
+		})
+
 		wtpManager.stateBus.addSubscriber((state) => {
 			const data =
 				state.type === WhatToPlayStateType.LOADED ? state.data : null
@@ -56,6 +75,10 @@ export class PositionLoadingManager {
 			this.whatToPlayData = data
 
 			if (changed) {
+				this.isPlayerReady = this.checkIsPlayerReady(
+					playerManager.playerStateBus.lastEvent
+				)
+
 				if (this.whatToPlayData) {
 					this.innerBus.emitEvent({
 						type: PositionLoadingManagerStateType.LOADING,
@@ -82,7 +105,20 @@ export class PositionLoadingManager {
 					pos
 				)
 				if (sd) {
+					const delta =
+						this.jumpBackAfterPauseManager.computeJumpBackTimeForPastPlayed(
+							null
+						)
 					this.playerActions.seek(sd)
+
+					// TODO(teawithsand): implement jumping back after pause here
+					// this is used for on-before-playing-started configurations
+					if (isTimeNumber(delta)) {
+						this.playerActions.seek({
+							type: SeekType.RELATIVE_GLOBAL,
+							positionDeltaMs: -delta,
+						})
+					}
 					this.innerBus.emitEvent({
 						type: PositionLoadingManagerStateType.LOADED,
 						whatToPlayDataId: this.whatToPlayData.id,

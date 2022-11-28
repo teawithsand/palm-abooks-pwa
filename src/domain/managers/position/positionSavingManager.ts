@@ -19,11 +19,9 @@ import { getTimestamps, Timestamps } from "@app/util/timestamps"
 import { isTimeNumber } from "@teawithsand/tws-player"
 import {
 	DefaultEventBus,
-	DefaultStickyEventBus,
 	generateUUID,
 	Lock,
 	MutexLockAdapter,
-	StickySubscribable,
 	Subscribable,
 	throwExpression,
 } from "@teawithsand/tws-stl"
@@ -74,7 +72,7 @@ export class PositionSavingManager {
 		return this.innerBus
 	}
 
-	private readonly positionSaveInterval = 30000
+	private readonly positionSaveInterval = 2000
 
 	private whatToPlayData: WhatToPlayData | null = null
 	private playerManagerState: PlayerManagerState | null = null
@@ -127,6 +125,12 @@ export class PositionSavingManager {
 			this.updateLastValidPosition()
 
 			if (changed) {
+				this.finishedPositionLoading = [
+					PositionLoadingManagerStateType.ERROR, // in that case do override
+					PositionLoadingManagerStateType.NOT_FOUND,
+					PositionLoadingManagerStateType.LOADED,
+				].includes(positionLoadingManager.bus.lastEvent.type)
+
 				if (data) {
 					this.intervalHelper.setDelay(this.positionSaveInterval)
 				} else {
@@ -237,7 +241,7 @@ export class PositionSavingManager {
 		if (
 			lastValidPlayerPosition &&
 			whatToPlayData &&
-			(!this.finishedPositionLoading || ignoreIfNotLoaded)
+			(this.finishedPositionLoading || ignoreIfNotLoaded)
 		) {
 			this.innerBus.emitEvent({
 				type: PositionSavingManagerEventType.PENDING,
@@ -269,6 +273,10 @@ export class PositionSavingManager {
 				}
 			})()
 		}
+	}
+
+	public suggestPositionSave = () => {
+		this.triggerPositionSave()
 	}
 
 	private savePosition = async (
