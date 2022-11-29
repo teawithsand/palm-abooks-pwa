@@ -10,12 +10,12 @@ import {
 	WhatToPlayDataType,
 } from "@app/domain/defines/whatToPlay/data"
 import { WhatToPlayStateType } from "@app/domain/defines/whatToPlay/state"
-import { JumpBackAfterPauseManager } from "@app/domain/managers/position/jumpBackAfterPause"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import {
 	PlayerManager,
 	PlayerManagerState,
 } from "@app/domain/managers/playerManager"
+import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseManager"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
 import { isTimeNumber } from "@teawithsand/tws-player"
 import { DefaultStickyEventBus, StickySubscribable } from "@teawithsand/tws-stl"
@@ -60,7 +60,7 @@ export class PositionLoadingManager {
 		wtpManager: WhatToPlayManager,
 		playerManager: PlayerManager,
 		private readonly playerActions: PlayerActionManager,
-		private readonly jumpBackAfterPauseManager: JumpBackAfterPauseManager
+		private readonly positionMoveAfterPauseManager: PositionMoveAfterPauseManager
 	) {
 		playerManager.playerStateBus.addSubscriber((state) => {
 			this.isPlayerReady = this.checkIsPlayerReady(state)
@@ -106,7 +106,7 @@ export class PositionLoadingManager {
 				)
 				if (sd) {
 					const delta =
-						this.jumpBackAfterPauseManager.computeJumpBackTimeForPastPlayed(
+						this.positionMoveAfterPauseManager.computeJumpBackTimeForPastPlayed(
 							null
 						)
 					this.playerActions.seek(sd)

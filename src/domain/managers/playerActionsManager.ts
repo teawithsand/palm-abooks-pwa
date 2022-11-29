@@ -18,11 +18,12 @@ import {
 
 // TODO(teawithsand): implement seek data here
 
+// TODO(teawithsand): get rid of WTP manager
 export class PlayerActionManager {
 	constructor(
 		private readonly playerManager: PlayerManager,
-		private readonly whatToPlayManager: WhatToPlayManager,
-		private readonly configManager: ConfigManager
+		private readonly configManager: ConfigManager,
+		private readonly whatToPlayManager: WhatToPlayManager
 	) {
 		this.initMediaSession()
 	}
@@ -86,7 +87,7 @@ export class PlayerActionManager {
 		if (!isTimeNumber(posMillis)) return
 
 		const { metadata, entriesBag } =
-			this.whatToPlayManager.bus.lastEvent ?? {}
+			this.playerManager.playerStateBus.lastEvent.whatToPlayData ?? {}
 		if (!metadata || !entriesBag) return
 
 		const index = metadata.getIndexFromPosition(posMillis)
@@ -121,7 +122,7 @@ export class PlayerActionManager {
 		if (sourceKey === null || currentPosition === null) return
 
 		const { metadata, entriesBag } =
-			this.whatToPlayManager.bus.lastEvent ?? {}
+			this.playerManager.playerStateBus.lastEvent.whatToPlayData ?? {}
 		if (!metadata || !entriesBag) return
 
 		const entryIndex = entriesBag.findIndexById(sourceKey)

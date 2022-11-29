@@ -32,13 +32,14 @@ export class AppManager {
 	public readonly configManager = new ConfigManager()
 	public readonly playerManager = new PlayerManager(
 		this.abookDb,
-		this.configManager
+		this.configManager,
+		this.whatToPlayManager
 	)
 
 	public readonly playerActionsManager = new PlayerActionManager(
 		this.playerManager,
-		this.whatToPlayManager,
-		this.configManager
+		this.configManager,
+		this.whatToPlayManager
 	)
 
 	public readonly positionMoveAfterPauseManager =
@@ -66,10 +67,6 @@ export class AppManager {
 	])
 
 	private constructor() {
-		this.whatToPlayManager.bus.addSubscriber((data) => {
-			this.playerManager.setSources(data?.entriesBag.entries ?? [])
-		})
-
 		this.configManager.globalPersistentPlayerState.bus.addSubscriber(
 			(config, canceler) => {
 				if (config !== undefined) {
