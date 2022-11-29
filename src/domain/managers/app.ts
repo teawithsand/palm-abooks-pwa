@@ -4,7 +4,7 @@ import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import { PlayerManager } from "@app/domain/managers/playerManager"
-import { PositionMoveAfterPauseHelper } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
+import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
 import { WhatToPlayLocatorResolverImpl } from "@app/domain/managers/whatToPlay/whatToPlayLocatorResolver"
@@ -34,17 +34,14 @@ export class AppManager {
 		this.whatToPlayManager
 	)
 
+	public readonly positionMoveAfterPauseManager =
+		new PositionMoveAfterPauseManager(this.playerManager)
+		
 	public readonly playerActionsManager = new PlayerActionManager(
 		this.playerManager,
 		this.configManager,
 		this.whatToPlayManager
 	)
-
-	public readonly positionMoveAfterPauseManager =
-		new PositionMoveAfterPauseHelper(
-			this.whatToPlayManager,
-			this.playerManager
-		)
 
 	public readonly initPromise = Promise.all([
 		this.configManager.loadedPromise,

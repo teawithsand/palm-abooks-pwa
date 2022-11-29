@@ -8,11 +8,7 @@ import {
 	PlayerManager,
 	PlayerManagerState,
 } from "@app/domain/managers/playerManager"
-import {
-	PositionLoadingManager,
-	PositionLoadingManagerStateType,
-} from "@app/domain/managers/position/positionLoadingManager"
-import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
+import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { AbookDb } from "@app/domain/storage/db"
 import { IntervalHelper } from "@app/util/IntervalHelper"
 import { getTimestamps, Timestamps } from "@app/util/timestamps"
@@ -88,7 +84,7 @@ export class PositionSavingManager {
 		private readonly db: AbookDb,
 		wtpManager: WhatToPlayManager,
 		playerManager: PlayerManager,
-		positionLoadingManager: PositionLoadingManager
+		positionLoadingManager: PositionLoadingHelper
 	) {
 		this.intervalHelper.bus.addSubscriber(() => {
 			this.triggerPositionSave()

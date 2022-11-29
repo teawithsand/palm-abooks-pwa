@@ -1,5 +1,6 @@
 import { Abook } from "@app/domain/defines/abook"
 import { PlayableEntry } from "@app/domain/defines/player/playableEntry"
+import { PositionVariants, SavedPositionVariants } from "@app/domain/defines/position"
 import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { PlayableEntriesBag } from "@app/domain/managers/playableEntriesBag"
 import { MetadataBag } from "@teawithsand/tws-player"
@@ -20,6 +21,7 @@ export type WhatToPlayData = {
 	entriesBag: PlayableEntriesBag
 	metadata: MetadataBag
 	locator: WhatToPlayLocator
+	positionToLoad: SavedPositionVariants | null
 } & (
 	| {
 			type: WhatToPlayDataType.ABOOK
