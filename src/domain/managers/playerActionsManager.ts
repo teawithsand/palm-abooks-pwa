@@ -3,7 +3,7 @@ import { SeekData, SeekType } from "@app/domain/defines/seek"
 import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { ConfigManager } from "@app/domain/managers/config"
 import { PlayerManager } from "@app/domain/managers/playerManager"
-import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
+import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { isTimeNumber } from "@teawithsand/tws-player"
 import {
 	MediaSessionApiHelper,
@@ -18,7 +18,6 @@ import {
 
 // TODO(teawithsand): implement seek data here
 
-// TODO(teawithsand): get rid of WTP manager
 export class PlayerActionManager {
 	constructor(
 		private readonly playerManager: PlayerManager,

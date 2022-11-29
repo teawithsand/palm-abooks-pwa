@@ -51,6 +51,7 @@ export class WhatToPlayLocatorResolverImpl
 				type: WhatToPlayLocatorType.ABOOK_ID,
 				id: abook.id,
 			},
+			positionToLoad: abook.position ?? {},
 		}
 	}
 
@@ -100,6 +101,7 @@ export class WhatToPlayLocatorResolverImpl
 				entries,
 				entriesBag: new PlayableEntriesBag(entries),
 				locator,
+				positionToLoad: {},
 			}
 		} else {
 			throw new Error(`Invalid locator ${locator}`)

@@ -4,13 +4,11 @@ import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import { PlayerManager } from "@app/domain/managers/playerManager"
-import { PositionLoadingManager } from "@app/domain/managers/position/positionLoadingManager"
-import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseManager"
-import { PositionSavingManager } from "@app/domain/managers/position/positionSavingManager"
+import { PositionMoveAfterPauseHelper } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
-import { WhatToPlayLocatorResolverImpl } from "@app/domain/managers/whatToPlayLocatorResolver"
-import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
+import { WhatToPlayLocatorResolverImpl } from "@app/domain/managers/whatToPlay/whatToPlayLocatorResolver"
+import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { AbookDb } from "@app/domain/storage/db"
 
 export class AppManager {
@@ -43,24 +41,10 @@ export class AppManager {
 	)
 
 	public readonly positionMoveAfterPauseManager =
-		new PositionMoveAfterPauseManager(
+		new PositionMoveAfterPauseHelper(
 			this.whatToPlayManager,
 			this.playerManager
 		)
-
-	public readonly positionLoadingManager = new PositionLoadingManager(
-		this.whatToPlayManager,
-		this.playerManager,
-		this.playerActionsManager,
-		this.positionMoveAfterPauseManager
-	)
-
-	public readonly positionSavingManager = new PositionSavingManager(
-		this.abookDb,
-		this.whatToPlayManager,
-		this.playerManager,
-		this.positionLoadingManager
-	)
 
 	public readonly initPromise = Promise.all([
 		this.configManager.loadedPromise,

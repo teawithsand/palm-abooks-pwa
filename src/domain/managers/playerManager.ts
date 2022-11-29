@@ -2,7 +2,7 @@ import { PlayableEntry } from "@app/domain/defines/player/playableEntry"
 import { WhatToPlayData } from "@app/domain/defines/whatToPlay/data"
 import { ConfigManager } from "@app/domain/managers/config"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
-import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
+import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { AbookDb } from "@app/domain/storage/db"
 import {
 	CollectionPlayerSourceProvider,

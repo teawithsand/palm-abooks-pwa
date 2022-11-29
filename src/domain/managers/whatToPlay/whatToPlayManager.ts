@@ -5,7 +5,7 @@ import {
 	WhatToPlayStateType,
 } from "@app/domain/defines/whatToPlay/state"
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
-import { WhatToPlayLocatorResolver } from "@app/domain/managers/whatToPlayLocatorResolver"
+import { WhatToPlayLocatorResolver } from "@app/domain/managers/whatToPlay/whatToPlayLocatorResolver"
 import {
 	DefaultStickyEventBus,
 	DefaultTaskAtom,
@@ -27,6 +27,9 @@ export class WhatToPlayManager {
 		return this.innerStateBus
 	}
 
+	/**
+	 * @deprecated Now full bus should be used.
+	 */
 	get bus(): StickySubscribable<WhatToPlayData | null> {
 		return this.innerSimpleBus
 	}
