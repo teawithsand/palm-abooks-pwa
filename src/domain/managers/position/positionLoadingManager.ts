@@ -10,7 +10,7 @@ import {
 	WhatToPlayDataType,
 } from "@app/domain/defines/whatToPlay/data"
 import { WhatToPlayStateType } from "@app/domain/defines/whatToPlay/state"
-import { JumpBackAfterPauseManager } from "@app/domain/managers/jumpBackAfterPause"
+import { JumpBackAfterPauseManager } from "@app/domain/managers/position/jumpBackAfterPause"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import {
 	PlayerManager,

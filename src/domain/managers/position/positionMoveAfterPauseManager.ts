@@ -2,7 +2,7 @@ import { PlayerManager } from "@app/domain/managers/playerManager"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlayManager"
 import { getNowTimestamp, TimestampMs } from "@teawithsand/tws-stl"
 
-export class JumpBackAfterPauseManager {
+export class PositionMoveAfterPauseManager {
 	private innerIsPlaying = false
 	private currentWhatToPlayDataId: string | null = null
 	private lastPauseTimestamp: TimestampMs | null = null

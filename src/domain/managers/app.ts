@@ -1,11 +1,11 @@
 import { lastPlayedSourceToWhatToPlaySourceLocator } from "@app/domain/defines/config/state"
 import { ConfigManager } from "@app/domain/managers/config"
 import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
-import { JumpBackAfterPauseManager } from "@app/domain/managers/jumpBackAfterPause"
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
 import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
 import { PlayerManager } from "@app/domain/managers/playerManager"
 import { PositionLoadingManager } from "@app/domain/managers/position/positionLoadingManager"
+import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseManager"
 import { PositionSavingManager } from "@app/domain/managers/position/positionSavingManager"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
@@ -41,16 +41,17 @@ export class AppManager {
 		this.configManager
 	)
 
-	public readonly jumpBackAfterPauseManager = new JumpBackAfterPauseManager(
-		this.whatToPlayManager,
-		this.playerManager
-	)
+	public readonly positionMoveAfterPauseManager =
+		new PositionMoveAfterPauseManager(
+			this.whatToPlayManager,
+			this.playerManager
+		)
 
 	public readonly positionLoadingManager = new PositionLoadingManager(
 		this.whatToPlayManager,
 		this.playerManager,
 		this.playerActionsManager,
-		this.jumpBackAfterPauseManager
+		this.positionMoveAfterPauseManager
 	)
 
 	public readonly positionSavingManager = new PositionSavingManager(

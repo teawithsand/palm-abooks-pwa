@@ -140,8 +140,29 @@ export class PositionSavingManager {
 		})
 
 		playerManager.playerStateBus.addSubscriber((state) => {
+			let requestImmediateSave = false
+
+			requestImmediateSave =
+				requestImmediateSave ||
+				this.playerManagerState?.innerState.config.sourceKey !==
+					state.innerState.config.sourceKey
+
+			requestImmediateSave =
+				requestImmediateSave ||
+				this.playerManagerState?.innerState.config.sourceProvider !==
+					state.innerState.config.sourceProvider
+
+			requestImmediateSave =
+				requestImmediateSave ||
+				(this.playerManagerState?.innerState.config.seekPosition !==
+					null &&
+					state.innerState.config.seekPosition === null)
+
 			this.playerManagerState = state
 			this.updateLastValidPosition()
+
+			// Here are some special save file conditions
+			if (requestImmediateSave) this.triggerPositionSave()
 		})
 	}
 
@@ -174,6 +195,13 @@ export class PositionSavingManager {
 			sourceProvider === null ||
 			whatToPlay === null ||
 			!this.finishedPositionLoading
+		)
+			return null
+
+		// Do not yield zero position, as it's default anyway
+		if (
+			position === 0 &&
+			sourceKey === sourceProvider.getNextSourceKey(null)
 		)
 			return null
 

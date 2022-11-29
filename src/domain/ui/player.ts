@@ -1,5 +1,6 @@
 import { PlayableEntry } from "@app/domain/defines/player/playableEntry"
 import { WhatToPlayData, WhatToPlayDataType } from "@app/domain/defines/whatToPlay/data"
+import { WhatToPlayLocatorType } from "@app/domain/defines/whatToPlay/locator"
 import { useAppManager } from "@app/domain/managers/app"
 import { PlayableEntriesBag } from "@app/domain/managers/playableEntriesBag"
 import { PlayerManagerState } from "@app/domain/managers/playerManager"
@@ -8,6 +9,7 @@ import {
 	MetadataLoadingResultType,
 	PlayerSourceProvider,
 } from "@teawithsand/tws-player"
+import { generateUUID } from "@teawithsand/tws-stl"
 import { useStickySubscribable } from "@teawithsand/tws-stl-react"
 import { useMemo, useRef } from "react"
 
@@ -61,6 +63,11 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 	const whatToPlayData: WhatToPlayData = useStickySubscribable(
 		app.whatToPlayManager.bus
 	) ?? {
+		id: generateUUID(),
+		locator: {
+			type: WhatToPlayLocatorType.RAW_ENTRIES,
+			files: []
+		},
 		type: WhatToPlayDataType.USER_PROVIDED_ENTRIES,
 		entriesBag: new PlayableEntriesBag([]),
 		metadata: new MetadataBag([]),
