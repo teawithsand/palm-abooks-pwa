@@ -3,7 +3,7 @@ import { WhatToPlayData, WhatToPlayDataType } from "@app/domain/defines/whatToPl
 import { WhatToPlayLocatorType } from "@app/domain/defines/whatToPlay/locator"
 import { useAppManager } from "@app/domain/managers/app"
 import { PlayableEntriesBag } from "@app/domain/managers/playableEntriesBag"
-import { PlayerManagerState } from "@app/domain/managers/playerManager"
+import { PlayerManagerState } from "@app/domain/managers/player/playerManager"
 import {
 	MetadataBag,
 	MetadataLoadingResultType,

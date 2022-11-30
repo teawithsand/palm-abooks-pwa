@@ -2,12 +2,14 @@ import { lastPlayedSourceToWhatToPlaySourceLocator } from "@app/domain/defines/c
 import { ConfigManager } from "@app/domain/managers/config"
 import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
 import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
-import { PlayerActionManager } from "@app/domain/managers/playerActionsManager"
-import { PlayerManager } from "@app/domain/managers/playerManager"
+import { PlayerActionManager } from "@app/domain/managers/player/playerActionsManager"
+import { PlayerManager } from "@app/domain/managers/player/playerManager"
 import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
+import { PositionSavingManager } from "@app/domain/managers/position/positionSavingManager"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
 import { WhatToPlayLocatorResolverImpl } from "@app/domain/managers/whatToPlay/whatToPlayLocatorResolver"
+import { WhatToPlayLocatorWriterImpl } from "@app/domain/managers/whatToPlay/whatToPlayLocatorWriter"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { AbookDb } from "@app/domain/storage/db"
 
@@ -34,9 +36,14 @@ export class AppManager {
 		this.whatToPlayManager
 	)
 
+	public readonly positionSavingManager = new PositionSavingManager(
+		this.playerManager,
+		new WhatToPlayLocatorWriterImpl(this.abookDb)
+	)
+
 	public readonly positionMoveAfterPauseManager =
 		new PositionMoveAfterPauseManager(this.playerManager)
-		
+
 	public readonly playerActionsManager = new PlayerActionManager(
 		this.playerManager,
 		this.configManager,

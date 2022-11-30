@@ -1,4 +1,4 @@
-import { PlayerManager } from "@app/domain/managers/playerManager"
+import { PlayerManager } from "@app/domain/managers/player/playerManager"
 import { getNowTimestamp, TimestampMs } from "@teawithsand/tws-stl"
 
 export class PositionMoveAfterPauseManager {

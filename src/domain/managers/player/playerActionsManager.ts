@@ -2,7 +2,7 @@ import { whatToPlaySourceLocatorToLastPlayedSource } from "@app/domain/defines/c
 import { SeekData, SeekType } from "@app/domain/defines/seek"
 import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { ConfigManager } from "@app/domain/managers/config"
-import { PlayerManager } from "@app/domain/managers/playerManager"
+import { PlayerManager } from "@app/domain/managers/player/playerManager"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { isTimeNumber } from "@teawithsand/tws-player"
 import {

@@ -8,7 +8,6 @@ import { WhatToPlayData } from "@app/domain/defines/whatToPlay/data"
 import { ConfigManager } from "@app/domain/managers/config"
 import { SeekEventType, SeekQueue } from "@app/domain/managers/player/seekQueue"
 import { PositionAndSeekDataResolver } from "@app/domain/managers/position/positionAndSeekDataResolver"
-import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
 import {
 	computeJumpBackTimeAfterPauseDuration,
 	DEFAULT_POSITION_MOVE_AFTER_PAUSE_STRATEGY,
@@ -67,7 +66,7 @@ export class PlayerManager {
 		return this.innerPlayerStateBus
 	}
 
-	public readonly seekQueue = new SeekQueue(this)
+	public readonly seekQueue: SeekQueue
 	public readonly resolver = new PositionAndSeekDataResolver()
 
 	constructor(
@@ -75,9 +74,6 @@ export class PlayerManager {
 		configManager: ConfigManager,
 		whatToPlayManager: WhatToPlayManager
 	) {
-		whatToPlayManager.bus.addSubscriber((data) => {
-			this.setWhatToPlayData(data)
-		})
 		this.player = new Player<PlayableEntry, string>(
 			new PlayableEntryPlayerSourceResolver(db)
 		)
@@ -88,6 +84,12 @@ export class PlayerManager {
 				whatToPlayData: null,
 				positionLoadingState: PositionLoadingState.IDLE,
 			})
+
+		this.seekQueue = new SeekQueue(this)
+
+		whatToPlayManager.bus.addSubscriber((data) => {
+			this.setWhatToPlayData(data)
+		})
 
 		this.player.stateBus.addSubscriber((state) => {
 			this.mediaSessionManager.setPositionState({
@@ -169,7 +171,7 @@ export class PlayerManager {
 				},
 				whatToPlayData.positionToLoad.variants
 			)
-			
+
 			if (!seekData) {
 				initPositionLoadingState = PositionLoadingState.ERROR
 			} else {

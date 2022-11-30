@@ -7,7 +7,7 @@ import { PlayableEntriesBag } from "@app/domain/managers/playableEntriesBag"
 import {
 	PlayerManager,
 	PlayerManagerState,
-} from "@app/domain/managers/playerManager"
+} from "@app/domain/managers/player/playerManager"
 import { PositionAndSeekDataResolver } from "@app/domain/managers/position/positionAndSeekDataResolver"
 import { Queue } from "@app/util/queue"
 import { MetadataBag } from "@teawithsand/tws-player"

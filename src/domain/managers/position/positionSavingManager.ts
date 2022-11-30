@@ -1,15 +1,12 @@
-import { AbookId } from "@app/domain/defines/abook"
 import { PlayableEntryType } from "@app/domain/defines/player/playableEntry"
 import { PositionType, PositionVariants } from "@app/domain/defines/position"
 import { WhatToPlayData } from "@app/domain/defines/whatToPlay/data"
-import { WhatToPlayLocatorType } from "@app/domain/defines/whatToPlay/locator"
-import { WhatToPlayStateType } from "@app/domain/defines/whatToPlay/state"
 import {
 	PlayerManager,
 	PlayerManagerState,
-} from "@app/domain/managers/playerManager"
-import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
-import { AbookDb } from "@app/domain/storage/db"
+	PositionLoadingState,
+} from "@app/domain/managers/player/playerManager"
+import { WhatToPlayLocatorWriter } from "@app/domain/managers/whatToPlay/whatToPlayLocatorWriter"
 import { IntervalHelper } from "@app/util/IntervalHelper"
 import { getTimestamps, Timestamps } from "@app/util/timestamps"
 import { isTimeNumber } from "@teawithsand/tws-player"
@@ -81,35 +78,31 @@ export class PositionSavingManager {
 	private finishedPositionLoading = false
 
 	constructor(
-		private readonly db: AbookDb,
-		wtpManager: WhatToPlayManager,
 		playerManager: PlayerManager,
-		positionLoadingManager: PositionLoadingHelper
+		private readonly writer: WhatToPlayLocatorWriter
 	) {
 		this.intervalHelper.bus.addSubscriber(() => {
 			this.triggerPositionSave()
 		})
 
-		positionLoadingManager.bus.addSubscriber((state) => {
-			this.finishedPositionLoading = [
-				PositionLoadingManagerStateType.ERROR, // in that case do override
-				PositionLoadingManagerStateType.NOT_FOUND,
-				PositionLoadingManagerStateType.LOADED,
-			].includes(state.type)
-		})
+		playerManager.playerStateBus.addSubscriber((state) => {
+			const whatToPlayData = state.whatToPlayData
 
-		wtpManager.stateBus.addSubscriber((state) => {
-			const data =
-				state.type === WhatToPlayStateType.LOADED ? state.data : null
+			const loadedPosition =
+				whatToPlayData !== null &&
+				(state.positionLoadingState === PositionLoadingState.LOADED ||
+					state.positionLoadingState ===
+						PositionLoadingState.NOT_FOUND)
+			this.finishedPositionLoading = loadedPosition
 
-			const changed = data?.id !== this.whatToPlayData?.id
+			const changed = whatToPlayData?.id !== this.whatToPlayData?.id
 			if (changed && this.whatToPlayData !== null) {
 				// TODO(teawithsand): for numerous reasons it's really bad
 				// it would be much simpler to trigger position save and then kill player
 				this.onBeforeWtpDataUnset() // still we can run something on old WTP data
 			}
 
-			this.whatToPlayData = data
+			this.whatToPlayData = whatToPlayData
 
 			if (changed) {
 				// make sure we use updated player state, even though
@@ -121,13 +114,7 @@ export class PositionSavingManager {
 			this.updateLastValidPosition()
 
 			if (changed) {
-				this.finishedPositionLoading = [
-					PositionLoadingManagerStateType.ERROR, // in that case do override
-					PositionLoadingManagerStateType.NOT_FOUND,
-					PositionLoadingManagerStateType.LOADED,
-				].includes(positionLoadingManager.bus.lastEvent.type)
-
-				if (data) {
+				if (whatToPlayData) {
 					this.intervalHelper.setDelay(this.positionSaveInterval)
 				} else {
 					this.intervalHelper.disable()
@@ -308,27 +295,9 @@ export class PositionSavingManager {
 		data: WhatToPlayData
 	) =>
 		await this.mutex.withLock(async () => {
-			const { locator } = data
-
-			if (
-				locator.type === WhatToPlayLocatorType.ABOOK ||
-				locator.type === WhatToPlayLocatorType.ABOOK_ID
-			) {
-				let abookId: AbookId
-				if (locator.type === WhatToPlayLocatorType.ABOOK) {
-					abookId = locator.abook.id
-				} else {
-					abookId = locator.id
-				}
-
-				const writeAccess = await this.db.abookWriteAccess(abookId)
-				try {
-					await writeAccess.update((draft) => {
-						draft.position = pos.position
-					})
-				} finally {
-					writeAccess.release()
-				}
-			}
+			await this.writer.savePosition(data.locator, {
+				variants: pos.position,
+				savedTimestamp: pos.createTimestamps.ts,
+			})
 		})
 }
