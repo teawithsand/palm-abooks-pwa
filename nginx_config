@@ -1,0 +1,143 @@
+server {
+    listen 443 ssl http2 default_server;
+    server_name abook.teawithsand.com;
+    root /app/public/tws-abook-player;
+
+    ssl_certificate     /app/certs/www.teawithsand.com.pem;
+    ssl_certificate_key /app/certs/www.teawithsand.com.key;
+
+    # Some basic security headers
+    # note: CSP should be added by app using HTML meta
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Strict-Transport-Security "max-age=15780000; includeSubDomains; preload" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+
+    # https://www.cloudflare.com/ips/
+    # Disallow non-cloudflare connections to nginx
+
+    
+    # Allow localhost ofc
+    # allow 127.0.0.1;
+    # 
+    # allow 173.245.48.0/20;
+    # allow 103.21.244.0/22;
+    # allow 103.22.200.0/22;
+    # allow 103.31.4.0/22;
+    # allow 141.101.64.0/18;
+    # allow 108.162.192.0/18;
+    # allow 190.93.240.0/20;
+    # allow 188.114.96.0/20;
+    # allow 197.234.240.0/22;
+    # allow 198.41.128.0/17;
+    # allow 162.158.0.0/15;
+    # allow 104.16.0.0/13;
+    # allow 104.24.0.0/14;
+    # allow 172.64.0.0/13;
+    # allow 131.0.72.0/22;
+    # 
+    # allow 2400:cb00::/32;
+    # allow 2606:4700::/32;
+    # allow 2803:f800::/32;
+    # allow 2405:b500::/32;
+    # allow 2405:8100::/32;
+    # allow 2a06:98c0::/29;
+    # allow 2c0f:f248::/32;
+    # 
+    # deny all;
+
+    add_header Cache-Control "private";
+    expires 1s;
+
+    error_page 404 /404.html;
+    index index.html;
+
+    # Remove trailing slash
+    rewrite ^/(.*)/$ /$1 permanent; 
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location = /favicon.ico {
+        add_header Cache-Control "public";
+        add_header Vary Accept-Encoding;
+        
+        expires 1s;
+
+        access_log off;
+        tcp_nodelay off;
+    }
+
+    location = /robots.txt {
+        add_header Cache-Control "public";
+        add_header Vary Accept-Encoding;
+
+        expires 1s;
+
+        access_log off;
+        tcp_nodelay off;
+    }
+
+    location = /sw.js {
+        add_header Cache-Control "public";
+        add_header Vary Accept-Encoding;
+
+        expires 1s;
+
+        access_log off;
+        tcp_nodelay off;
+    }
+
+    location = /page-data.json {
+        add_header Cache-Control "public";
+        add_header Vary Accept-Encoding;
+
+        expires 1s;
+
+        access_log off;
+        tcp_nodelay off;
+    }
+
+
+    location = /app-data.json {
+        add_header Cache-Control "public";
+        add_header Vary Accept-Encoding;
+
+        expires 1s;
+
+        access_log off;
+        tcp_nodelay off;
+    }
+
+    # While it's really useful to cache HTML files, it's not safe as we want to have different HTML on same path while we update site.
+    #
+    # That being said
+    # ETag caches should work great for these pages
+    # So maybe some solution is to disable cache at all
+    # One of reasons being better site statistics in access logs
+    location ~* \.(html)$ {
+        expires 5s; # 5s expires is ok I guess. Aside from that ETag and LastModified still work
+
+        add_header Vary Accept-Encoding;
+        add_header Cache-Control "public";
+    }
+
+    # For json use a bit more secure caching, since 
+    # some gatsby's JSONs are not safe to cache for eternity
+    location ~* \.(json)$ {
+        access_log off;
+        expires 5m;
+
+        add_header Vary Accept-Encoding;
+        add_header Cache-Control "public";
+    }
+
+    location ~* \.(wasm|css|gif|jpg|js|png|otf|pdf|sng|xls|doc|exe|jpeg|tgx|webp|avif)$ {
+        access_log off;
+        expires max;
+
+        tcp_nodelay off;
+
+        add_header Vary Accept-Encoding;
+        add_header Cache-Control "public";
+    }
+}

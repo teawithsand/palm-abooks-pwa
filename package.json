@@ -13,6 +13,7 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "typecheck": "tsc --noEmit",
+    "deploy": "DEPLOYER_PROJECT_NAME=tws-abook-player /build/deployer.py push-static ./public ./nginx_config",
     "test": "jest"
   },
   "dependencies": {
