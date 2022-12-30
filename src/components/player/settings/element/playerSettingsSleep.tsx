@@ -21,15 +21,7 @@ export const PlayerSettingsSleepSection = () => {
 		useStickySubscribable(app.configManager.globalPlayerConfig.bus)
 			?.sleepConfig || INIT_GLOBAL_PLAYER_CONFIG.sleepConfig
 	const actions = app.playerActionsManager
-	const resetSleepIfNeeded = () => {
-		if (
-			app.sleepManager.bus.lastEvent.type ===
-				SleepManagerStateType.ENABLED ||
-			app.sleepManager.bus.lastEvent.type ===
-				SleepManagerStateType.ENABLED_BUT_STOPPED
-		)
-			actions.setSleepFromConfig()
-	}
+	const resetSleepIfNeeded = () => actions.resetSleep()
 
 	return (
 		<Container>
@@ -87,6 +79,22 @@ export const PlayerSettingsSleepSection = () => {
 					})
 
 					resetSleepIfNeeded()
+				}}
+			/>
+			<Form.Check
+				label="Enabled"
+				checked={
+					app.sleepManager.bus.lastEvent.type ===
+						SleepManagerStateType.ENABLED ||
+					app.sleepManager.bus.lastEvent.type ===
+						SleepManagerStateType.ENABLED_BUT_STOPPED
+				}
+				onChange={(v) => {
+					if (v.target.checked) {
+						app.playerActionsManager.setSleepFromConfig()
+					}else{
+						app.playerActionsManager.unsetSleep()
+					}
 				}}
 			/>
 		</Container>

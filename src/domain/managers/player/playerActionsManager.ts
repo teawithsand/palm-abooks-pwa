@@ -53,13 +53,13 @@ export class PlayerActionManager {
 			} else if (event.type === MediaSessionEventType.PREVIOUS_TRACK) {
 				this.executeSeekAction(
 					this.configManager.globalPlayerConfig.getOrThrow()
-						.mediaSessionSeekAction,
+						.seekActions.mediaSession,
 					true
 				)
 			} else if (event.type === MediaSessionEventType.NEXT_TRACK) {
 				this.executeSeekAction(
 					this.configManager.globalPlayerConfig.getOrThrow()
-						.mediaSessionSeekAction,
+						.seekActions.mediaSession,
 					false
 				)
 			}
@@ -198,32 +198,30 @@ export class PlayerActionManager {
 
 	public shortForwardButtonAction = () => {
 		this.executeSeekAction(
-			this.configManager.globalPlayerConfig.getOrThrow()
-				.shortButtonSeekAction,
+			this.configManager.globalPlayerConfig.getOrThrow().seekActions
+				.short,
 			false
 		)
 	}
 
 	public longForwardButtonAction = () => {
 		this.executeSeekAction(
-			this.configManager.globalPlayerConfig.getOrThrow()
-				.longButtonSeekAction,
+			this.configManager.globalPlayerConfig.getOrThrow().seekActions.long,
 			false
 		)
 	}
 
 	public shortBackwardButtonAction = () => {
 		this.executeSeekAction(
-			this.configManager.globalPlayerConfig.getOrThrow()
-				.shortButtonSeekAction,
+			this.configManager.globalPlayerConfig.getOrThrow().seekActions
+				.short,
 			true
 		)
 	}
 
 	public longBackwardButtonAction = () => {
 		this.executeSeekAction(
-			this.configManager.globalPlayerConfig.getOrThrow()
-				.longButtonSeekAction,
+			this.configManager.globalPlayerConfig.getOrThrow().seekActions.long,
 			true
 		)
 	}

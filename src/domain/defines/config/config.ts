@@ -10,9 +10,11 @@ export type GlobalPlayerConfig = {
 	preservePitchForSpeed: boolean
 	isSleepEnabled: boolean
 
-	mediaSessionSeekAction: PlayerSeekAction
-	shortButtonSeekAction: PlayerSeekAction
-	longButtonSeekAction: PlayerSeekAction
+	seekActions: {
+		mediaSession: PlayerSeekAction
+		short: PlayerSeekAction
+		long: PlayerSeekAction
+	}
 }
 
 export const INIT_GLOBAL_PLAYER_CONFIG: GlobalPlayerConfig = {
@@ -28,18 +30,20 @@ export const INIT_GLOBAL_PLAYER_CONFIG: GlobalPlayerConfig = {
 		turnVolumeDownStartLevel: 1,
 	},
 
-	mediaSessionSeekAction: {
-		type: PlayerSeekActionType.SEEK_RELATIVE,
-		offsetMillis: 10 * 1000,
-	},
+	seekActions: {
+		mediaSession: {
+			type: PlayerSeekActionType.SEEK_RELATIVE,
+			offsetMillis: 10 * 1000,
+		},
 	
-	shortButtonSeekAction: {
-		type: PlayerSeekActionType.SEEK_RELATIVE,
-		offsetMillis: 10 * 1000,
-	},
-
-	longButtonSeekAction: {
-		type: PlayerSeekActionType.SEEK_RELATIVE,
-		offsetMillis: 60 * 1000,
-	},
+		short: {
+			type: PlayerSeekActionType.SEEK_RELATIVE,
+			offsetMillis: 10 * 1000,
+		},
+	
+		long: {
+			type: PlayerSeekActionType.SEEK_RELATIVE,
+			offsetMillis: 60 * 1000,
+		},
+	}
 }
