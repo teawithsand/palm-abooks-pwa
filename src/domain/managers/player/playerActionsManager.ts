@@ -208,6 +208,15 @@ export class PlayerActionManager {
 		})
 	}
 
+	public setPreservePitchForSpeed = (preserve: boolean) => {
+		this.playerManager.mutateConfig((draft) => {
+			draft.preservePitchForSpeed = preserve
+		})
+		this.configManager.globalPlayerConfig.update((draft) => {
+			draft.preservePitchForSpeed = preserve
+		})
+	}
+
 	public setSleepConfigManual = (sleepData: SleepConfig | null) => {
 		this.sleepManager.setSleep(sleepData)
 	}

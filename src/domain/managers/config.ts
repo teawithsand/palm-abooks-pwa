@@ -70,7 +70,7 @@ function objectEquals(x: any, y: any): boolean {
 	)
 }
 
-export class GenericConfigManager<T extends {}> {
+export class GenericConfigManager<T extends Record<string, any>> {
 	public readonly innerBus: EmptyStickyEventBus<T>
 	public get bus(): StickySubscribable<T | undefined> {
 		return this.innerBus
@@ -91,7 +91,12 @@ export class GenericConfigManager<T extends {}> {
 
 		const loadedPromise = mutex.withLock(async () => {
 			this.innerBus.emitEvent(
-				(await forage.getItem<T>(key)) ?? initialValue
+				{
+					// hack to make sure that all new fields are added
+					// it's NOT here to implement backward compatibility or sth, it's more of debugging helper for dev releases
+					...initialValue, 
+					...(await forage.getItem<T>(key)),
+				} ?? initialValue
 			)
 		})
 		this.loadedPromise = loadedPromise

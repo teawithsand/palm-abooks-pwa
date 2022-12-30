@@ -1,13 +1,12 @@
-import { PageContainer } from "@app/components/PageContainer"
+import { PageContainer, PageContainerType } from "@app/components/PageContainer"
+import { PlayerSettings } from "@app/components/player/settings/playerSettings"
 import { wrapLocationProvider } from "@app/util/useLocation"
 import React from "react"
 
 const PlayerOptionsPage = () => {
 	return (
-		<PageContainer>
-			{
-				// TODO(teawithsand): implement this page. Add things like speed here.
-			}
+		<PageContainer type={PageContainerType.NORMAL} title="Player settings">
+			<PlayerSettings />
 		</PageContainer>
 	)
 }
