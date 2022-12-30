@@ -3,6 +3,10 @@ import { SeekData, SeekType } from "@app/domain/defines/seek"
 import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { ConfigManager } from "@app/domain/managers/config"
 import { PlayerManager } from "@app/domain/managers/player/playerManager"
+import {
+	SleepConfig,
+	SleepManager,
+} from "@app/domain/managers/sleep/sleepManager"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { isTimeNumber } from "@teawithsand/tws-player"
 import {
@@ -22,7 +26,8 @@ export class PlayerActionManager {
 	constructor(
 		private readonly playerManager: PlayerManager,
 		private readonly configManager: ConfigManager,
-		private readonly whatToPlayManager: WhatToPlayManager
+		private readonly whatToPlayManager: WhatToPlayManager,
+		private readonly sleepManager: SleepManager
 	) {
 		this.initMediaSession()
 	}
@@ -203,8 +208,23 @@ export class PlayerActionManager {
 		})
 	}
 
-	public setSleep = (sleepData: null) => {
-		// TODO(teawithsand): NIY
+	public setSleepConfigManual = (sleepData: SleepConfig | null) => {
+		this.sleepManager.setSleep(sleepData)
+	}
+
+	public setSleepFromConfig = () => {
+		// this.setSleepConfigManual(this.configManager.globalPlayerConfig.getOrThrow().sleepConfig)
+		this.setSleepConfigManual({
+			baseDuration: 30 * 1000,
+			shakeResetsSleep: true,
+			turnVolumeDownDuration: 10 * 1000,
+			turnVolumeDownEndLevel: 0,
+			turnVolumeDownStartLevel: 1,
+		})
+	}
+
+	public unsetSleep = () => {
+		this.setSleepConfigManual(null)
 	}
 
 	public setWhatToPlayLocator = (locator: WhatToPlayLocator | null) => {

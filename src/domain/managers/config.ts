@@ -162,6 +162,18 @@ export class GenericConfigManager<T extends {}> {
 			)
 		}
 	}
+
+	/**
+	 * Throws if config is not loaded.
+	 */
+	getOrThrow = (): T => {
+		const { lastEvent } = this.bus
+		if (lastEvent === undefined) {
+			throw new Error(`Config was not loaded yet`)
+		}
+
+		return lastEvent
+	}
 }
 
 export class ConfigManager {

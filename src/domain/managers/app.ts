@@ -7,6 +7,7 @@ import { PlayerManager } from "@app/domain/managers/player/playerManager"
 import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
 import { PositionSavingManager } from "@app/domain/managers/position/positionSavingManager"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
+import { SleepManager } from "@app/domain/managers/sleep/sleepManager"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
 import { WhatToPlayLocatorResolverImpl } from "@app/domain/managers/whatToPlay/whatToPlayLocatorResolver"
 import { WhatToPlayLocatorWriterImpl } from "@app/domain/managers/whatToPlay/whatToPlayLocatorWriter"
@@ -35,6 +36,7 @@ export class AppManager {
 		this.configManager,
 		this.whatToPlayManager
 	)
+	public readonly sleepManager = new SleepManager(this.playerManager)
 
 	public readonly positionSavingManager = new PositionSavingManager(
 		this.playerManager,
@@ -47,7 +49,8 @@ export class AppManager {
 	public readonly playerActionsManager = new PlayerActionManager(
 		this.playerManager,
 		this.configManager,
-		this.whatToPlayManager
+		this.whatToPlayManager,
+		this.sleepManager,
 	)
 
 	public readonly initPromise = Promise.all([

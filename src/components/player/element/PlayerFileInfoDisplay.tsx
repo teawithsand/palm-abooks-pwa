@@ -11,6 +11,8 @@ const Container = styled.div`
 	overflow: hidden;
 	text-align: center;
 
+	word-break: break-word;
+
 	font-size: 1.2em;
 `
 
@@ -42,6 +44,8 @@ export const PlayerFileInfoDisplay = () => {
 	} else {
 		if (ui.whatToPlayData.type === WhatToPlayDataType.ABOOK) {
 			content = `Now playing: ${ui.whatToPlayData.abook.metadata.title}/${name}`
+		} else {
+			content = ""
 		}
 	}
 

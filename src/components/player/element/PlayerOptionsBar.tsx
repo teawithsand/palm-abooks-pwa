@@ -8,10 +8,15 @@ import InnerPause from "@app/components/player/icons/pause.svg"
 import InnerPlay from "@app/components/player/icons/play.svg"
 import Skip from "@app/components/player/icons/skip.svg"
 
-import { breakpointMediaDown, BREAKPOINT_MD } from "@teawithsand/tws-stl-react"
+import {
+	breakpointMediaDown,
+	BREAKPOINT_MD,
+	useStickySubscribable,
+} from "@teawithsand/tws-stl-react"
 import { Button } from "react-bootstrap"
 import { LinkContainer } from "@app/util/LinkContainer"
 import { useAppPaths } from "@app/paths"
+import { SleepManagerStateType } from "@app/domain/managers/sleep/sleepManager"
 
 const Play = styled(InnerPlay)``
 
@@ -40,7 +45,9 @@ const Bar = styled.div`
 
 export const PlayerOptionsBar = () => {
 	const uiData = useUiPlayerData()
-	const actions = useAppManager().playerActionsManager
+	const app = useAppManager()
+	const actions = app.playerActionsManager
+	const sleepState = useStickySubscribable(app.sleepManager.bus)
 
 	const { playerOptionsPath } = useAppPaths()
 
@@ -49,6 +56,17 @@ export const PlayerOptionsBar = () => {
 			<LinkContainer to={playerOptionsPath}>
 				<Button href="#">Player options</Button>
 			</LinkContainer>
+			<Button
+				onClick={() => {
+					if (sleepState.type === SleepManagerStateType.DISABLED) {
+						actions.setSleepFromConfig()
+					} else {
+						actions.unsetSleep()
+					}
+				}}
+			>
+				Toggle sleep
+			</Button>
 		</Bar>
 	)
 }
