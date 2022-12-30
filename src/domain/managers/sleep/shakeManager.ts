@@ -64,15 +64,21 @@ export class ShakeManager {
 				listener = (event) => {
 					const now = getNowPerformanceTimestamp()
 					const { x = 0, y = 0, z = 0 } = event.acceleration ?? {}
-					const acceleration = [x ?? 0, y ?? 0, z ?? 0]
-						.map((v) => v * v)
-						.reduce((pv, v) => pv + v)
+					const acceleration = Math.sqrt(
+						[x ?? 0, y ?? 0, z ?? 0]
+							.map((v) => v * v)
+							.reduce((pv, v) => pv + v)
+					)
 					if (lastAcceleration === null) {
 						lastAcceleration = {
 							acc: acceleration,
 							ts: now,
 						}
 					} else {
+						if (now - lastAcceleration.ts < 10) {
+							// wait for next event, refresh was too fast
+							return
+						}
 						const delta = Math.abs(
 							lastAcceleration.acc - acceleration
 						)

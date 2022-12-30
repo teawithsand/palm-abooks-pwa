@@ -187,7 +187,9 @@ export class SleepManager {
 
 				// for now we exclusively own volume here, in other cases it may be delegated to somewhere else
 				playerManager.mutateConfig((draft) => (draft.volume = volume))
-			} else if (
+			}
+			
+			if (
 				event.type === SleepEventType.SLEEP_CANCEL ||
 				event.type === SleepEventType.SLEEP_FINISHED
 			) {

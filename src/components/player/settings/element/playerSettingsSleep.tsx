@@ -62,10 +62,6 @@ export const PlayerSettingsSleepSection = () => {
 					const newTurnVolumeDownDuration = v.target.checked
 						? 10 * 1000
 						: 0
-					console.log({
-						checked: v.target.checked,
-						newTurnVolumeDownDuration,
-					})
 
 					app.configManager.globalPlayerConfig.update((draft) => {
 						draft.sleepConfig = {
@@ -95,6 +91,22 @@ export const PlayerSettingsSleepSection = () => {
 					}else{
 						app.playerActionsManager.unsetSleep()
 					}
+				}}
+			/>
+			<Form.Check
+				label="Shaking resets sleep"
+				checked={
+					sleepConfig.shakeResetsSleep
+				}
+				disabled={!app.shakeManager.isSupported}
+				onChange={(v) => {
+					const checked = v.target.checked
+					
+					app.configManager.globalPlayerConfig.update((draft) => {
+						draft.sleepConfig.shakeResetsSleep = checked
+					})
+
+					resetSleepIfNeeded()
 				}}
 			/>
 		</Container>
