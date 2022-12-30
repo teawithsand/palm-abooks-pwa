@@ -102,7 +102,7 @@ export const AbookSmallCard = (props: { abook: Abook }) => {
 						<li>Never played</li>
 					)}
 					{duration ? (
-						<li>Duration: {formatDurationSeconds(duration)}</li>
+						<li>Duration: {formatDurationSeconds(duration / 1000)}</li>
 					) : (
 						<li>Duration not loaded or there is no files</li>
 					)}
