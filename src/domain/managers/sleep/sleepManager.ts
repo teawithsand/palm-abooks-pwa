@@ -1,5 +1,6 @@
 import { ConfigManager } from "@app/domain/managers/config"
 import { PlayerManager } from "@app/domain/managers/player/playerManager"
+import { ShakeManager } from "@app/domain/managers/sleep/shakeManager"
 import { Timestamps, getTimestamps } from "@app/util/timestamps"
 import {
 	SleepEventType,
@@ -50,13 +51,13 @@ export class SleepManager {
 	private readonly configBus: StickyEventBus<SleepConfig | null> =
 		new DefaultStickyEventBus(null)
 
-	private readonly innerPlayerStateBus: StickyEventBus<SleepManagerState> =
+	private readonly innerBus: StickyEventBus<SleepManagerState> =
 		new DefaultStickyEventBus({
 			type: SleepManagerStateType.DISABLED,
 		})
 
 	public get bus(): StickySubscribable<SleepManagerState> {
-		return this.innerPlayerStateBus
+		return this.innerBus
 	}
 
 	setSleep = (sleepConfig: SleepConfig | null) => {
@@ -71,12 +72,23 @@ export class SleepManager {
 
 	constructor(
 		playerManager: PlayerManager,
-		private readonly configManager: ConfigManager
+		private readonly configManager: ConfigManager,
+		shakeManager: ShakeManager
 	) {
 		let currentSleepConfig: SleepConfig | null = null
 		let lastIsPlayingWhenReady =
 			playerManager.playerStateBus.lastEvent.innerState.config
 				.isPlayingWhenReady
+
+		shakeManager.shakeBus.addSubscriber(() => {
+			const lastEvent = this.innerBus.lastEvent
+			if (
+				lastEvent.type === SleepManagerStateType.ENABLED &&
+				lastEvent.config.shakeResetsSleep
+			) {
+				this.setSleep(lastEvent.config)
+			}
+		})
 
 		const syncConfigToHelper = (
 			config: SleepConfig | null,
@@ -86,19 +98,19 @@ export class SleepManager {
 				// if player config was updated for different reason, we do not want to handle it
 
 				if (isPlaying) {
-					this.innerPlayerStateBus.emitEvent({
+					this.innerBus.emitEvent({
 						type: SleepManagerStateType.ENABLED,
 						config,
 						startedTimestamps: getTimestamps(),
 					})
 				} else {
-					this.innerPlayerStateBus.emitEvent({
+					this.innerBus.emitEvent({
 						type: SleepManagerStateType.ENABLED_BUT_STOPPED,
 						config,
 					})
 				}
 			} else {
-				this.innerPlayerStateBus.emitEvent({
+				this.innerBus.emitEvent({
 					type: SleepManagerStateType.DISABLED,
 				})
 			}
@@ -135,7 +147,7 @@ export class SleepManager {
 			}
 		})
 
-		this.innerPlayerStateBus.addSubscriber((state) => {
+		this.innerBus.addSubscriber((state) => {
 			if (state.type === SleepManagerStateType.ENABLED) {
 				const { config } = state
 				this.sleepHelper.setSleep({

@@ -7,6 +7,7 @@ import { PlayerManager } from "@app/domain/managers/player/playerManager"
 import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
 import { PositionSavingManager } from "@app/domain/managers/position/positionSavingManager"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
+import { ShakeManager } from "@app/domain/managers/sleep/shakeManager"
 import { SleepManager } from "@app/domain/managers/sleep/sleepManager"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
 import { WhatToPlayLocatorResolverImpl } from "@app/domain/managers/whatToPlay/whatToPlayLocatorResolver"
@@ -20,6 +21,7 @@ export class AppManager {
 	 * Use `useAppManager` hook instead.
 	 */
 	public static readonly instance: AppManager = new AppManager()
+	public readonly shakeManager = new ShakeManager()
 	public readonly globalEventsManager = new GlobalEventsManager()
 	public readonly storageSizeManager = new StorageSizeManager()
 	public readonly abookDb: AbookDb = new AbookDb(this.storageSizeManager)
@@ -38,7 +40,8 @@ export class AppManager {
 	)
 	public readonly sleepManager = new SleepManager(
 		this.playerManager,
-		this.configManager
+		this.configManager,
+		this.shakeManager
 	)
 
 	public readonly positionSavingManager = new PositionSavingManager(
@@ -61,6 +64,16 @@ export class AppManager {
 	])
 
 	private constructor() {
+		// Enabling has to be done by user initiated event.
+		// Click is good enough to do so at some point, if it's required
+		document.addEventListener("click", () => {
+			if (this.configManager.globalPlayerConfig.loaded) {
+				// enable this if it's needed or not just because it may become needed at some point
+				// and why not
+				this.shakeManager.enable()
+			}
+		})
+
 		this.configManager.globalPersistentPlayerState.bus.addSubscriber(
 			(config, canceler) => {
 				if (config !== undefined) {
@@ -84,7 +97,7 @@ export class AppManager {
 					// as sleep manager updates config, we would trigger that update(even though it's no-op update)
 					// and go through another iteration of this listener
 					canceler()
-					
+
 					if (config.isSleepEnabled) {
 						this.sleepManager.setSleep(config.sleepConfig)
 					}
