@@ -2,12 +2,9 @@ import { useAppManager } from "@app/domain/managers/app"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 
-import FastForward from "@app/components/player/icons/fast-forward.svg"
-import InnerPause from "@app/components/player/icons/pause.svg"
-import InnerPlay from "@app/components/player/icons/play.svg"
-import Skip from "@app/components/player/icons/skip.svg"
-
 import { SleepManagerStateType } from "@app/domain/managers/sleep/sleepManager"
+import { useAppPaths } from "@app/paths"
+import { useNavigate } from "@app/util/navigate"
 import {
 	formatDurationSeconds,
 	getNowPerformanceTimestamp,
@@ -25,6 +22,7 @@ const Bar = styled.div`
 	width: 100%;
 
 	justify-items: center;
+	cursor: pointer;
 `
 
 export const PlayerSleepBar = () => {
@@ -43,6 +41,9 @@ export const PlayerSleepBar = () => {
 			clearInterval(interval)
 		}
 	}, [])
+
+	const navigate = useNavigate()
+	const { playerOptionsPath } = useAppPaths()
 
 	if (sleepState.type === SleepManagerStateType.ENABLED) {
 		const millisLeft = Math.max(
@@ -73,5 +74,13 @@ export const PlayerSleepBar = () => {
 		inner = `Sleep not set`
 	}
 
-	return <Bar>{inner}</Bar>
+	return (
+		<Bar
+			onClick={() => {
+				navigate(playerOptionsPath)
+			}}
+		>
+			{inner}
+		</Bar>
+	)
 }

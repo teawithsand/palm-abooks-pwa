@@ -1,6 +1,8 @@
 import { PlayableEntryType } from "@app/domain/defines/player/playableEntry"
 import { WhatToPlayDataType } from "@app/domain/defines/whatToPlay/data"
 import { useUiPlayerData } from "@app/domain/ui/player"
+import { useAppPaths } from "@app/paths"
+import { useNavigate } from "@app/util/navigate"
 import React from "react"
 import styled from "styled-components"
 
@@ -14,10 +16,13 @@ const Container = styled.div`
 	word-break: break-word;
 
 	font-size: 1.2em;
+	cursor: pointer;
 `
 
 export const PlayerFileInfoDisplay = () => {
 	const ui = useUiPlayerData()
+	const navigate = useNavigate()
+	const { playerPlaylistPath } = useAppPaths()
 
 	let name = ""
 	const entry = ui?.currentPosition.entry
@@ -49,5 +54,13 @@ export const PlayerFileInfoDisplay = () => {
 		}
 	}
 
-	return <Container>{content}</Container>
+	return (
+		<Container
+			onClick={() => {
+				navigate(playerPlaylistPath)
+			}}
+		>
+			{content}
+		</Container>
+	)
 }
