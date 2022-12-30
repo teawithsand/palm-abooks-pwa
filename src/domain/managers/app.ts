@@ -36,7 +36,10 @@ export class AppManager {
 		this.configManager,
 		this.whatToPlayManager
 	)
-	public readonly sleepManager = new SleepManager(this.playerManager)
+	public readonly sleepManager = new SleepManager(
+		this.playerManager,
+		this.configManager
+	)
 
 	public readonly positionSavingManager = new PositionSavingManager(
 		this.playerManager,
@@ -50,7 +53,7 @@ export class AppManager {
 		this.playerManager,
 		this.configManager,
 		this.whatToPlayManager,
-		this.sleepManager,
+		this.sleepManager
 	)
 
 	public readonly initPromise = Promise.all([
@@ -61,16 +64,29 @@ export class AppManager {
 		this.configManager.globalPersistentPlayerState.bus.addSubscriber(
 			(config, canceler) => {
 				if (config !== undefined) {
-					try {
-						if (config.lastPlayed) {
-							this.whatToPlayManager.setLocator(
-								lastPlayedSourceToWhatToPlaySourceLocator(
-									config.lastPlayed
-								)
+					canceler()
+
+					if (config.lastPlayed) {
+						this.whatToPlayManager.setLocator(
+							lastPlayedSourceToWhatToPlaySourceLocator(
+								config.lastPlayed
 							)
-						}
-					} finally {
-						canceler()
+						)
+					}
+				}
+			}
+		)
+
+		this.configManager.globalPlayerConfig.bus.addSubscriber(
+			(config, canceler) => {
+				if (config !== undefined) {
+					// HACK: canceller has to be called here in order to prevent infinite recursion
+					// as sleep manager updates config, we would trigger that update(even though it's no-op update)
+					// and go through another iteration of this listener
+					canceler()
+					
+					if (config.isSleepEnabled) {
+						this.sleepManager.setSleep(config.sleepConfig)
 					}
 				}
 			}

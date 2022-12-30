@@ -1,4 +1,4 @@
-
+import { PlayerSettingsSleepSection } from "@app/components/player/settings/element/playerSettingsSleep"
 import { PlayerSettingsSpeedSection } from "@app/components/player/settings/element/playerSettingsSpeed"
 import React from "react"
 import styled from "styled-components"
@@ -8,14 +8,15 @@ const Container = styled.div`
 	grid-auto-flow: row;
 
 	height: 100%;
-    
-    gap: 1em;
+
+	gap: 2em;
 `
 
 export const PlayerSettings = () => {
 	return (
 		<Container>
-            <PlayerSettingsSpeedSection />
+			<PlayerSettingsSpeedSection />
+			<PlayerSettingsSleepSection />
 		</Container>
 	)
 }

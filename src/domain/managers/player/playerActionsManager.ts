@@ -217,21 +217,17 @@ export class PlayerActionManager {
 		})
 	}
 
+	public setSleepFromConfig = () => {
+		this.sleepManager.setSleepConfigFromStoredConfig()
+	}
+
 	public setSleepConfigManual = (sleepData: SleepConfig | null) => {
 		this.sleepManager.setSleep(sleepData)
 	}
 
-	public setSleepFromConfig = () => {
-		// this.setSleepConfigManual(this.configManager.globalPlayerConfig.getOrThrow().sleepConfig)
-		this.setSleepConfigManual({
-			baseDuration: 30 * 1000,
-			shakeResetsSleep: true,
-			turnVolumeDownDuration: 10 * 1000,
-			turnVolumeDownEndLevel: 0,
-			turnVolumeDownStartLevel: 1,
-		})
-	}
-
+	/**
+	 * @deprecated Just set sleep config manual to null.
+	 */
 	public unsetSleep = () => {
 		this.setSleepConfigManual(null)
 	}

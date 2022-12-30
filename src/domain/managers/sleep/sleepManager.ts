@@ -1,3 +1,4 @@
+import { ConfigManager } from "@app/domain/managers/config"
 import { PlayerManager } from "@app/domain/managers/player/playerManager"
 import { Timestamps, getTimestamps } from "@app/util/timestamps"
 import {
@@ -62,7 +63,16 @@ export class SleepManager {
 		this.configBus.emitEvent(sleepConfig)
 	}
 
-	constructor(playerManager: PlayerManager) {
+	setSleepConfigFromStoredConfig = () => {
+		this.setSleep(
+			this.configManager.globalPlayerConfig.getOrThrow().sleepConfig
+		)
+	}
+
+	constructor(
+		playerManager: PlayerManager,
+		private readonly configManager: ConfigManager
+	) {
 		let currentSleepConfig: SleepConfig | null = null
 		let lastIsPlayingWhenReady =
 			playerManager.playerStateBus.lastEvent.innerState.config
@@ -103,6 +113,16 @@ export class SleepManager {
 				playerManager.playerStateBus.lastEvent.innerState.config
 					.isPlayingWhenReady
 			)
+
+			// HACK(teawithsand): config should be already loaded, but this will work as well
+			if (configManager.globalPlayerConfig.loaded) {
+				configManager.globalPlayerConfig.update((draft) => {
+					if (config) {
+						draft.sleepConfig = config
+					}
+					draft.isSleepEnabled = config !== null
+				})
+			}
 		})
 
 		playerManager.playerStateBus.addSubscriber((state) => {

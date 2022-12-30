@@ -4,11 +4,14 @@ export type GlobalPlayerConfig = {
 	speed: number
 	sleepConfig: SleepConfig
 	preservePitchForSpeed: boolean
+	isSleepEnabled: boolean
 }
 
 export const INIT_GLOBAL_PLAYER_CONFIG: GlobalPlayerConfig = {
 	speed: 1,
 	preservePitchForSpeed: false,
+	
+	isSleepEnabled: false,
 	sleepConfig: {
 		baseDuration: 30 * 60 * 1000,
 		shakeResetsSleep: false,

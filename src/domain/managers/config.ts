@@ -81,6 +81,10 @@ export class GenericConfigManager<T extends Record<string, any>> {
 	public readonly loadedPromise: Promise<void>
 	public readonly busPromise: Promise<StickySubscribable<T>>
 
+	get loaded(): boolean {
+		return this.bus.lastEvent !== undefined
+	}
+
 	constructor(key: string, initialValue: T) {
 		this.innerBus = new EmptyStickyEventBus<T>()
 

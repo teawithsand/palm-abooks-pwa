@@ -43,7 +43,7 @@ export const PlayerSettingsSpeedSection = () => {
 				checked={preservePitchForSpeed}
 				label="Preserve pitch for speed"
 				onChange={(v) => {
-					actions.setPreservePitchForSpeed(v.target.checked)
+					actions.setPreservePitchForSpeed(!!v.target.checked)
 				}}
 			/>
 			<Button
