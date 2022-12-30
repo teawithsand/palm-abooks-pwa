@@ -1,7 +1,5 @@
 import { PlayerEntriesList } from "@app/components/player/element/PlayerEntriesList"
 import { useAppManager } from "@app/domain/managers/app"
-import { useAppPaths } from "@app/paths"
-import { useNavigate } from "@app/util/navigate"
 import React from "react"
 import styled from "styled-components"
 
@@ -13,11 +11,14 @@ const Container = styled.div`
 export const PlayerPlaylistUi = () => {
 	const actions = useAppManager().playerActionsManager
 
-    return (
+	return (
 		<Container>
 			<PlayerEntriesList
 				onEntryClick={(id) => {
+					actions.resetSleep()
+
 					actions.jump(id)
+					actions.setIsPlaying(true)
 				}}
 			/>
 		</Container>

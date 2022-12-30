@@ -6,6 +6,7 @@ import { PlayerManager } from "@app/domain/managers/player/playerManager"
 import {
 	SleepConfig,
 	SleepManager,
+	SleepManagerStateType,
 } from "@app/domain/managers/sleep/sleepManager"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { isTimeNumber } from "@teawithsand/tws-player"
@@ -55,7 +56,7 @@ export class PlayerActionManager {
 		})
 	}
 
-	public seek = (seekData: SeekData) => {
+	public seek = (seekData: SeekData) => {	
 		if (seekData.type === SeekType.ABSOLUTE_IN_FILE) {
 			this.localSeek(seekData.positionMs)
 		} else if (seekData.type === SeekType.ABSOLUTE_TO_FILE) {
@@ -230,6 +231,13 @@ export class PlayerActionManager {
 	 */
 	public unsetSleep = () => {
 		this.setSleepConfigManual(null)
+	}
+
+	public resetSleep = () => {
+		const lastEvent = this.sleepManager.bus.lastEvent
+		if (lastEvent.type === SleepManagerStateType.ENABLED) {
+			this.sleepManager.setSleep(lastEvent.config)
+		}
 	}
 
 	public setWhatToPlayLocator = (locator: WhatToPlayLocator | null) => {
