@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
 const InnerLayout = (props: { children: ReactNode }) => {
 	return (
 		<SSRProvider>
-			<DndProvider backend={HTML5Backend}>
+			<DndProvider backend={HTML5Backend}> {/* TODO(teawithsand): auto backend switching for touch devices */}
 				<QueryClientProvider client={queryClient}>
 					{props.children}
 				</QueryClientProvider>
