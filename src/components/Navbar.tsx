@@ -24,6 +24,7 @@ export const Navbar = (props: {
 		playerUiPath: playerPath,
 		storageInfoPath,
 		playerPlaylistPath,
+		playerOptionsPath,
 	} = useAppPaths()
 
 	return (
@@ -86,10 +87,12 @@ export const Navbar = (props: {
 						>
 							<LinkContainer to={playerPath}>
 								<NavDropdown.Item>
-									{translations.playerDropdown.showPlayerUi}
+									{translations.playerDropdown.playerUi}
 								</NavDropdown.Item>
 							</LinkContainer>
 
+							{/*
+							NIY
 							<NavDropdown.Item
 								onClick={() => {
 									navigate(playerPath)
@@ -98,12 +101,20 @@ export const Navbar = (props: {
 								{translations.playerDropdown.playLocal}
 							</NavDropdown.Item>
 
+							*/}
 							<NavDropdown.Item
 								onClick={() => {
 									navigate(playerPlaylistPath)
 								}}
 							>
 								Playlist
+							</NavDropdown.Item>
+							<NavDropdown.Item
+								onClick={() => {
+									navigate(playerOptionsPath)
+								}}
+							>
+								Options
 							</NavDropdown.Item>
 						</NavDropdown>
 

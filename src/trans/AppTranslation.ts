@@ -33,7 +33,7 @@ export interface AppTranslation {
 		playerDropdown: {
 			title: string
 			playLocal: string
-			showPlayerUi: string
+			playerUi: string
 		}
 	}
 }

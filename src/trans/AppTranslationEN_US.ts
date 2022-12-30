@@ -25,7 +25,7 @@ const AppTranslationEN_US: AppTranslation = {
 		playerDropdown: {
 			title: "Player",
 			playLocal: "Play files form this computer",
-			showPlayerUi: "Show player UI",
+			playerUi: "Player",
 		},
 		pageTitle: "PalmABooks PWA",
 		homePage: "Home",
