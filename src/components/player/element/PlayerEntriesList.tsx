@@ -4,7 +4,10 @@ import {
 } from "@app/domain/defines/player/playableEntry"
 import { useAppManager } from "@app/domain/managers/app"
 import { useUiPlayerData } from "@app/domain/ui/player"
-import { MetadataLoadingResultType } from "@teawithsand/tws-player"
+import {
+	MetadataLoadingResultType,
+	isTimeNumber,
+} from "@teawithsand/tws-player"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import React from "react"
 import styled from "styled-components"
@@ -146,17 +149,38 @@ export const PlayerEntriesList = (props: {
 
 				let bottomInfoProgress = ""
 
+				let startsAtNotice = ""
+				const startsAtTime = ui.metadataBag.getDurationToIndex(index)
+				if (
+					startsAtTime !== null &&
+					isTimeNumber(startsAtTime) &&
+					duration !== null &&
+					isTimeNumber(duration)
+				) {
+					startsAtNotice = `From ${formatDurationSeconds(
+						startsAtTime / 1000
+					)} To ${formatDurationSeconds(
+						(startsAtTime + duration) / 1000
+					)}`
+				}
+
+				bottomInfoProgress = bottomInfoProgress.trim()
+
 				if (
 					isPlaying &&
 					duration !== null &&
 					duration >= 0 &&
 					ui.currentPosition.currentEntryPosition !== null
 				) {
-					bottomInfoProgress = `(${formatDurationSeconds(
-						ui.currentPosition.currentEntryPosition
-					)} / ${formatDurationSeconds(duration)})`
+					bottomInfoProgress = `${formatDurationSeconds(
+						ui.currentPosition.currentEntryPosition / 1000
+					)} / ${formatDurationSeconds(
+						duration / 1000
+					)} ${startsAtNotice}`
 				} else if (duration !== null && duration >= 0) {
-					bottomInfoProgress = `(${formatDurationSeconds(duration)})`
+					bottomInfoProgress = `${formatDurationSeconds(
+						duration / 1000
+					)} ${startsAtNotice}`
 				}
 
 				return (
