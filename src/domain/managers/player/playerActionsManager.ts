@@ -73,18 +73,18 @@ export class PlayerActionManager {
 		if (!isTimeNumber(posMillis)) return
 
 		this.playerManager.mutateConfig((draft) => {
-			draft.seekPosition = posMillis
+			draft.seekPosition = posMillis / 1000
 		})
 	}
 
 	public localRelativeSeek = (deltaMillis: number) => {
-		if (isFinite(deltaMillis)) return
+		if (!isTimeNumber(Math.abs(deltaMillis))) return
 
 		const currentPosition =
-			this.playerManager.playerStateBus.lastEvent.innerState.position
+			this.playerManager.playerStateBus.lastEvent.innerState.position // this one is in seconds, not millis
 		if (currentPosition === null) return
 
-		this.localSeek(Math.max(0, currentPosition + deltaMillis))
+		this.localSeek(Math.max(0, currentPosition * 1000 + deltaMillis))
 	}
 
 	public globalSeek = (posMillis: number) => {
@@ -159,10 +159,12 @@ export class PlayerActionManager {
 	}
 
 	public jumpForward = () => {
+		console.log("JF")
 		this.localRelativeSeek(10 * 1000)
 	}
 
 	public jumpBackward = () => {
+		console.log("JB")
 		this.localRelativeSeek(-10 * 1000)
 	}
 
