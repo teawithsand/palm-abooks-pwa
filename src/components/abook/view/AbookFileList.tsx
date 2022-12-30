@@ -3,6 +3,7 @@ import { List } from "@app/components/util/List"
 import { FileEntry } from "@app/domain/defines/abookFile"
 import { makeFileEntryShowData } from "@app/domain/ui/fileEntry"
 import { useAppTranslationSelector } from "@app/trans/AppTranslation"
+import { isTimeNumber } from "@teawithsand/tws-player"
 import {
 	formatDurationSeconds,
 	formatFileSize,
@@ -10,6 +11,7 @@ import {
 } from "@teawithsand/tws-stl"
 import { Sortable } from "@teawithsand/tws-ui"
 import React, { useMemo } from "react"
+import { Button } from "react-bootstrap"
 import styled from "styled-components"
 
 const Parent = styled(List)``
@@ -82,9 +84,10 @@ const AbookFileEntryDisplay = (props: {
 				{showData.size !== null && showData.size >= 0
 					? formatFileSize(showData.size)
 					: null}{" "}
-				{(showData.musicMetadata?.duration ?? -1) >= 0
+				{typeof showData.musicMetadata?.duration === "number" &&
+				isTimeNumber(showData.musicMetadata.duration)
 					? formatDurationSeconds(
-							showData.musicMetadata?.duration ?? -1
+							showData.musicMetadata.duration / 1000
 					  )
 					: null}
 			</BottomInfo>
