@@ -57,11 +57,11 @@ export const PlayerControlsBar = () => {
 	const uiData = useUiPlayerData()
 	const actions = useAppManager().playerActionsManager
 
-	const onPrev = () => actions.prevFile()
-	const onRewind = () => actions.jumpBackward()
+	const onPrev = () => actions.longBackwardButtonAction()
+	const onRewind = () => actions.shortBackwardButtonAction()
 	const onTogglePlayPause = () => actions.togglePlay()
-	const onFastForward = () => actions.jumpForward()
-	const onSkip = () => actions.nextFile()
+	const onFastForward = () => actions.shortForwardButtonAction()
+	const onSkip = () => actions.longForwardButtonAction()
 
 	return (
 		<Bar>

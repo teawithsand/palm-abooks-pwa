@@ -1,4 +1,8 @@
 import { whatToPlaySourceLocatorToLastPlayedSource } from "@app/domain/defines/config/state"
+import {
+	PlayerSeekAction,
+	PlayerSeekActionType,
+} from "@app/domain/defines/player/action"
 import { SeekData, SeekType } from "@app/domain/defines/seek"
 import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { ConfigManager } from "@app/domain/managers/config"
@@ -47,16 +51,24 @@ export class PlayerActionManager {
 			} else if (event.type === MediaSessionEventType.PLAY) {
 				this.setIsPlaying(true)
 			} else if (event.type === MediaSessionEventType.PREVIOUS_TRACK) {
-				this.prevFile()
+				this.executeSeekAction(
+					this.configManager.globalPlayerConfig.getOrThrow()
+						.mediaSessionSeekAction,
+					true
+				)
 			} else if (event.type === MediaSessionEventType.NEXT_TRACK) {
-				this.nextFile()
+				this.executeSeekAction(
+					this.configManager.globalPlayerConfig.getOrThrow()
+						.mediaSessionSeekAction,
+					false
+				)
 			}
 
 			// TODO(teawithsand): here support for the rest of events
 		})
 	}
 
-	public seek = (seekData: SeekData) => {	
+	public seek = (seekData: SeekData) => {
 		if (seekData.type === SeekType.ABSOLUTE_IN_FILE) {
 			this.localSeek(seekData.positionMs)
 		} else if (seekData.type === SeekType.ABSOLUTE_TO_FILE) {
@@ -67,6 +79,23 @@ export class PlayerActionManager {
 			this.localRelativeSeek(seekData.positionDeltaMs)
 		} else if (seekData.type === SeekType.ABSOLUTE_GLOBAL) {
 			this.globalSeek(seekData.positionMs)
+		}
+	}
+
+	public executeSeekAction = (
+		seekAction: PlayerSeekAction,
+		backwards: boolean
+	) => {
+		if (seekAction.type === PlayerSeekActionType.JUMP_FILE) {
+			if (backwards) {
+				this.prevFile()
+			} else {
+				this.nextFile()
+			}
+		} else if (seekAction.type === PlayerSeekActionType.SEEK_RELATIVE) {
+			this.globalRelativeSeek(
+				seekAction.offsetMillis * (backwards ? -1 : 1)
+			)
 		}
 	}
 
@@ -117,7 +146,7 @@ export class PlayerActionManager {
 	}
 
 	public globalRelativeSeek = (deltaMillis: number) => {
-		if (isFinite(deltaMillis)) return
+		if (!isTimeNumber(Math.abs(deltaMillis))) return
 
 		const sourceKey =
 			this.playerManager.playerStateBus.lastEvent.innerState.config
@@ -165,6 +194,38 @@ export class PlayerActionManager {
 
 	public jumpBackward = () => {
 		this.localRelativeSeek(-10 * 1000)
+	}
+
+	public shortForwardButtonAction = () => {
+		this.executeSeekAction(
+			this.configManager.globalPlayerConfig.getOrThrow()
+				.shortButtonSeekAction,
+			false
+		)
+	}
+
+	public longForwardButtonAction = () => {
+		this.executeSeekAction(
+			this.configManager.globalPlayerConfig.getOrThrow()
+				.longButtonSeekAction,
+			false
+		)
+	}
+
+	public shortBackwardButtonAction = () => {
+		this.executeSeekAction(
+			this.configManager.globalPlayerConfig.getOrThrow()
+				.shortButtonSeekAction,
+			true
+		)
+	}
+
+	public longBackwardButtonAction = () => {
+		this.executeSeekAction(
+			this.configManager.globalPlayerConfig.getOrThrow()
+				.longButtonSeekAction,
+			true
+		)
 	}
 
 	public prevFile = () => {
