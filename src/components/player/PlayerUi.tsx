@@ -5,6 +5,8 @@ import { PlayerGlobalProgressBar } from "@app/components/player/element/PlayerGl
 import { PlayerGlobalProgressDisplay } from "@app/components/player/element/PlayerGlobalProgressDisplay"
 import { PlayerLocalProgressBar } from "@app/components/player/element/PlayerLocalProgressBar"
 import { PlayerLocalProgressDisplay } from "@app/components/player/element/PlayerLocalProgressDisplay"
+import { PlayerOptionsBar } from "@app/components/player/element/PlayerOptionsBar"
+import { PlayerSleepBar } from "@app/components/player/element/PlayerSleepBar"
 import React from "react"
 import styled from "styled-components"
 
@@ -18,6 +20,8 @@ const Container = styled.div`
 export const PlayerMusicUi = () => {
 	return (
 		<Container>
+			<PlayerOptionsBar />
+			<PlayerSleepBar />
 			<PlayerCoverDisplay />
 			<PlayerFileInfoDisplay />
 			<PlayerLocalProgressBar />
