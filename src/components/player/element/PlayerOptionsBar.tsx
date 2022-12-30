@@ -49,14 +49,20 @@ export const PlayerOptionsBar = () => {
 	const actions = app.playerActionsManager
 	const sleepState = useStickySubscribable(app.sleepManager.bus)
 
-	const { playerOptionsPath } = useAppPaths()
+	const { playerOptionsPath, playerPlaylistPath } = useAppPaths()
 
 	return (
 		<Bar>
 			<LinkContainer to={playerOptionsPath}>
-				<Button href="#">Player options</Button>
+				<Button href="#" variant="success">
+					Player options
+				</Button>
+			</LinkContainer>
+			<LinkContainer to={playerPlaylistPath}>
+				<Button href="#">Playlist</Button>
 			</LinkContainer>
 			<Button
+				variant="secondary"
 				onClick={() => {
 					if (sleepState.type === SleepManagerStateType.DISABLED) {
 						actions.setSleepFromConfig()

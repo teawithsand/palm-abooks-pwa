@@ -12,18 +12,14 @@ const Container = styled.div`
 
 export const PlayerPlaylistUi = () => {
 	const actions = useAppManager().playerActionsManager
-	const navigate = useNavigate()
 
-	const { playerUiPath } = useAppPaths()
-
-	return (
-        <Container>
-            <PlayerEntriesList
-                onEntryClick={(id) => {
-                    actions.jump(id)
-                    navigate(playerUiPath)
-                }}
-            />
-        </Container>
+    return (
+		<Container>
+			<PlayerEntriesList
+				onEntryClick={(id) => {
+					actions.jump(id)
+				}}
+			/>
+		</Container>
 	)
 }
