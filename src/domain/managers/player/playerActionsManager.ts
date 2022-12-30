@@ -159,12 +159,10 @@ export class PlayerActionManager {
 	}
 
 	public jumpForward = () => {
-		console.log("JF")
 		this.localRelativeSeek(10 * 1000)
 	}
 
 	public jumpBackward = () => {
-		console.log("JB")
 		this.localRelativeSeek(-10 * 1000)
 	}
 
