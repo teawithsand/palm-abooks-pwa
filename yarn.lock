@@ -2333,13 +2333,13 @@
     "@svgr/webpack" "^6.5.1"
     tsconfig-paths-webpack-plugin "^3.5.2"
 
-"@teawithsand/tws-player@^0.0.10":
-  version "0.0.10"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.0.10.tgz#4111aa37c5098ad564910681f5d882a4635c3ada"
-  integrity sha512-m1pI5mlxJhJu31gKy+5sfL7L1wY/5JXd9RMCayN1FkBndzdGKVZU2DWGtkdubsj0of6KUYUp3vhmCsaWj3o/tQ==
+"@teawithsand/tws-player@^0.0.11":
+  version "0.0.11"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.0.11.tgz#1d61252073351029698d5b5d8d7e46323f0de583"
+  integrity sha512-9ywrD1KRgSP7Wu16uR/9lIGKp/hV86D7vKWSsD38CDyl6H4na14yqFGMC+pw7bUo3xoYyuGRIRqq6/0PP1zxbw==
   dependencies:
     "@teawithsand/jsmediatags" "^3.9.1008"
-    "@teawithsand/tws-stl" "^0.0.4"
+    "@teawithsand/tws-stl" "^0.0.9"
     immer "^9.0.15"
 
 "@teawithsand/tws-stl-react@^0.0.1":
@@ -2349,20 +2349,28 @@
   dependencies:
     react-error-boundary "^3.1.4"
 
+"@teawithsand/tws-stl-react@^0.0.4":
+  version "0.0.4"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl-react/-/tws-stl-react-0.0.4.tgz#6bdd63b00d9f186726c38eaf14a91222539743c2"
+  integrity sha512-R52UKQy9nKuNfZtcLEt3uPgcs+vVL0zeJ61gtHVHt/bysD5AXIfIb9zu4LGsz4NZCzHsn2ELdvpKvZV91bWRog==
+  dependencies:
+    "@teawithsand/tws-stl" "^0.0.9"
+    react-error-boundary "^3.1.4"
+
+"@teawithsand/tws-stl@^0.0.10":
+  version "0.0.10"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.10.tgz#a5f7ebc88199e7a95d382b95ff02fbc6d598e79d"
+  integrity sha512-35mVYjsMc2xSGIPXACrp4mtgFjNdB8lXeB/plrc8JQpC/6DAANBHRwm/RIFg5aNTzs8LtstrCdoV0o/gcqOhZA==
+
 "@teawithsand/tws-stl@^0.0.2":
   version "0.0.2"
   resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.2.tgz#b2ebeb854e67754cc6f9087c2015a8edf8857519"
   integrity sha512-H7JB1DAeczZOyj0aFSp7qE67E42KQNvsZH3nszzDwTR38LKtOS9cyshN3MKRZBUO5JsoV/a/cStvbhl2PIDV6Q==
 
-"@teawithsand/tws-stl@^0.0.4":
-  version "0.0.4"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.4.tgz#ae090f8a29e00e7fe660e66df1325f655d27c9f8"
-  integrity sha512-RiUKxhZFkXxudc0JqkKamwhNIrfAZly3tqSjgdV9ZQJ2ZTK2B8fC/BGfE2mE2jKif/hgiyJCGrjUNCPOLUiPJw==
-
-"@teawithsand/tws-stl@^0.0.8":
-  version "0.0.8"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.8.tgz#a8883dd13f12e3313af4ff541a4aaa400cd226ea"
-  integrity sha512-YLPNijQrU73Xn3QBehz14w3mYNGjYlG5Uax9O1bqurT72HlPU3d0Gs54ljyb9iSzuc//HGBzmSxQlBcalOlEGw==
+"@teawithsand/tws-stl@^0.0.9":
+  version "0.0.9"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.9.tgz#b7dac8bc942f08050b3947c99d4346cb30b14d56"
+  integrity sha512-pGJuL4mJjI+3E/iPnvewjNUOLtSmR7T977hzGDRG8oFKg5mwjV7pV7AyFCz6USzN6tipKx2TliHh7QwxS6I6+g==
 
 "@teawithsand/tws-trans@^0.0.2":
   version "0.0.2"
