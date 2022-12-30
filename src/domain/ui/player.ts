@@ -1,5 +1,8 @@
 import { PlayableEntry } from "@app/domain/defines/player/playableEntry"
-import { WhatToPlayData, WhatToPlayDataType } from "@app/domain/defines/whatToPlay/data"
+import {
+	WhatToPlayData,
+	WhatToPlayDataType,
+} from "@app/domain/defines/whatToPlay/data"
 import { WhatToPlayLocatorType } from "@app/domain/defines/whatToPlay/locator"
 import { useAppManager } from "@app/domain/managers/app"
 import { PlayableEntriesBag } from "@app/domain/managers/playableEntriesBag"
@@ -66,12 +69,13 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 		id: generateUUID(),
 		locator: {
 			type: WhatToPlayLocatorType.RAW_ENTRIES,
-			files: []
+			files: [],
 		},
 		type: WhatToPlayDataType.USER_PROVIDED_ENTRIES,
 		entriesBag: new PlayableEntriesBag([]),
 		metadata: new MetadataBag([]),
 		entries: [],
+		positionToLoad: null,
 	}
 
 	const lastValidPositionRef = useRef<UiPlayerPositionData | null>(null)
