@@ -164,7 +164,7 @@ export const AbookView = (props: {
 				<InfoList>
 					<li>Title: {metadata.title}</li>
 					<li>Author name: {metadata.authorName || "-"}</li>
-					<li>Duration: {formatDurationSeconds(duration)}</li>
+					<li>Duration: {formatDurationSeconds(duration / 1000)}</li>
 					<li>Music files: {musicEntries.length}</li>
 					<li>
 						Description: {metadata.description || "No description"}

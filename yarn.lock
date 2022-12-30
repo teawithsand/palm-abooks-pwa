@@ -2333,10 +2333,10 @@
     "@svgr/webpack" "^6.5.1"
     tsconfig-paths-webpack-plugin "^3.5.2"
 
-"@teawithsand/tws-player@^0.0.11":
-  version "0.0.11"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.0.11.tgz#1d61252073351029698d5b5d8d7e46323f0de583"
-  integrity sha512-9ywrD1KRgSP7Wu16uR/9lIGKp/hV86D7vKWSsD38CDyl6H4na14yqFGMC+pw7bUo3xoYyuGRIRqq6/0PP1zxbw==
+"@teawithsand/tws-player@^0.1.1":
+  version "0.1.1"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.1.1.tgz#57f9f32299e38343b3e4c2b458b23ec64e7243cd"
+  integrity sha512-92+zmbzBFm8K52cSEaQUi+fTjhi4ElB7wUiivmcfcShzR9xqZzahoX6JmzLg4Qrpo5wuXZnNYZRDdIbjw7L9Ow==
   dependencies:
     "@teawithsand/jsmediatags" "^3.9.1008"
     "@teawithsand/tws-stl" "^0.0.9"

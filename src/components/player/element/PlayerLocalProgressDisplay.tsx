@@ -34,19 +34,21 @@ export const PlayerLocalProgressDisplay = () => {
 		<Bar>
 			<Left>
 				{position !== null
-					? formatDurationSeconds(position)
+					? formatDurationSeconds(position / 1000)
 					: formatDurationSeconds(0)}
 			</Left>
 			<Middle>
 				{duration
 					? `Played ${Math.floor(
 							(position / duration) * 100
-					  )}%; ${formatDurationSeconds(duration - position)} left`
+					  )}%; ${formatDurationSeconds(
+							(duration - position) / 1000
+					  )} left`
 					: null}
 			</Middle>
 			<Right>
 				{duration !== null
-					? formatDurationSeconds(duration)
+					? formatDurationSeconds(duration / 1000)
 					: formatDurationSeconds(0)}
 			</Right>
 		</Bar>

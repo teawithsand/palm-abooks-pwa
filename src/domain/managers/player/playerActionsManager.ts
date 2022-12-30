@@ -73,7 +73,7 @@ export class PlayerActionManager {
 		if (!isTimeNumber(posMillis)) return
 
 		this.playerManager.mutateConfig((draft) => {
-			draft.seekPosition = posMillis / 1000
+			draft.seekPosition = posMillis
 		})
 	}
 
@@ -81,10 +81,10 @@ export class PlayerActionManager {
 		if (!isTimeNumber(Math.abs(deltaMillis))) return
 
 		const currentPosition =
-			this.playerManager.playerStateBus.lastEvent.innerState.position // this one is in seconds, not millis
+			this.playerManager.playerStateBus.lastEvent.innerState.position
 		if (currentPosition === null) return
 
-		this.localSeek(Math.max(0, currentPosition * 1000 + deltaMillis))
+		this.localSeek(Math.max(0, currentPosition + deltaMillis))
 	}
 
 	public globalSeek = (posMillis: number) => {
