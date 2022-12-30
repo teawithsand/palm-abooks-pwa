@@ -19,6 +19,7 @@ export interface AppPaths extends Paths {
 
 	playerUiPath: string
 	playerPlaylistPath: string
+	playerOptionsPath: string
 }
 
 const paths: AppPaths = {
@@ -49,6 +50,7 @@ const paths: AppPaths = {
 	abookManagementPath: "/store/abook",
 	playerUiPath: "/player",
 	playerPlaylistPath: "/player/playlist",
+	playerOptionsPath: "/player/options"
 }
 
 const config: UseLanguagePrefixedPathsConfig = {
