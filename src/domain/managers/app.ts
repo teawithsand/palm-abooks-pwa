@@ -14,13 +14,15 @@ import { WhatToPlayLocatorResolverImpl } from "@app/domain/managers/whatToPlay/w
 import { WhatToPlayLocatorWriterImpl } from "@app/domain/managers/whatToPlay/whatToPlayLocatorWriter"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { AbookDb } from "@app/domain/storage/db"
+import { isSsr } from "@teawithsand/tws-stl-react"
 
 export class AppManager {
 	/**
 	 * Note: This field is quite hacky and should not be used.
 	 * Use `useAppManager` hook instead.
 	 */
-	public static readonly instance: AppManager = new AppManager()
+	// public static readonly instance: AppManager = new AppManager()
+
 	public readonly shakeManager = new ShakeManager()
 	public readonly globalEventsManager = new GlobalEventsManager()
 	public readonly storageSizeManager = new StorageSizeManager()
@@ -63,7 +65,7 @@ export class AppManager {
 		this.configManager.loadedPromise,
 	])
 
-	private constructor() {
+	constructor() {
 		// Enabling has to be done by user initiated event.
 		// Click is good enough to do so at some point, if it's required
 		document.addEventListener("click", () => {
@@ -107,4 +109,13 @@ export class AppManager {
 	}
 }
 
-export const useAppManager = () => AppManager.instance
+let globalAppManager: AppManager | null = null
+
+export const useAppManager = () => {
+	// HACK: this way we do not app code on SSR, so we do not throw
+	if(isSsr()) return null as any as AppManager
+	if(globalAppManager) return globalAppManager
+	const am = new AppManager()
+	globalAppManager = am
+	return am
+}
