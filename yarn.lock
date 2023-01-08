@@ -2325,12 +2325,13 @@
   dependencies:
     xhr2 "^0.1.4"
 
-"@teawithsand/tws-gatsby-plugin@^0.0.2":
-  version "0.0.2"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-gatsby-plugin/-/tws-gatsby-plugin-0.0.2.tgz#d4d457a1a33f75359dd4da6f222de7e9930c218f"
-  integrity sha512-E0d7BYe+KxI4ZEhB3Ra6OPwIWewU4wZSzVfcoSBQED6h05z1fXfg2gDxJE0dId2xwG5aZSjDnUwtgBbBxG0yww==
+"@teawithsand/tws-gatsby-plugin@^0.0.9":
+  version "0.0.9"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-gatsby-plugin/-/tws-gatsby-plugin-0.0.9.tgz#eafcc06880893813f42e89acdd57e86a2cb99153"
+  integrity sha512-cfr26w2q3mNsXyNRyxhFzP+vfXCSthRaX4qhF6IafqLzYxZJV25e5XGfGaeNaPBDbzlTjInPb9k5EuC+Jz63ZA==
   dependencies:
     "@svgr/webpack" "^6.5.1"
+    dotenv "^16.0.3"
     tsconfig-paths-webpack-plugin "^3.5.2"
 
 "@teawithsand/tws-player@^0.1.1":
@@ -5012,6 +5013,11 @@ dotenv-expand@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-5.1.0.tgz#3fbaf020bfd794884072ea26b1e9791d45a629f0"
   integrity sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==
+
+dotenv@^16.0.3:
+  version "16.0.3"
+  resolved "http://verdaccio:4873/dotenv/-/dotenv-16.0.3.tgz#115aec42bac5053db3c456db30cc243a5a836a07"
+  integrity sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==
 
 dotenv@^7.0.0:
   version "7.0.0"

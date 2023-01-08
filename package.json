@@ -13,12 +13,12 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "typecheck": "tsc --noEmit",
-    "deploy": "DEPLOYER_PROJECT_NAME=tws-abook-player /build/deployer.py push-static ./public ./nginx_config",
+    "deploy": "/build/deployer.py push-static ./public ./nginx_config.php",
     "test": "jest"
   },
   "dependencies": {
     "@tanstack/react-query": "^4.14.5",
-    "@teawithsand/tws-gatsby-plugin": "^0.0.2",
+    "@teawithsand/tws-gatsby-plugin": "^0.0.9",
     "@teawithsand/tws-player": "^0.1.1",
     "@teawithsand/tws-stl": "^0.0.10",
     "@teawithsand/tws-stl-react": "^0.0.4",
