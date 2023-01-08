@@ -3,6 +3,7 @@ import { PageContainer } from "@app/components/PageContainer"
 import { useAppManager } from "@app/domain/managers/app"
 import { wrapLocationProvider } from "@app/util/useLocation"
 import { useQuery } from "@tanstack/react-query"
+import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 import React from "react"
 
 const InnerPage = () => {
@@ -22,4 +23,4 @@ const ListAbookPage = () => {
 	)
 }
 
-export default wrapLocationProvider(ListAbookPage)
+export default wrapNoSSR(wrapLocationProvider(ListAbookPage))

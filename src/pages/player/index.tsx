@@ -1,6 +1,7 @@
 import { PageContainer, PageContainerType } from "@app/components/PageContainer"
 import { PlayerMusicUi } from "@app/components/player/PlayerUi"
 import { wrapLocationProvider } from "@app/util/useLocation"
+import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 import React from "react"
 
 const PlayerPage = () => {
@@ -11,4 +12,4 @@ const PlayerPage = () => {
 	)
 }
 
-export default wrapLocationProvider(PlayerPage)
+export default wrapNoSSR(wrapLocationProvider(PlayerPage))

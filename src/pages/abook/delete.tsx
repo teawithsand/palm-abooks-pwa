@@ -5,6 +5,7 @@ import { useAppManager } from "@app/domain/managers/app"
 import { wrapLocationProvider } from "@app/util/useLocation"
 import { useQuery } from "@tanstack/react-query"
 import { throwExpression } from "@teawithsand/tws-stl"
+import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 import React from "react"
 
 const InnerPage = () => {
@@ -36,4 +37,4 @@ const DeleteAbookPage = () => {
 	)
 }
 
-export default wrapLocationProvider(DeleteAbookPage)
+export default wrapNoSSR(wrapLocationProvider(DeleteAbookPage))

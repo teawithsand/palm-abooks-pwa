@@ -23,6 +23,7 @@ import {
 	getNowTimestamp,
 	TimestampMs,
 } from "@teawithsand/tws-stl"
+import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 import React from "react"
 
 const AddLocalAbookPage = () => {
@@ -37,4 +38,4 @@ const AddLocalAbookPage = () => {
 	)
 }
 
-export default wrapLocationProvider(AddLocalAbookPage)
+export default wrapNoSSR(wrapLocationProvider(AddLocalAbookPage))

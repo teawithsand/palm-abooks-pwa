@@ -1,6 +1,7 @@
 import { PageContainer } from "@app/components/PageContainer"
 import { StoragePanel } from "@app/components/storage/StoragePanel"
 import { wrapLocationProvider } from "@app/util/useLocation"
+import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 import React from "react"
 
 const IndexPage = () => {
@@ -11,4 +12,4 @@ const IndexPage = () => {
 	)
 }
 
-export default wrapLocationProvider(IndexPage)
+export default wrapNoSSR(wrapLocationProvider(IndexPage))

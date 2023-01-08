@@ -1,6 +1,7 @@
 import { PageContainer } from "@app/components/PageContainer"
 import { useAppManager } from "@app/domain/managers/app"
 import { wrapLocationProvider } from "@app/util/useLocation"
+import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 import React from "react"
 import { Button } from "react-bootstrap"
 import styled from "styled-components"
@@ -30,4 +31,4 @@ const DebugPage = () => {
 	)
 }
 
-export default wrapLocationProvider(DebugPage)
+export default wrapNoSSR(wrapLocationProvider(DebugPage))

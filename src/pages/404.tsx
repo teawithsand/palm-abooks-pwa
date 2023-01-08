@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Link, HeadFC } from "gatsby"
 import { wrapLocationProvider } from "@app/util/useLocation"
+import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 
 const pageStyles = {
 	color: "#232129",
@@ -46,6 +47,6 @@ const NotFoundPage = () => {
 	)
 }
 
-export default wrapLocationProvider(NotFoundPage)
+export default wrapNoSSR(wrapLocationProvider(NotFoundPage))
 
 export const Head: HeadFC = () => <title>Not found</title>
