@@ -6,6 +6,7 @@
         "localforage",
         "LOCALSTORAGE",
         "Millis",
+        "PMAP",
         "tanstack"
     ]
 }

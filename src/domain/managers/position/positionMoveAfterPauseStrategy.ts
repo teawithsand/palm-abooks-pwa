@@ -15,11 +15,12 @@ export type PositionMoveAfterPauseStrategy =
 			limit: number
 	  }
 
-export const DEFAULT_POSITION_MOVE_AFTER_PAUSE_STRATEGY: PositionMoveAfterPauseStrategy = {
-	type: PositionMoveAfterPauseStrategyType.LINEAR,
-	coefficient: 0.3,
-	limit: 30 * 1000,
-}
+export const DEFAULT_POSITION_MOVE_AFTER_PAUSE_STRATEGY: PositionMoveAfterPauseStrategy =
+	{
+		type: PositionMoveAfterPauseStrategyType.LINEAR,
+		coefficient: 1 / 3,
+		limit: 30 * 1000,
+	}
 
 export const computeJumpBackTimeAfterPauseDuration = (
 	strategy: PositionMoveAfterPauseStrategy,

@@ -7,6 +7,7 @@ import { SeekData, SeekType } from "@app/domain/defines/seek"
 import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { ConfigManager } from "@app/domain/managers/config"
 import { PlayerManager } from "@app/domain/managers/player/playerManager"
+import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
 import {
 	SleepConfig,
 	SleepManager,
@@ -32,7 +33,8 @@ export class PlayerActionManager {
 		private readonly playerManager: PlayerManager,
 		private readonly configManager: ConfigManager,
 		private readonly whatToPlayManager: WhatToPlayManager,
-		private readonly sleepManager: SleepManager
+		private readonly sleepManager: SleepManager,
+		private readonly positionMoveAfterPauseManager: PositionMoveAfterPauseManager
 	) {
 		this.initMediaSession()
 	}
@@ -246,15 +248,42 @@ export class PlayerActionManager {
 	}
 
 	public togglePlay = () => {
-		this.playerManager.mutateConfig((draft) => {
-			draft.isPlayingWhenReady = !draft.isPlayingWhenReady
-		})
+		this.setIsPlaying(
+			!this.playerManager.playerStateBus.lastEvent.innerState.config
+				.isPlayingWhenReady
+		)
 	}
 
 	public setIsPlaying = (isPlaying: boolean) => {
-		this.playerManager.mutateConfig((draft) => {
-			draft.isPlayingWhenReady = isPlaying
-		})
+		if (isPlaying) {
+			// HACK(teawithsand): there is a risk that in between executing seek and setting play
+			// somebody will trigger another seeking, which would double, or in general multiple PMAP effect
+			//
+			// This is now handled by hack in PMAPManager, which resets timer when enqueueJumpBackAfterSeek occurs.
+			const res = this.positionMoveAfterPauseManager.enqueueJumpBackSeek()
+
+			const play = () => {
+				this.playerManager.mutateConfig((draft) => {
+					draft.isPlayingWhenReady = true
+				})
+			}
+
+			if (!res) {
+				play()
+			} else {
+				// TODO(teawithsand): skip call to play if PMAP seeking was started already
+				res.addSubscriber((ev, unsubscribe) => {
+					if (!ev) return
+					unsubscribe()
+
+					play()
+				})
+			}
+		} else {
+			this.playerManager.mutateConfig((draft) => {
+				draft.isPlayingWhenReady = false
+			})
+		}
 	}
 
 	public setSpeed = (speed: number) => {

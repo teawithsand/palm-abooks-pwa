@@ -5,22 +5,18 @@ import {
 	SeekType,
 } from "@app/domain/defines/seek"
 import { WhatToPlayData } from "@app/domain/defines/whatToPlay/data"
+import { WhatToPlayStateType } from "@app/domain/defines/whatToPlay/state"
 import { ConfigManager } from "@app/domain/managers/config"
-import {
-	SeekEvent,
-	SeekEventType,
-	SeekQueue,
-} from "@app/domain/managers/player/seekQueue"
+import { SeekEventType, SeekQueue } from "@app/domain/managers/player/seekQueue"
 import { PositionAndSeekDataResolver } from "@app/domain/managers/position/positionAndSeekDataResolver"
 import {
-	computeJumpBackTimeAfterPauseDuration,
 	DEFAULT_POSITION_MOVE_AFTER_PAUSE_STRATEGY,
+	computeJumpBackTimeAfterPauseDuration,
 } from "@app/domain/managers/position/positionMoveAfterPauseStrategy"
 import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
 import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { AbookDb } from "@app/domain/storage/db"
 import {
-	CollectionPlayerSourceProvider,
 	MapPlayerSourceProvider,
 	Player,
 	PlayerConfig,
@@ -28,13 +24,13 @@ import {
 } from "@teawithsand/tws-player"
 import {
 	DefaultStickyEventBus,
-	generateUUID,
-	getNowPerformanceTimestamp,
-	getNowTimestamp,
 	MediaSessionApiHelper,
 	PerformanceTimestampMs,
 	StickyEventBus,
 	StickySubscribable,
+	generateUUID,
+	getNowPerformanceTimestamp,
+	getNowTimestamp,
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
 
@@ -91,8 +87,12 @@ export class PlayerManager {
 
 		this.seekQueue = new SeekQueue(this)
 
-		whatToPlayManager.bus.addSubscriber((data) => {
-			this.setWhatToPlayData(data)
+		whatToPlayManager.stateBus.addSubscriber((data) => {
+			if (data.type === WhatToPlayStateType.LOADED) {
+				this.setWhatToPlayData(data.data)
+			} else {
+				this.setWhatToPlayData(null)
+			}
 		})
 
 		this.player.stateBus.addSubscriber((state) => {
@@ -136,38 +136,15 @@ export class PlayerManager {
 		})
 	}
 
-	private setWhatToPlayData = (whatToPlayData: WhatToPlayData | null) => {
+	private onNewWhatToPlayDataSet = (whatToPlayData: WhatToPlayData) => {
 		this.seekQueue.clear()
-
-		// TODO(teawithsand): ensure that WTP id always changes
-
-		const sources = whatToPlayData?.entriesBag?.entries ?? []
-
-		// this is the only kind of SP that we are setting, so this cast is valid
-		const currentProvider = this.player.stateBus.lastEvent.config
-			.sourceProvider as unknown as CollectionPlayerSourceProvider<PlayableEntry>
-
-		const currentSourcesIds = new Set(
-			(currentProvider?.sources ?? []).map((v) => v.id)
-		)
-		const newSourcesIds = new Set(sources.map((s) => s.id))
-
-		if (
-			currentSourcesIds.size === newSourcesIds.size &&
-			[...currentSourcesIds].every((x) => newSourcesIds.has(x))
-		) {
-			return // If ids didn't change source set this operation is no-op, so end early
-		}
-
-		const src = new MapPlayerSourceProvider(sources, (s) => s.id)
-		const key = src.getNextSourceKey(null)
 
 		let initPositionLoadingState: PositionLoadingState =
 			PositionLoadingState.NOT_FOUND
 
 		let seekData: SeekData | null = null
 
-		if (whatToPlayData && whatToPlayData.positionToLoad) {
+		if (whatToPlayData.positionToLoad) {
 			seekData = this.resolver.resolvePositionVariants(
 				{
 					entriesBag: whatToPlayData.entriesBag,
@@ -183,28 +160,12 @@ export class PlayerManager {
 			}
 		}
 
-		this.innerPlayerStateBus.emitEvent(
-			produce(this.innerPlayerStateBus.lastEvent, (draft) => {
-				draft.whatToPlayData = whatToPlayData
-				draft.sources = sources
-
-				draft.positionLoadingState = initPositionLoadingState
-				// HACK: update these two in single stroke, so they are in sync with outer state.
-				// In same JS tick we will update player, which will update these, so it's fine.
-				//
-				// To do this in non-hacky way I'd have to implement is-in-sync-logic
-				// 	and update state only if it indeed is in sync
-				draft.innerState.config.sourceProvider = src
-				draft.innerState.config.sourceKey = key
-			})
+		this.onWhatToPlayDataDifferentSourcesOverride(
+			whatToPlayData,
+			initPositionLoadingState
 		)
 
-		this.player.mutateConfig((draft) => {
-			draft.sourceProvider = src
-			draft.sourceKey = key
-		})
-
-		if (whatToPlayData && whatToPlayData.positionToLoad && seekData) {
+		if (whatToPlayData.positionToLoad && seekData) {
 			const nowPerf = getNowPerformanceTimestamp()
 
 			const loadPositionSeekDeadline =
@@ -304,6 +265,113 @@ export class PlayerManager {
 							onSecondSeekDone(event.type)
 						}
 					})
+			}
+		}
+	}
+
+	private onWhatToPlayDataSameSourcesOverride = (
+		whatToPlayData: WhatToPlayData
+	) => {
+		this.innerPlayerStateBus.emitEvent(
+			produce(this.innerPlayerStateBus.lastEvent, (draft) => {
+				draft.whatToPlayData = whatToPlayData
+				draft.sources = whatToPlayData.entriesBag.entries
+			})
+		)
+	}
+
+	private onWhatToPlayDataDifferentSourcesOverride = (
+		whatToPlayData: WhatToPlayData,
+		positionLoadingState: PositionLoadingState | null = null
+	) => {
+		const src = new MapPlayerSourceProvider(
+			whatToPlayData.entriesBag.entries,
+			(s) => s.id
+		)
+		const key = src.getNextSourceKey(null)
+
+		this.innerPlayerStateBus.emitEvent(
+			produce(this.innerPlayerStateBus.lastEvent, (draft) => {
+				draft.whatToPlayData = whatToPlayData
+				draft.sources = whatToPlayData.entriesBag.entries
+
+				if (positionLoadingState !== null) {
+					draft.positionLoadingState = positionLoadingState
+				}
+
+				// HACK: update these two in single stroke, so they are in sync with outer state.
+				// In same JS tick we will update player, which will update these, so it's fine.
+				//
+				// To do this in non-hacky way I'd have to implement is-in-sync-logic
+				// 	and update state only if it indeed is in sync
+				draft.innerState.config.sourceProvider = src
+				draft.innerState.config.sourceKey = key
+			})
+		)
+
+		this.player.mutateConfig((draft) => {
+			draft.sourceProvider = src
+			draft.sourceKey = key
+		})
+	}
+
+	private onWhatToPlayDataUnset = () => {
+		this.seekQueue.clear()
+
+		this.innerPlayerStateBus.emitEvent(
+			produce(this.innerPlayerStateBus.lastEvent, (draft) => {
+				draft.whatToPlayData = null
+				draft.sources = []
+				draft.positionLoadingState = PositionLoadingState.IDLE
+
+				// HACK: update these two in single stroke, so they are in sync with outer state.
+				// In same JS tick we will update player, which will update these, so it's fine.
+				//
+				// To do this in non-hacky way I'd have to implement is-in-sync-logic
+				// 	and update state only if it indeed is in sync
+				draft.innerState.config.sourceProvider =
+					new MapPlayerSourceProvider<PlayableEntry>([], (s) => s.id)
+				draft.innerState.config.sourceKey = null
+			})
+		)
+	}
+
+	private isWhatToPlayDataSame = (
+		oldWhatToPlayData: WhatToPlayData,
+		newWhatToPlayData: WhatToPlayData
+	) => {
+		const newSources = newWhatToPlayData.entriesBag.entries ?? []
+
+		// this is the only kind of SP that we are setting, so this cast is valid
+		const oldSources = oldWhatToPlayData.entriesBag.entries ?? []
+
+		const oldSourcesIds = new Set((oldSources ?? []).map((v) => v.id))
+		const newSourcesIds = new Set(newSources.map((s) => s.id))
+
+		return (
+			oldSourcesIds.size === newSourcesIds.size &&
+			[...oldSourcesIds].every((x) => newSourcesIds.has(x))
+		)
+	}
+
+	private setWhatToPlayData = (newWhatToPlayData: WhatToPlayData | null) => {
+		const oldWhatToPlayData =
+			this.innerPlayerStateBus.lastEvent.whatToPlayData
+
+		if (!newWhatToPlayData) {
+			this.onWhatToPlayDataUnset()
+		} else if (
+			!oldWhatToPlayData ||
+			oldWhatToPlayData?.id !== newWhatToPlayData.id
+		) {
+			this.onNewWhatToPlayDataSet(newWhatToPlayData)
+		} else {
+			if (
+				!this.isWhatToPlayDataSame(oldWhatToPlayData, newWhatToPlayData)
+			) {
+				this.onWhatToPlayDataSameSourcesOverride(newWhatToPlayData)
+			} else {
+				this.onWhatToPlayDataDifferentSourcesOverride(newWhatToPlayData)
 			}
 		}
 	}

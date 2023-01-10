@@ -58,7 +58,8 @@ export class AppManager {
 		this.playerManager,
 		this.configManager,
 		this.whatToPlayManager,
-		this.sleepManager
+		this.sleepManager,
+		this.positionMoveAfterPauseManager
 	)
 
 	public readonly initPromise = Promise.all([
@@ -113,8 +114,8 @@ let globalAppManager: AppManager | null = null
 
 export const useAppManager = () => {
 	// HACK: this way we do not app code on SSR, so we do not throw
-	if(isSsr()) return null as any as AppManager
-	if(globalAppManager) return globalAppManager
+	if (isSsr()) return null as any as AppManager
+	if (globalAppManager) return globalAppManager
 	const am = new AppManager()
 	globalAppManager = am
 	return am
