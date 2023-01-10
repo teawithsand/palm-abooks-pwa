@@ -22,17 +22,25 @@ import {
 
 export enum SeekEventType {
 	PERFORMED = 1,
-	DISCARDED = 2,
+	DISCARDED_TIMEOUT = 2,
+	DISCARDED_CONDITION_FILED = 3,
+	DISCARDED_CANT_PERFORM_INSTANTLY = 4,
 }
 
 export type SeekEvent = {
 	data: ExtendedSeekData
 } & (
 	| {
-			type: SeekEventType.DISCARDED
+			type: SeekEventType.PERFORMED
 	  }
 	| {
-			type: SeekEventType.PERFORMED
+			type: SeekEventType.DISCARDED_TIMEOUT
+	  }
+	| {
+			type: SeekEventType.DISCARDED_CANT_PERFORM_INSTANTLY
+	  }
+	| {
+			type: SeekEventType.DISCARDED_CONDITION_FILED
 	  }
 )
 
@@ -47,7 +55,7 @@ export class SeekQueue {
 
 			// discard these
 			this.innerBus.emitEvent({
-				type: SeekEventType.DISCARDED,
+				type: SeekEventType.DISCARDED_TIMEOUT,
 				data: v,
 			})
 		}
@@ -78,17 +86,18 @@ export class SeekQueue {
 			const delta = seek.deadlinePerfTimestamp - now
 
 			if (isFinite(delta) && delta > 0) {
-				const tmo = setTimeout(() => {
+				const timeoutHandle = setTimeout(() => {
 					this.tryApplySeekData(
 						this.playerManager.playerStateBus.lastEvent
 					)
 				}, delta)
 
+				// If SB else executed that event, then do not trigger timeout for it.
 				bus.addSubscriber((s, unsubscribe) => {
 					if (s === null) return
 					unsubscribe()
-					
-					clearTimeout(tmo)
+
+					clearTimeout(timeoutHandle)
 				})
 			}
 		}
@@ -129,13 +138,13 @@ export class SeekQueue {
 					data: sd,
 				})
 			}
-			const discard = () => {
+			const discard = (reason: SeekEventType) => {
 				if (emittedEvent) return
 				emittedEvent = true
 
 				this.queue.pop()
 				this.innerBus.emitEvent({
-					type: SeekEventType.DISCARDED,
+					type: reason,
 					data: sd,
 				})
 			}
@@ -145,7 +154,7 @@ export class SeekQueue {
 				sd.deadlinePerfTimestamp !== null &&
 				now > sd.deadlinePerfTimestamp
 			) {
-				discard()
+				discard(SeekEventType.DISCARDED_TIMEOUT)
 				continue
 			}
 
@@ -156,7 +165,9 @@ export class SeekQueue {
 				state.innerState.config.seekPosition === null &&
 				state.innerState.config.sourceProvider !== null
 
-			if (canSeek) {
+			const conditionPassed = !canSeek || !sd.immediateExecCond || sd.immediateExecCond()
+
+			if (canSeek && conditionPassed) {
 				// not the most elegant thing to do, but will work
 				this.playerManager.mutateConfig((draft) => {
 					draft.sourceKey = resolved.playableEntryId
@@ -165,13 +176,17 @@ export class SeekQueue {
 
 				notifyPerformed()
 				return // exit seek procedure, another event must trigger next seeking
+			} else if (canSeek && !conditionPassed) {
+				discard(SeekEventType.DISCARDED_CONDITION_FILED)
+				continue
 			} else {
-				if (
-					sd.discardCond === SeekDiscardCondition.INSTANT ||
-					(sd.discardCond === SeekDiscardCondition.NO_METADATA &&
-						!resolved)
+				if (sd.discardCond === SeekDiscardCondition.INSTANT) {
+					discard(SeekEventType.DISCARDED_CANT_PERFORM_INSTANTLY)
+				} else if (
+					sd.discardCond === SeekDiscardCondition.NO_METADATA &&
+					!resolved // ie. no metadata
 				) {
-					discard()
+					discard(SeekEventType.DISCARDED_CANT_PERFORM_INSTANTLY)
 				} else {
 					// exit loop, wait for other event to resolve this seek
 					break
@@ -182,6 +197,9 @@ export class SeekQueue {
 
 	constructor(private readonly playerManager: PlayerManager) {
 		this.playerManager.playerStateBus.addSubscriber((state) => {
+			// feed some events to trigger our seeks for stuff like metadata arrived and so on.
+			// There could be some filter of events which are meaningful here,
+			// but this call is so fast that it's not required.
 			this.tryApplySeekData(state)
 		})
 	}

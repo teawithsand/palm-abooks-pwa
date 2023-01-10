@@ -41,9 +41,21 @@ export type TrivialSeekData = {
  * When seek should be discarded from seek queue.
  */
 export enum SeekDiscardCondition {
-	NEVER = 1, // Hold seek until it's possible to seek.
-	INSTANT = 2, // If can't seek right now, just throw it
-	NO_METADATA = 3, // If there is no metadata loaded, which for some reason is required to perform that seek
+	/**
+	 * Always wait until deadline for this seek, unless one is set.
+	 */
+	NEVER = 1,
+
+	/**
+	 * Discard this seek if can't seek right now(say, another seek is in queue), then just throw it away.
+	 */
+	INSTANT = 2, 
+
+	/**
+	 * Discard this seek if there is no metadata loaded, which for some reason is required to perform that seek.
+	 * Otherwise(say, another seek is in queue) wait until it's possible to execute it or until deadline.
+	 */
+	NO_METADATA = 3, 
 }
 
 export type ExtendedSeekData = {
@@ -51,4 +63,9 @@ export type ExtendedSeekData = {
 	discardCond: SeekDiscardCondition
 	deadlinePerfTimestamp: PerformanceTimestampMs | null
 	seekData: SeekData
+	/**
+	 * Function, which is called *just* before this seek is executed and after it was popped from queue.
+	 * If it returns false, then seek will be discarded due to condition failure.
+	 */
+	immediateExecCond?: (() => boolean) | null
 }
