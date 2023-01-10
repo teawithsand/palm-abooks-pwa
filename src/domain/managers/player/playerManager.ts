@@ -6,7 +6,11 @@ import {
 } from "@app/domain/defines/seek"
 import { WhatToPlayData } from "@app/domain/defines/whatToPlay/data"
 import { ConfigManager } from "@app/domain/managers/config"
-import { SeekEventType, SeekQueue } from "@app/domain/managers/player/seekQueue"
+import {
+	SeekEvent,
+	SeekEventType,
+	SeekQueue,
+} from "@app/domain/managers/player/seekQueue"
 import { PositionAndSeekDataResolver } from "@app/domain/managers/position/positionAndSeekDataResolver"
 import {
 	computeJumpBackTimeAfterPauseDuration,
@@ -42,7 +46,7 @@ export enum PositionLoadingState {
 	ERROR = 4,
 }
 
-const LOADING_POSITION_SEEK_DELTA_MS = 2000
+const LOADING_POSITION_SEEK_TIMEOUT_MS = 2000
 
 export type PlayerManagerState = {
 	innerState: PlayerState<PlayableEntry, string>
@@ -201,11 +205,55 @@ export class PlayerManager {
 		})
 
 		if (whatToPlayData && whatToPlayData.positionToLoad && seekData) {
-			const now = getNowPerformanceTimestamp()
+			const nowPerf = getNowPerformanceTimestamp()
+
 			const loadPositionSeekDeadline =
-				now + LOADING_POSITION_SEEK_DELTA_MS
+				nowPerf + LOADING_POSITION_SEEK_TIMEOUT_MS
 			const jumpBackAfterPauseSeekDeadline =
-				loadPositionSeekDeadline + LOADING_POSITION_SEEK_DELTA_MS
+				loadPositionSeekDeadline + LOADING_POSITION_SEEK_TIMEOUT_MS // deadline AFTER 1st seek is done
+
+			// TODO(teawithsand): remove this abs once ensured it's safe to do so(as it should be)
+			const deltaTime = Math.abs(
+				computeJumpBackTimeAfterPauseDuration(
+					DEFAULT_POSITION_MOVE_AFTER_PAUSE_STRATEGY,
+					getNowTimestamp() -
+						whatToPlayData.positionToLoad.savedTimestamp
+				)
+			)
+
+			const willTrySecondSeek = deltaTime > 0
+
+			let firstSeekResult: SeekEventType | null = null
+
+			const wasSeekSuccessful = (res: SeekEventType | null) =>
+				res === SeekEventType.PERFORMED
+
+			const sendDoneEvent = (ok: boolean) => {
+				const last = this.innerPlayerStateBus.lastEvent
+
+				this.innerPlayerStateBus.emitEvent(
+					produce(last, (draft) => {
+						draft.positionLoadingState = ok
+							? PositionLoadingState.LOADED
+							: PositionLoadingState.ERROR
+					})
+				)
+			}
+
+			const onFirstSeekDone = (type: SeekEventType) => {
+				firstSeekResult = type
+				const isSuccess = wasSeekSuccessful(type)
+
+				if (!willTrySecondSeek) {
+					sendDoneEvent(isSuccess)
+				}
+			}
+			const onSecondSeekDone = (type: SeekEventType) => {
+				// if first seek filed, then this will be discarded
+				// with info that this seek was discarded due to cond used
+				// in other words, this is ok.
+				sendDoneEvent(wasSeekSuccessful(type))
+			}
 
 			this.seekQueue
 				.enqueueSeek({
@@ -218,44 +266,44 @@ export class PlayerManager {
 				.addSubscriber((event, unsubscribe) => {
 					if (event === null) return
 
+					// can be done here, as no matter which event comes, we want to quit subscribing anyway
+					// although it's not required
 					unsubscribe()
 
 					const last = this.innerPlayerStateBus.lastEvent
 					if (last.whatToPlayData?.id === whatToPlayData.id) {
 						// only if WTP didn't change
-						this.innerPlayerStateBus.emitEvent(
-							produce(last, (draft) => {
-								draft.positionLoadingState =
-									event.type === SeekEventType.PERFORMED
-										? PositionLoadingState.LOADED
-										: PositionLoadingState.ERROR
-							})
-						)
+						onFirstSeekDone(event.type)
 					}
 				})
 
-			// TODO(teawithsand): remove this abs
-			const deltaTime = Math.abs(
-				computeJumpBackTimeAfterPauseDuration(
-					DEFAULT_POSITION_MOVE_AFTER_PAUSE_STRATEGY,
-					getNowTimestamp() -
-						whatToPlayData.positionToLoad.savedTimestamp
-				)
-			)
+			if (willTrySecondSeek) {
+				this.seekQueue
+					.enqueueSeek({
+						id: generateUUID(),
+						deadlinePerfTimestamp:
+							jumpBackAfterPauseSeekDeadline as PerformanceTimestampMs,
+						discardCond: SeekDiscardCondition.NEVER, // always wait until deadline,
+						seekData: {
+							type: SeekType.RELATIVE_GLOBAL,
+							positionDeltaMs: -deltaTime,
+						},
+						immediateExecCond: () =>
+							wasSeekSuccessful(firstSeekResult),
+					})
+					.addSubscriber((event, unsubscribe) => {
+						if (event === null) return
 
-			// TODO(teawithsand): We notify external users about whether position was loaded or not,
-			// but we do not do so for this JBAP seek, which is unsound.
-			if (deltaTime > 0) {
-				this.seekQueue.enqueueSeek({
-					id: generateUUID(),
-					deadlinePerfTimestamp:
-						jumpBackAfterPauseSeekDeadline as PerformanceTimestampMs,
-					discardCond: SeekDiscardCondition.NEVER, // always wait until deadline,
-					seekData: {
-						type: SeekType.RELATIVE_GLOBAL,
-						positionDeltaMs: -deltaTime,
-					},
-				})
+						// can be done here, as no matter which event comes, we want to quit subscribing anyway
+						unsubscribe()
+
+						const last = this.innerPlayerStateBus.lastEvent
+						if (last.whatToPlayData?.id === whatToPlayData.id) {
+							// only if WTP didn't change
+
+							onSecondSeekDone(event.type)
+						}
+					})
 			}
 		}
 	}
