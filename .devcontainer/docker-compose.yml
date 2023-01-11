@@ -13,8 +13,19 @@ services:
     command: sleep infinity
     networks:
       - "loc-net"
+      - "inner-net"
+      
+  peer:
+    build:
+      context: ./peerjs
+      dockerfile: ./Dockerfile
+      
+    networks:
+      - "inner-net"
+
 
 networks:
+  inner-net:
   loc-net:
     name: verdaccio-local-net
     external: true
