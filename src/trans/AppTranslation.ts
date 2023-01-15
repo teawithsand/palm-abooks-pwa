@@ -28,6 +28,7 @@ export interface AppTranslation {
 			managementPanel: string
 			addLocalABook: string
 			listABooks: string
+			sendLocalFiles: string
 		}
 
 		playerDropdown: {
