@@ -16,7 +16,12 @@ export interface AppPaths extends Paths {
 	abookReorderEntriesPath: (id: string) => string
 	abookLocalEntriesAddPath: (id: string) => string
 	abookEntriesDeletePath: (id: string) => string
+	abookReceiveFilesPath: (id: string) => string
+	// TODO(teawithsand): TBD
+	// abookSendPath: (id: string) => string
+	// abookReceivePath: string
 
+	sendFilesPath: string
 	playerUiPath: string
 	playerPlaylistPath: string
 	playerOptionsPath: string
@@ -46,11 +51,15 @@ const paths: AppPaths = {
 	abookEntriesDeletePath: (id: string) => {
 		return `/abook/entries-delete?id=${encodeURIComponent(id)}`
 	},
+	abookReceiveFilesPath: (id: string) => {
+		return `/abook/remote/receive?id=${encodeURIComponent(id)}`
+	},
 
+	sendFilesPath: "/remote/send",
 	abookManagementPath: "/store/abook",
 	playerUiPath: "/player",
 	playerPlaylistPath: "/player/playlist",
-	playerOptionsPath: "/player/options"
+	playerOptionsPath: "/player/options",
 }
 
 const config: UseLanguagePrefixedPathsConfig = {

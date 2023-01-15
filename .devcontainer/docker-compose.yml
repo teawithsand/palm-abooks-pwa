@@ -19,6 +19,8 @@ services:
     build:
       context: ./peerjs
       dockerfile: ./Dockerfile
+    ports:
+      - 127.0.0.0:80:8888
       
     networks:
       - "inner-net"
