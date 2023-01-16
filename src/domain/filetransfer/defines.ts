@@ -1,5 +1,18 @@
 import { DataConnection, Peer } from "@teawithsand/tws-peer"
 
+export enum FileTransferAuthType {
+	REQUEST = 1,
+	PROVIDE = 2,
+}
+
+export type FileTransferAuth = {
+	type: FileTransferAuthType.PROVIDE,
+	authSecret: string
+} | {
+	type: FileTransferAuthType.REQUEST,
+	authSecret: string
+}
+
 export interface FileTransferEntry {
 	publicName: string
 	sha512hash: string
@@ -20,12 +33,6 @@ export const fileTransferHeaderFromFileTransferEntry = (
 	size: entry.file.size,
 })
 
-export enum SenderStageFileTransfer {
-	PICK_FILES = 1,
-	EXCHANGE_CODE = 2,
-	PERFORM_SENDING = 3,
-}
-
 export enum ReceiverStageFileTransfer {
 	PICK_TARGET = 1,
 	EXCHANGE_CODE = 2,
@@ -41,3 +48,4 @@ export interface FileTransferPeerData {
 export const MAGIC_ACCEPT_FILES = "MAGIC_ACCEPT_FILE"
 export const MAGIC_END_OF_FILES = "MAGIC_END_OF_FILES"
 export const MAGIC_DID_RECEIVE = "MAGIC_DID_RECEIVE"
+export const MAGIC_AUTH_SUCCESS = "MAGIC_AUTH_SUCCESS"
