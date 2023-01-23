@@ -16,6 +16,7 @@ import {
 	DefaultStickyEventBus,
 	StickySubscribable,
 	generateUUID,
+	latePromise,
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
 
@@ -30,6 +31,16 @@ export type FileReceiverConfig = {
 	 * This function is omitted and data is always accepted, if it's not set.
 	 */
 	checkEntriesHeaders?: (entries: FileTransferEntryHeader[]) => Promise<void>
+
+	decisions: {
+		[id: string]: FileReceiverTransferDecision
+	}
+}
+
+export enum FileReceiverTransferDecision {
+	HOLD = 0,
+	ACCEPT = 1,
+	DENY = 2,
 }
 
 export enum FileReceiverTransferState {
@@ -81,6 +92,7 @@ export class FileReceiver {
 					type: FileTransferAuthType.PROVIDE,
 					authSecret: "",
 				},
+				decisions: {},
 			},
 
 			transfers: {},
@@ -130,6 +142,23 @@ export class FileReceiver {
 
 				updateTransfer(() => {})
 
+				const [authenticatedPromise, resolve, reject] =
+					latePromise<void>()
+				const unsubscribe = this.stateBus.addSubscriber(
+					(receivedState, unsubscribe) => {
+						const decision = receivedState.config.decisions[id]
+						if (decision === FileReceiverTransferDecision.ACCEPT) {
+							resolve()
+							unsubscribe()
+						} else if (
+							decision === FileReceiverTransferDecision.DENY
+						) {
+							reject(new Error("User denied connection"))
+							unsubscribe()
+						}
+					}
+				)
+
 				let caughtError: Error | null = null
 				try {
 					if (config.auth.type === FileTransferAuthType.PROVIDE) {
@@ -155,6 +184,8 @@ export class FileReceiver {
 					const headers: FileTransferEntryHeader[] =
 						await receiver.receiveData()
 
+					await authenticatedPromise
+
 					updateTransfer((draft) => {
 						draft.entries = headers.map((v) => ({
 							header: v,
@@ -164,6 +195,7 @@ export class FileReceiver {
 						draft.state = FileReceiverTransferState.RECEIVED_HEADER
 					})
 
+					// TODO(teawithsand): handle this in better way than awaiting
 					if (config.checkEntriesHeaders)
 						await config.checkEntriesHeaders(headers)
 
@@ -221,6 +253,8 @@ export class FileReceiver {
 				} catch (e) {
 					caughtError = e
 				} finally {
+					unsubscribe()
+
 					updateTransfer((draft) => {
 						draft.error =
 							(caughtError instanceof Error
