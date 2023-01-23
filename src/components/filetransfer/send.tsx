@@ -41,7 +41,7 @@ export type SenderState =
 	  }
 	| {
 			type: SenderStateType.PERFORM_SENDING_ACCEPT
-			token: FileTransferTokenData
+			authSecret: string
 	  }
 
 const SenderStateContext = makeStateContext<SenderState>()
@@ -90,7 +90,7 @@ const FileSendHelperStatePicker = () => {
 					onClick={() => {
 						setState({
 							type: SenderStateType.PERFORM_SENDING_ACCEPT,
-							token: state.token, // peer id should match, but authId has to be passed somehow
+							authSecret: state.token.authId, // peer id should match, but authId has to be passed somehow
 						})
 					}}
 				>
@@ -127,7 +127,7 @@ const FileSendHelperStatePicker = () => {
 				<SenderAcceptPerformer
 					entries={constants.entries}
 					peer={constants.peer}
-					token={state.token}
+					authSecret={state.authSecret}
 				/>
 			</div>
 		)
