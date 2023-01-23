@@ -50,6 +50,8 @@ export type FileSenderTransfer = {
 	currentEntryIndex: number
 	currentEntryFraction: number
 
+	totalFraction: number
+
 	error: Error | null
 	isClosed: boolean
 
@@ -96,6 +98,7 @@ export class FileSender {
 			state: FileSenderTransferState.CONNECTED,
 			id,
 			conn,
+			totalFraction: 0,
 			currentEntryFraction: 0,
 			currentEntryIndex: -1,
 			doneCount: 0,
@@ -162,6 +165,13 @@ export class FileSender {
 							throw new Error("Invalid magic received")
 						}
 
+						const totalSize = entries.length
+							? entries
+									.map((v) => v.file.size)
+									.reduce((a, b) => a + b)
+							: 0
+
+						let sentSize = 0
 						for (const entry of entries) {
 							if (state.isClosed || state.error) return
 							const { file } = entry
@@ -179,6 +189,7 @@ export class FileSender {
 								ptr += chunk.size
 
 								const arrayBuffer = await chunk.arrayBuffer()
+								sentSize += arrayBuffer.byteLength
 								conn.send(arrayBuffer)
 
 								const res = await receiver.receiveData()
@@ -188,6 +199,7 @@ export class FileSender {
 
 								updateTransfer((draft) => {
 									draft.currentEntryFraction = ptr / file.size
+									draft.totalFraction = sentSize / totalSize
 								})
 							}
 
