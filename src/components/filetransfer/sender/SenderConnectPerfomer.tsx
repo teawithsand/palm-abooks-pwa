@@ -23,6 +23,10 @@ export const SenderConnectPerformer = (props: {
         })
 
         sender.handleConn(peer, peer.connect(token.peerId))
+
+        return () => {
+			peer.destroy()
+		}
     }, [peer, token, entries, sender])
 
     return <div>

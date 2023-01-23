@@ -10,10 +10,10 @@ import React, { useEffect, useMemo } from "react"
 
 export const SenderAcceptPerformer = (props: {
 	peer: Peer
-	token: FileTransferTokenData
+	authSecret: string
 	entries: FileTransferEntry[]
 }) => {
-	const { peer, token, entries } = props
+	const { peer, authSecret: token, entries } = props
 
 	const sender = useMemo(() => new FileSender(), [peer, token, entries])
 
@@ -21,13 +21,17 @@ export const SenderAcceptPerformer = (props: {
 		sender.updateConfig((draft) => {
 			draft.auth = {
 				type: FileTransferAuthType.REQUEST,
-				authSecret: token.authId,
+				authSecret: token,
 			}
 			draft.entries = entries
 			draft.acceptConnections = true
 		})
 
 		sender.listenOnPeer(peer)
+
+		return () => {
+			peer.destroy()
+		}
 	}, [peer, token, entries, sender])
 
 	return (
