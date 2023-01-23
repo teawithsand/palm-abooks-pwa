@@ -2275,10 +2275,29 @@
     "dotenv" "^16.0.3"
     "tsconfig-paths-webpack-plugin" "^3.5.2"
 
+"@teawithsand/tws-peer-react@^0.0.1":
+  "integrity" "sha512-cA887jK3FErr3lyLUca0ZMryK3lAJ96e4spCHvY09ek9rh7BXjYXJDYa6L8oO2C0nzzEgWu7Nfh3Bo8O8t0fQw=="
+  "resolved" "http://verdaccio:4873/@teawithsand%2ftws-peer-react/-/tws-peer-react-0.0.1.tgz"
+  "version" "0.0.1"
+  dependencies:
+    "@teawithsand/tws-peer" "0.0.3"
+    "@teawithsand/tws-stl" "^0.0.14"
+    "@teawithsand/tws-stl-react" "^0.0.4"
+    "html5-qrcode" "^2.3.4"
+
 "@teawithsand/tws-peer@^0.0.5":
   "integrity" "sha512-u9PgRa2foAsmOoArcUWu1e3qle/0bEboESy/Dnq/Bjq7LWi7i5W3jjewBxy2Sg9gvuf939er3Y+oEKOSiHKhQg=="
   "resolved" "http://verdaccio:4873/@teawithsand%2ftws-peer/-/tws-peer-0.0.5.tgz"
   "version" "0.0.5"
+  dependencies:
+    "@teawithsand/tws-stl" "^0.0.14"
+    "peerjs" "^1.4.7"
+    "qrcode" "^1.5.1"
+
+"@teawithsand/tws-peer@0.0.3":
+  "integrity" "sha512-wBEtXJdPduMx++xxUlshmC4ZFnPlaazI1Rts3tCpo4Nxce5IDx8ncstph6WEVjeugeNaqh3q4TclksiW4T3O8Q=="
+  "resolved" "http://verdaccio:4873/@teawithsand%2ftws-peer/-/tws-peer-0.0.3.tgz"
+  "version" "0.0.3"
   dependencies:
     "@teawithsand/tws-stl" "^0.0.14"
     "peerjs" "^1.4.7"
@@ -2306,6 +2325,14 @@
   "version" "0.0.4"
   dependencies:
     "@teawithsand/tws-stl" "^0.0.9"
+    "react-error-boundary" "^3.1.4"
+
+"@teawithsand/tws-stl-react@^0.0.5":
+  "integrity" "sha512-YCteqUmKjiZyBKZZAJKS7+J23apZulWHEuv9j81oQYZ/OYI0zyfTOIRRv2S8HhTVAX9qc0ouWJc1kCQhabnmQw=="
+  "resolved" "http://verdaccio:4873/@teawithsand%2ftws-stl-react/-/tws-stl-react-0.0.5.tgz"
+  "version" "0.0.5"
+  dependencies:
+    "@teawithsand/tws-stl" "^0.0.14"
     "react-error-boundary" "^3.1.4"
 
 "@teawithsand/tws-stl@^0.0.1", "@teawithsand/tws-stl@^0.0.2":
@@ -6947,6 +6974,11 @@
   "integrity" "sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg=="
   "resolved" "http://verdaccio:4873/html-escaper/-/html-escaper-2.0.2.tgz"
   "version" "2.0.2"
+
+"html5-qrcode@^2.3.4":
+  "integrity" "sha512-VPZrOTG8XR9HmIAhSSiGtJVPErZxKy/DuGc9cPQLburCWZEbvxQGJP9y4K4P+8vdalLtYB/vM5YP1BdWQKZ8jQ=="
+  "resolved" "http://verdaccio:4873/html5-qrcode/-/html5-qrcode-2.3.4.tgz"
+  "version" "2.3.4"
 
 "htmlparser2@^6.1.0":
   "integrity" "sha512-gyyPk6rgonLFEDGoeRgQNaEUvdJ4ktTmmUh/h2t7s+M8oPpIPxgNACWa+6ESR57kXstwqPiCut0V8NRpcwgU7A=="
