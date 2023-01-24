@@ -1,5 +1,10 @@
 import { DataConnection, Peer } from "@teawithsand/tws-peer"
 
+export type FileTransferConn = {
+	conn: DataConnection
+	peer: Peer
+}
+
 export enum FileTransferAuthType {
 	REQUEST = 1,
 	PROVIDE = 2,
