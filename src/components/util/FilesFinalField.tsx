@@ -21,8 +21,12 @@ const abookFilesMimesAndExtensions = [
 	"image/webp",
 ]
 
-export const FilesFinalField = (props: { label?: string; name: string }) => {
-	const { name, label } = props
+export const FilesFinalField = (props: {
+	label?: string
+	name: string
+	disabled?: boolean
+}) => {
+	const { name, label, disabled = false } = props
 	const app = useAppManager()
 	const stats = useStickySubscribable(app.storageSizeManager.storageStatsBus)
 
@@ -44,6 +48,7 @@ export const FilesFinalField = (props: { label?: string; name: string }) => {
 							<Form.Control
 								accept={abookFilesMimesAndExtensions.join(",")}
 								type="file"
+								disabled={disabled}
 								{...{
 									...input,
 
@@ -51,6 +56,8 @@ export const FilesFinalField = (props: { label?: string; name: string }) => {
 
 									// instead of the default target.value
 									onChange: (e: any) => {
+										if (disabled) return
+
 										// TODO(teawithsand): check if it works on older browsers, works on state-of-art ff
 										const files = [
 											...(e.target.files || []),
@@ -93,8 +100,10 @@ export const FilesFinalField = (props: { label?: string; name: string }) => {
 											<td>{formatFileSize(f.size)}</td>
 											<td>
 												<Button
+													disabled={disabled}
 													variant="danger"
 													onClick={() => {
+														if (disabled) return
 														fields.remove(i)
 													}}
 												>
