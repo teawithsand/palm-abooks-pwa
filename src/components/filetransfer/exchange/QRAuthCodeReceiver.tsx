@@ -1,15 +1,14 @@
 import {
 	FileTransferTokenData,
 	decodeFileTransferTokenData,
-	encodeFileTransferTokenData,
 } from "@app/domain/filetransfer"
-import { QRCodeDisplay, QRCodeScanner } from "@teawithsand/tws-peer-react"
+import { QRCodeScanner } from "@teawithsand/tws-peer-react"
 import React, { useCallback, useMemo, useState } from "react"
 import styled from "styled-components"
 
 const Container = styled.div``
 
-export const AuthCodeReceiver = (props: {
+export const QRAuthCodeReceiver = (props: {
 	onToken: (token: FileTransferTokenData) => void
 }) => {
 	const { onToken } = props
@@ -25,19 +24,27 @@ export const AuthCodeReceiver = (props: {
 			}
 
 			if (token) {
+				console.log("Got token", token)
 				onToken(token)
 			}
 		},
 		[onToken, setLastResultText]
 	)
 
+	const config = useMemo(() => ({
+		fps: 30,
+	}), [])
+
+	const onFailure = useCallback((errorMessage: string) => {
+		setLastResultText(errorMessage)
+	}, [setLastResultText])
+
 	return (
 		<Container>
 			<QRCodeScanner
 				onScanSuccess={onSuccess}
-				onScanFailure={(errorMessage, error) => {
-					setLastResultText(errorMessage)
-				}}
+				onScanFailure={onFailure}
+				config={config}
 			/>
 			{lastResultText ? <p>{lastResultText}</p> : null}
 		</Container>
