@@ -2350,9 +2350,9 @@
     dotenv "^16.0.3"
     tsconfig-paths-webpack-plugin "^3.5.2"
 
-"@teawithsand/tws-peer-react@^0.0.1":
+"@teawithsand/tws-peer-react@^0.0.1-b1":
   version "0.0.1"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-peer-react/-/tws-peer-react-0.0.1.tgz"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-peer-react/-/tws-peer-react-0.0.1.tgz#e5f9a12b830133500c3511133f9db1a02268b860"
   integrity sha512-cA887jK3FErr3lyLUca0ZMryK3lAJ96e4spCHvY09ek9rh7BXjYXJDYa6L8oO2C0nzzEgWu7Nfh3Bo8O8t0fQw==
   dependencies:
     "@teawithsand/tws-peer" "0.0.3"
@@ -2369,10 +2369,10 @@
     peerjs "^1.4.7"
     qrcode "^1.5.1"
 
-"@teawithsand/tws-peer@^0.1.2-b2":
-  version "0.1.2-b2"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-peer/-/tws-peer-0.1.2-b2.tgz#9a483243664f40bcc11c4d8ef5eb63794247e798"
-  integrity sha512-wrFyotv+uiBRngZR3pwmdYIk5VZLeFbvYoiTBffWY+iH+Vg3LWfzu/6ZtXkdNDeLwdKL/wv406B1WsYWBin8JA==
+"@teawithsand/tws-peer@^0.1.2-b5":
+  version "0.1.2-b5"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-peer/-/tws-peer-0.1.2-b5.tgz#16bb28bfc74319da305905ed150ae129928db053"
+  integrity sha512-1ZXFNCJIPtcFPF3Ppl93rk4K5tUrKu6d1m2a+nyRg6TyDDIwZTqb40DXcD5cR6qiobdD/uV6n2VRWAQXRKky5Q==
   dependencies:
     "@teawithsand/tws-stl" "^0.0.15"
     peerjs "^1.4.7"
