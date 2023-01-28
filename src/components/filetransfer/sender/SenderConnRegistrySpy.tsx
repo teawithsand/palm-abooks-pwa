@@ -12,7 +12,7 @@ import {
 	useStickySubscribableSelector,
 } from "@teawithsand/tws-stl-react"
 import React from "react"
-import { Button } from "react-bootstrap"
+import { Button, ButtonGroup } from "react-bootstrap"
 import styled from "styled-components"
 
 const Container = styled.div`
@@ -72,6 +72,64 @@ const SenderConnSpy = (props: {
 		config: { stage },
 	} = state
 
+	let buttons = null
+
+	if (isClosed || status === SenderAdapterConnStatus.DONE) {
+		buttons = (
+			<Button
+				variant="danger"
+				onClick={() => {
+					registry.setConfig(id, {
+						stage: SenderAdapterConnStage.CLOSE,
+					})
+					registry.removeConn(id)
+				}}
+			>
+				Remove
+			</Button>
+		)
+	} else if (status === SenderAdapterConnStatus.AUTHENTICATED) {
+		buttons = (
+			<ButtonGroup>
+				<Button
+					variant="success"
+					onClick={() => {
+						registry.setConfig(id, {
+							stage: SenderAdapterConnStage.SEND_ENTRIES,
+						})
+					}}
+				>
+					Accept
+				</Button>
+				<Button
+					variant="danger"
+					onClick={() => {
+						registry.setConfig(id, {
+							stage: SenderAdapterConnStage.CLOSE,
+						})
+						registry.removeConn(id)
+					}}
+				>
+					Deny
+				</Button>
+			</ButtonGroup>
+		)
+	} else if (status === SenderAdapterConnStatus.SENDING_FILES) {
+		buttons = (
+			<Button
+				variant="danger"
+				onClick={() => {
+					registry.setConfig(id, {
+						stage: SenderAdapterConnStage.CLOSE,
+					})
+					registry.removeConn(id)
+				}}
+			>
+				Stop
+			</Button>
+		)
+	}
+
 	return (
 		<Entry>
 			{JSON.stringify({
@@ -86,28 +144,7 @@ const SenderConnSpy = (props: {
 					? entries.map((v) => v.file.size).reduce((a, b) => a + b)
 					: 0,
 			})}
-			{isClosed ? (
-				<Button
-					onClick={() => {
-						registry.setConfig(id, {
-							stage: SenderAdapterConnStage.CLOSE,
-						})
-						registry.removeConn(id)
-					}}
-				>
-					Delete
-				</Button>
-			) : (
-				<Button
-					onClick={() => {
-						registry.setConfig(id, {
-							stage: SenderAdapterConnStage.SEND_ENTRIES,
-						})
-					}}
-				>
-					Accept
-				</Button>
-			)}
+			{buttons}
 		</Entry>
 	)
 }
