@@ -30,7 +30,7 @@ export const SenderConnOpener = () => {
 			onToken={(token) => {
 				if (!peer) return
 
-				if (token.peerId === token.peerId) return
+				if (peer.id === token.peerId) return
 
 				const conn = peer.connect(token.peerId)
 				senderStateManager.registry.addConn(
