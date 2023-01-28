@@ -1,10 +1,11 @@
 import { PageContainer } from "@app/components/PageContainer"
+import { AutonomousFileSender } from "@app/components/filetransfer/send"
 import { wrapLocationProvider } from "@app/util/useLocation"
 import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 import React from "react"
 
 const InnerPage = () => {
-	return <>NIY</>
+	return <AutonomousFileSender />
 }
 
 const SendFilesPage = () => {

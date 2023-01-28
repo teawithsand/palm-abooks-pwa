@@ -1,177 +1,114 @@
-import { AuthCodeReceiver } from "@app/components/filetransfer/exchange/AuthCodeReceiver"
-import { AuthCodeSender } from "@app/components/filetransfer/exchange/AuthCodeSender"
-import { SenderAcceptPerformer } from "@app/components/filetransfer/sender/SenderAcceptPerformer"
-import { SenderConnectPerformer } from "@app/components/filetransfer/sender/SenderConnectPerfomer"
+import { PeerManager } from "@app/components/filetransfer/PeerManager"
+import { QRAuthCodeSender } from "@app/components/filetransfer/exchange/QRAuthCodeSender"
+import { SenderConnOpener } from "@app/components/filetransfer/sender/SenderConnOpener"
+import { SenderConnRegistrySpy } from "@app/components/filetransfer/sender/SenderConnRegistrySpy"
+import { SenderEntriesPicker } from "@app/components/filetransfer/sender/SenderEntriesPicker"
 import {
 	FileTransferEntry,
-	FileTransferTokenData,
+	FileTransferStateManager,
+	FileTransferStateManagerContext,
+	SenderStateManager,
+	SenderStateManagerContext,
+	useFileTransferStateManager,
+	useSenderStateManager
 } from "@app/domain/filetransfer"
-import { Peer, generateSecureClientId } from "@teawithsand/tws-peer"
-import { generateUUID } from "@teawithsand/tws-stl"
-import {
-	StateContextProvider,
-	makeStateContext,
-	useStateContext,
-} from "@teawithsand/tws-stl-react"
-import React, { createContext, useContext, useMemo } from "react"
-import { Button } from "react-bootstrap"
+import { PeerHelper } from "@teawithsand/tws-peer"
+import { useStickySubscribable } from "@teawithsand/tws-stl-react"
+import React, { useEffect, useMemo } from "react"
+import styled from "styled-components"
 
-export enum SenderStateType {
-	PICK_AUTH_SEND_OR_RECEIVE = 1,
-	SEND_AUTH_CODE = 2,
-	RECEIVE_AUTH_CODE = 3,
-	PERFORM_SENDING_CONNECT = 4,
-	PERFORM_SENDING_ACCEPT = 5,
-}
+const Container = styled.div`
+	display: grid;
+	grid-auto-flow: row;
+	grid-template-columns: auto;
+	gap: 1em;
+`
 
-export type SenderState =
-	| {
-			type: SenderStateType.PICK_AUTH_SEND_OR_RECEIVE
-	  }
-	| {
-			type: SenderStateType.SEND_AUTH_CODE
-			token: FileTransferTokenData
-	  }
-	| {
-			type: SenderStateType.RECEIVE_AUTH_CODE
-	  }
-	| {
-			type: SenderStateType.PERFORM_SENDING_CONNECT
-			token: FileTransferTokenData
-	  }
-	| {
-			type: SenderStateType.PERFORM_SENDING_ACCEPT
-			authSecret: string
-	  }
+const Section = styled.div``
 
-const SenderStateContext = makeStateContext<SenderState>()
-const SenderConstantsContext = createContext<{
-	peer: Peer
-	entries: FileTransferEntry[]
-}>(null as any) // HACK(teawithsand): implement some proper not-set value
+const SectionTitle = styled.h3``
 
-const FileSendHelperStatePicker = () => {
-	const [state, setState] = useStateContext(SenderStateContext)
-	const constants = useContext(SenderConstantsContext)
+const SectionBody = styled.div``
 
-	if (state.type === SenderStateType.PICK_AUTH_SEND_OR_RECEIVE) {
-		return (
-			<div>
-				<Button
-					onClick={() => {
-						setState({
-							...state,
-							type: SenderStateType.SEND_AUTH_CODE,
-							token: {
-								authId: generateSecureClientId(),
-								peerId: generateUUID(),
-							},
-						})
-					}}
-				>
-					Send code
-				</Button>
-				<Button
-					onClick={() => {
-						setState({
-							type: SenderStateType.RECEIVE_AUTH_CODE,
-						})
-					}}
-				>
-					Receive code
-				</Button>
-			</div>
-		)
-	} else if (state.type === SenderStateType.SEND_AUTH_CODE) {
-		return (
-			<div>
-				<AuthCodeSender token={state.token} />
-				<Button
-					onClick={() => {
-						setState({
-							type: SenderStateType.PERFORM_SENDING_ACCEPT,
-							authSecret: state.token.authId, // peer id should match, but authId has to be passed somehow
-						})
-					}}
-				>
-					I am done! Take me to file sending!
-				</Button>
-			</div>
-		)
-	} else if (state.type === SenderStateType.RECEIVE_AUTH_CODE) {
-		return (
-			<div>
-				<AuthCodeReceiver
-					onToken={(token) => {
-						setState({
-							type: SenderStateType.PERFORM_SENDING_CONNECT,
-							token,
-						})
-					}}
-				/>
-			</div>
-		)
-	} else if (state.type === SenderStateType.PERFORM_SENDING_CONNECT) {
-		return (
-			<div>
-				<SenderConnectPerformer
-					entries={constants.entries}
-					peer={constants.peer}
-					token={state.token}
-				/>
-			</div>
-		)
-	} else if (state.type === SenderStateType.PERFORM_SENDING_ACCEPT) {
-		return (
-			<div>
-				<SenderAcceptPerformer
-					entries={constants.entries}
-					peer={constants.peer}
-					authSecret={state.authSecret}
-				/>
-			</div>
-		)
-	} else {
-		throw new Error("Unreachable code")
-	}
-}
+// TODO(teawithsand): clear conn registry on entries or auth code or peer id change
+//  can do it with hack
 
-/**
- * This component:
- * 1. Assumes that one already has peer
- * 2. Assumes that one already has files picked
- *
- * Then it guides user through file sending process.
- */
-export const FileSendHelperComponent = (props: {
-	entries: FileTransferEntry[]
-	peer: Peer
-}) => {
-	const { peer, entries } = props
-
-	const initState: SenderState = useMemo(
-		() => ({
-			type: SenderStateType.PICK_AUTH_SEND_OR_RECEIVE,
-		}),
-		[peer, entries]
-	)
-
-	const value = useMemo(
-		() => ({
-			peer,
-			entries,
-		}),
-		[peer, entries]
-	)
+const InnerFileSender = () => {
+	const transferManager = useFileTransferStateManager()
+	const senderManager = useSenderStateManager()
+	const authSecret = useStickySubscribable(transferManager.authSecretBus)
+	const peerState = useStickySubscribable(transferManager.peerHelper.stateBus)
 
 	return (
-		<SenderConstantsContext.Provider value={value}>
-			<StateContextProvider
-				ctx={SenderStateContext}
-				initValue={initState}
+		<Container>
+			<Section>
+				<SectionTitle>1. Pick files to send</SectionTitle>
+				<SectionBody>
+					<SenderEntriesPicker />
+				</SectionBody>
+			</Section>
+			<Section>
+				<SectionTitle>2. Enable communication</SectionTitle>
+				<SectionBody>
+					<PeerManager />
+				</SectionBody>
+			</Section>
+			<Section>
+				<SectionTitle>
+					3. Scan OR show code to make connection
+				</SectionTitle>
+				<SectionBody>
+					<SenderConnOpener />
+				</SectionBody>
+			</Section>
+			<Section>
+				<SectionTitle>
+					4. Accept connections to perform file transfers
+				</SectionTitle>
+				<SectionBody>
+					<SenderConnRegistrySpy registry={senderManager.registry} />
+				</SectionBody>
+			</Section>
+		</Container>
+	)
+}
+
+export const AutonomousFileSender = (props: {
+	entries?: FileTransferEntry[] | null | undefined
+}) => {
+	const { entries } = props
+	const fileTransferStateManager = useMemo(
+		() => new FileTransferStateManager(new PeerHelper()),
+		[]
+	)
+	const senderStateManager = useMemo(
+		() => new SenderStateManager(fileTransferStateManager),
+		[fileTransferStateManager]
+	)
+
+	useEffect(() => {
+		return () => {
+			senderStateManager.close()
+		}
+	}, [senderStateManager])
+
+	useEffect(() => {
+		return () => {
+			fileTransferStateManager.close()
+		}
+	}, [fileTransferStateManager])
+
+	useEffect(() => {
+		if (entries) senderStateManager.setEntries(entries)
+	}, [entries, senderStateManager])
+
+	return (
+		<SenderStateManagerContext.Provider value={senderStateManager}>
+			<FileTransferStateManagerContext.Provider
+				value={fileTransferStateManager}
 			>
-				<FileSendHelperStatePicker />
-			</StateContextProvider>
-		</SenderConstantsContext.Provider>
+				<InnerFileSender />
+			</FileTransferStateManagerContext.Provider>
+		</SenderStateManagerContext.Provider>
 	)
 }

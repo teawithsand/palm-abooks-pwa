@@ -66,16 +66,22 @@ export const encodeFileTransferTokenData = (
 	data: FileTransferTokenData
 ): string => {
 	const { authId, peerId } = data
-	return JSON.stringify({
-		authId,
-		peerId,
-	})
+	return btoa(
+		JSON.stringify({
+			authId,
+			peerId,
+		})
+	)
+		.replace(/[=]*/g, "")
 }
 
 export const decodeFileTransferTokenData = (
 	token: string
 ): FileTransferTokenData => {
 	try {
+		token = atob(token)
+		if (typeof token !== "string")
+			throw new Error("Invalid base64 string provided")
 		const res = JSON.parse(token)
 		if (typeof res !== "object" || res instanceof Array)
 			throw new Error("Invalid token data type")

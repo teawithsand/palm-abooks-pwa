@@ -6,23 +6,28 @@ import {
 } from "@teawithsand/tws-stl"
 import { createContext, useContext } from "react"
 
-export class FileTransferContextHelper {
+export class FileTransferStateManager {
 	private readonly innerAuthSecretBus = new DefaultStickyEventBus(
 		generateSecureClientId()
 	)
-	constructor(public readonly helper: PeerHelper) {}
+	constructor(public readonly peerHelper: PeerHelper) {}
 
 	get authSecretBus(): StickySubscribable<string> {
-		return this.authSecretBus
+		return this.innerAuthSecretBus
 	}
 
 	regenerateAuthSecret = () => {
 		this.innerAuthSecretBus.emitEvent(generateSecureClientId())
 	}
+
+	close = () => {
+		this.peerHelper.setConfig(null)
+	}
 }
 
-export const PeerHelperContext = createContext<PeerHelper | null>(null)
+export const FileTransferStateManagerContext =
+	createContext<FileTransferStateManager | null>(null)
 
-export const usePeerHelper = () =>
-	useContext(PeerHelperContext) ??
+export const useFileTransferStateManager = () =>
+	useContext(FileTransferStateManagerContext) ??
 	throwExpression(new Error("No peer helper found"))
