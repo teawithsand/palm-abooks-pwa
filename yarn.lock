@@ -2369,10 +2369,10 @@
     peerjs "^1.4.7"
     qrcode "^1.5.1"
 
-"@teawithsand/tws-peer@^0.1.2-b5":
-  version "0.1.2-b5"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-peer/-/tws-peer-0.1.2-b5.tgz#16bb28bfc74319da305905ed150ae129928db053"
-  integrity sha512-1ZXFNCJIPtcFPF3Ppl93rk4K5tUrKu6d1m2a+nyRg6TyDDIwZTqb40DXcD5cR6qiobdD/uV6n2VRWAQXRKky5Q==
+"@teawithsand/tws-peer@^0.1.2-b7":
+  version "0.1.2-b7"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-peer/-/tws-peer-0.1.2-b7.tgz#947f416e225d7f6da8e893b9a3a01ca66231e380"
+  integrity sha512-NpWyY9xSsQmiuMRa+7E0weHTSD7DGflxEcNV7Mh1UXq1I8Ia6rUAZwcEIMDZoEC/WOFMtJfnkpGZUFbQZ7S7Bg==
   dependencies:
     "@teawithsand/tws-stl" "^0.0.15"
     peerjs "^1.4.7"
