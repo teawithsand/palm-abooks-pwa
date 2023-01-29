@@ -1,16 +1,16 @@
 import { PageContainer } from "@app/components/PageContainer"
-import { AutonomousFileSender } from "@app/components/filetransfer/AutonomousFileSender"
+import { AutonomousFileReceiver } from "@app/components/filetransfer/AutonomousFileReceiver"
 import { wrapLocationProvider } from "@app/util/useLocation"
 import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 import React from "react"
 
 const InnerPage = () => {
-	return <AutonomousFileSender />
+	return <AutonomousFileReceiver />
 }
 
 const SendFilesPage = () => {
 	return (
-		<PageContainer title="Send local files to other device">
+		<PageContainer title="Receive files to local device">
 			<InnerPage />
 		</PageContainer>
 	)

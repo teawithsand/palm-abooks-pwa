@@ -1,27 +1,16 @@
-import {
-	FileTransferAuthType,
-	FileTransferEntry,
-} from "@app/domain/filetransfer/defines"
+import { FileTransferAuthType } from "@app/domain/filetransfer/defines"
 import { FileTransferStateManager } from "@app/domain/filetransfer/fileTransferContext"
 import {
-	SenderAdapterConnStage,
-	SenderConnAdapter,
-} from "@app/domain/filetransfer/senderAdapter"
+	ReceiverAdapterConnStage,
+	ReceiverConnAdapter,
+} from "@app/domain/filetransfer/receiverAdapter"
 import { ConnRegistry, PeerEventType } from "@teawithsand/tws-peer"
-import {
-	DefaultStickyEventBus,
-	StickySubscribable,
-	SubscriptionCanceler,
-	throwExpression,
-} from "@teawithsand/tws-stl"
+import { SubscriptionCanceler, throwExpression } from "@teawithsand/tws-stl"
 import produce from "immer"
 import { createContext, useContext } from "react"
 
-export class SenderStateManager {
-	public readonly registry = new ConnRegistry(new SenderConnAdapter())
-	private readonly innerEntriesBus = new DefaultStickyEventBus<
-		FileTransferEntry[]
-	>([])
+export class ReceiverStateManager {
+	public readonly registry = new ConnRegistry(new ReceiverConnAdapter())
 
 	private fileTransferStateManagerSubscriptionCanceller: SubscriptionCanceler | null =
 		null
@@ -50,27 +39,18 @@ export class SenderStateManager {
 										fileTransferStateManager.authSecretBus
 											.lastEvent,
 								},
-								entries: this.entriesBus.lastEvent,
 							}
 						)
 
 						this.registry.updateConfig(id, (cfg) =>
 							produce(cfg, (draft) => {
 								draft.stage =
-									SenderAdapterConnStage.AUTHENTICATE_SEND_HEADERS
+									ReceiverAdapterConnStage.AUTHENTICATE_RECEIVE_HEADER
 							})
 						)
 					}
 				}
 			)
-	}
-
-	get entriesBus(): StickySubscribable<FileTransferEntry[]> {
-		return this.innerEntriesBus
-	}
-
-	setEntries = (entries: FileTransferEntry[]) => {
-		this.innerEntriesBus.emitEvent(entries)
 	}
 
 	/**
@@ -79,7 +59,7 @@ export class SenderStateManager {
 	purgeConnRegistry = () => {
 		for (const key of Object.keys(this.registry.stateBus.lastEvent)) {
 			this.registry.setConfig(key, {
-				stage: SenderAdapterConnStage.CLOSE,
+				stage: ReceiverAdapterConnStage.CLOSE,
 			})
 			// TODO(teawithsand): fix remove conn bug in registry implementation
 			//  right now conn may be re-added by some event even if it was removed
@@ -97,9 +77,9 @@ export class SenderStateManager {
 	}
 }
 
-export const SenderStateManagerContext =
-	createContext<SenderStateManager | null>(null)
+export const ReceiverStateManagerContext =
+	createContext<ReceiverStateManager | null>(null)
 
-export const useSenderStateManager = () =>
-	useContext(SenderStateManagerContext) ??
+export const useReceiverStateManager = () =>
+	useContext(ReceiverStateManagerContext) ??
 	throwExpression(new Error("No peer helper found"))

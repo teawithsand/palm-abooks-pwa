@@ -1,10 +1,10 @@
 import {
 	FileTransferConn,
-	SenderAdapterConnStage,
-	SenderAdapterConnState,
-	SenderAdapterConnStatus,
-	SenderAdapterInitData,
-	SenderConnConfig,
+	ReceiverAdapterConnConfig,
+	ReceiverAdapterConnStage,
+	ReceiverAdapterConnState,
+	ReceiverAdapterConnStatus,
+	ReceiverAdapterInitData,
 } from "@app/domain/filetransfer"
 import { ConnRegistry } from "@teawithsand/tws-peer"
 import {
@@ -22,20 +22,22 @@ const Container = styled.div`
 	grid-template-columns: auto;
 `
 
-export const SenderConnRegistrySpy = (props: {
+export const ReceiverConnRegistrySpy = (props: {
 	registry: ConnRegistry<
 		FileTransferConn,
-		SenderAdapterConnState,
-		SenderConnConfig,
-		SenderAdapterInitData
+		ReceiverAdapterConnState,
+		ReceiverAdapterConnConfig,
+		ReceiverAdapterInitData
 	>
 }) => {
 	const { registry } = props
+	const state = useStickySubscribable(registry.stateBus)
+	console.log({ state })
 	const keys = useStickySubscribableSelector(registry.stateBus, (state) =>
 		Object.entries(state)
 			.filter(
 				([_k, v]) =>
-					v.state.status !== SenderAdapterConnStatus.CONNECTED
+					v.state.status !== ReceiverAdapterConnStatus.CONNECTED
 			)
 			.map(([k, _v]) => k)
 	)
@@ -44,17 +46,21 @@ export const SenderConnRegistrySpy = (props: {
 		<Container>
 			{!keys.length
 				? "No connections so far"
-				: keys.map((k) => <SenderConnSpy id={k} registry={registry} />)}
+				: keys.map((k) => (
+						<ReceiverConnSpy id={k} registry={registry} />
+				  ))}
 		</Container>
 	)
 }
 
-const SenderConnSpy = (props: {
+const Entry = styled.div``
+
+const ReceiverConnSpy = (props: {
 	registry: ConnRegistry<
 		FileTransferConn,
-		SenderAdapterConnState,
-		SenderConnConfig,
-		SenderAdapterInitData
+		ReceiverAdapterConnState,
+		ReceiverAdapterConnConfig,
+		ReceiverAdapterInitData
 	>
 	id: string
 }) => {
@@ -67,20 +73,20 @@ const SenderConnSpy = (props: {
 
 	const {
 		isClosed,
-		initData: { auth, entries },
-		state: { status, totalFraction },
+		initData: { auth },
+		state: { status, totalDoneFraction, headers },
 		config: { stage },
 	} = state
 
 	let buttons = null
 
-	if (isClosed || status === SenderAdapterConnStatus.DONE) {
+	if (isClosed || status === ReceiverAdapterConnStatus.DONE) {
 		buttons = (
 			<Button
 				variant="danger"
 				onClick={() => {
 					registry.setConfig(id, {
-						stage: SenderAdapterConnStage.CLOSE,
+						stage: ReceiverAdapterConnStage.CLOSE,
 					})
 					registry.removeConn(id)
 				}}
@@ -88,14 +94,14 @@ const SenderConnSpy = (props: {
 				Remove
 			</Button>
 		)
-	} else if (status === SenderAdapterConnStatus.AUTHENTICATED_HEADERS_SENT) {
+	} else if (status === ReceiverAdapterConnStatus.RECEIVED_HEADERS) {
 		buttons = (
 			<ButtonGroup>
 				<Button
 					variant="success"
 					onClick={() => {
 						registry.setConfig(id, {
-							stage: SenderAdapterConnStage.SEND_ENTRIES,
+							stage: ReceiverAdapterConnStage.RECEIVE_FILES,
 						})
 					}}
 				>
@@ -105,7 +111,7 @@ const SenderConnSpy = (props: {
 					variant="danger"
 					onClick={() => {
 						registry.setConfig(id, {
-							stage: SenderAdapterConnStage.CLOSE,
+							stage: ReceiverAdapterConnStage.CLOSE,
 						})
 						registry.removeConn(id)
 					}}
@@ -114,18 +120,32 @@ const SenderConnSpy = (props: {
 				</Button>
 			</ButtonGroup>
 		)
-	} else if (status === SenderAdapterConnStatus.SENDING_FILES) {
+	} else if (status === ReceiverAdapterConnStatus.RECEIVING_FILES) {
 		buttons = (
 			<Button
 				variant="danger"
 				onClick={() => {
 					registry.setConfig(id, {
-						stage: SenderAdapterConnStage.CLOSE,
+						stage: ReceiverAdapterConnStage.CLOSE,
 					})
 					registry.removeConn(id)
 				}}
 			>
 				Stop
+			</Button>
+		)
+	} else if (status === ReceiverAdapterConnStatus.AUTHENTICATED) {
+		buttons = (
+			<Button
+				variant="danger"
+				onClick={() => {
+					registry.setConfig(id, {
+						stage: ReceiverAdapterConnStage.CLOSE,
+					})
+					registry.removeConn(id)
+				}}
+			>
+				Close
 			</Button>
 		)
 	}
@@ -135,18 +155,13 @@ const SenderConnSpy = (props: {
 			{JSON.stringify({
 				status,
 				isClosed,
-				totalFraction,
+				totalDoneFraction,
 				stage,
 				auth,
 
-				entriesCount: entries.length,
-				entriesSumSize: entries.length
-					? entries.map((v) => v.file.size).reduce((a, b) => a + b)
-					: 0,
+				headers,
 			})}
 			{buttons}
 		</Entry>
 	)
 }
-
-const Entry = styled.div``

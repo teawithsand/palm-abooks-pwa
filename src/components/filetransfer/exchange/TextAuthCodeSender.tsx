@@ -9,6 +9,12 @@ import styled from "styled-components"
 const TokenField = styled.div`
 	font-weight: bold;
 	max-width: 100%;
+
+	white-space: break-all;
+	word-break: break-all;
+
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
 `
 
 const CopyButton = styled(Button)`
@@ -33,11 +39,7 @@ export const TextAuthCodeSender = (props: { token: FileTransferTokenData }) => {
 	return (
 		<Alert variant="info">
 			<h4>Copy the following token onto receiving device:</h4>
-			<TokenField>
-				<pre>
-					<code>{encodedToken}</code>
-				</pre>
-			</TokenField>
+			<TokenField>{encodedToken}</TokenField>
 			{"clipboard" in navigator ? (
 				<CopyButton
 					onClick={() => {
