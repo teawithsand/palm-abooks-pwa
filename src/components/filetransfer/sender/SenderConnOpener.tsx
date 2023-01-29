@@ -18,36 +18,30 @@ export const SenderConnOpener = () => {
 	const fileTransferStateManager = useFileTransferStateManager()
 	const token = useTokenData()
 
-	const peer = useStickySubscribableSelector(
-		fileTransferStateManager.peerHelper.stateBus,
-		(state) => state.peer
-	)
+	const peer = fileTransferStateManager.peer
 
 	const entries = useStickySubscribable(senderStateManager.entriesBus)
+	const peerState = useStickySubscribable(peer.stateBus)
 
 	return (
 		<ConnOpener
-			disabled={!peer}
+			disabled={
+				!peerState.isReady || !peerState.id
+			}
 			token={token}
-			onToken={(token) => {
+			onToken={async (token) => {
 				if (!peer) return
 
-				if (peer.id === token.peerId) return
+				if (peer.stateBus.lastEvent.id === token.peerId) return
 
-				const conn = peer.connect(token.peerId)
-				const id = senderStateManager.registry.addConn(
-					{
-						conn,
-						peer,
+				const conn = await peer.connect(token.peerId)
+				const id = senderStateManager.registry.addConn(conn, {
+					auth: {
+						type: FileTransferAuthType.PROVIDE,
+						authSecret: token.authId,
 					},
-					{
-						auth: {
-							type: FileTransferAuthType.PROVIDE,
-							authSecret: token.authId,
-						},
-						entries,
-					}
-				)
+					entries,
+				})
 
 				senderStateManager.registry.updateConfig(id, (cfg) =>
 					produce(cfg, (draft) => {

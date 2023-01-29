@@ -35,7 +35,7 @@ export const SenderConnRegistrySpy = (props: {
 		Object.entries(state)
 			.filter(
 				([_k, v]) =>
-					v.state.status !== SenderAdapterConnStatus.CONNECTED
+					true || v.state.status !== SenderAdapterConnStatus.CONNECTED
 			)
 			.map(([k, _v]) => k)
 	)

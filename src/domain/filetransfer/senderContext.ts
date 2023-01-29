@@ -7,7 +7,7 @@ import {
 	SenderAdapterConnStage,
 	SenderConnAdapter,
 } from "@app/domain/filetransfer/senderAdapter"
-import { ConnRegistry, PeerEventType } from "@teawithsand/tws-peer"
+import { ConnRegistry, IPeerEventType } from "@teawithsand/tws-peer"
 import {
 	DefaultStickyEventBus,
 	StickySubscribable,
@@ -28,41 +28,30 @@ export class SenderStateManager {
 
 	constructor(fileTransferStateManager: FileTransferStateManager) {
 		this.fileTransferStateManagerSubscriptionCanceller =
-			fileTransferStateManager.peerHelper.peerBus.addSubscriber(
-				(event) => {
-					if (event.type === PeerEventType.CALL) {
-						event.call.close()
-					} else if (event.type === PeerEventType.CONNECT) {
-						const id = this.registry.addConn(
-							{
-								conn: event.conn,
-								peer:
-									fileTransferStateManager.peerHelper.stateBus
-										.lastEvent.peer ??
-									throwExpression(
-										new Error("Unreachable code")
-									),
-							},
-							{
-								auth: {
-									type: FileTransferAuthType.REQUEST,
-									authSecret:
-										fileTransferStateManager.authSecretBus
-											.lastEvent,
-								},
-								entries: this.entriesBus.lastEvent,
-							}
-						)
+			fileTransferStateManager.peer.eventBus.addSubscriber((event) => {
+				if (event.type === IPeerEventType.MEDIA_CONN) {
+					event.conn.close()
+				} else if (event.type === IPeerEventType.DATA_CONN) {
+					console.log("Sender got connection: ", event.conn)
+					
+					const id = this.registry.addConn(event.conn, {
+						auth: {
+							type: FileTransferAuthType.REQUEST,
+							authSecret:
+								fileTransferStateManager.authSecretBus
+									.lastEvent,
+						},
+						entries: this.entriesBus.lastEvent,
+					})
 
-						this.registry.updateConfig(id, (cfg) =>
-							produce(cfg, (draft) => {
-								draft.stage =
-									SenderAdapterConnStage.AUTHENTICATE_SEND_HEADERS
-							})
-						)
-					}
+					this.registry.updateConfig(id, (cfg) =>
+						produce(cfg, (draft) => {
+							draft.stage =
+								SenderAdapterConnStage.AUTHENTICATE_SEND_HEADERS
+						})
+					)
 				}
-			)
+			})
 	}
 
 	get entriesBus(): StickySubscribable<FileTransferEntry[]> {

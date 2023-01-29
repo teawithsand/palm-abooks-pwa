@@ -4,7 +4,7 @@ import {
 	ReceiverAdapterConnStage,
 	ReceiverConnAdapter,
 } from "@app/domain/filetransfer/receiverAdapter"
-import { ConnRegistry, PeerEventType } from "@teawithsand/tws-peer"
+import { ConnRegistry, IPeerEventType } from "@teawithsand/tws-peer"
 import { SubscriptionCanceler, throwExpression } from "@teawithsand/tws-stl"
 import produce from "immer"
 import { createContext, useContext } from "react"
@@ -17,40 +17,27 @@ export class ReceiverStateManager {
 
 	constructor(fileTransferStateManager: FileTransferStateManager) {
 		this.fileTransferStateManagerSubscriptionCanceller =
-			fileTransferStateManager.peerHelper.peerBus.addSubscriber(
-				(event) => {
-					if (event.type === PeerEventType.CALL) {
-						event.call.close()
-					} else if (event.type === PeerEventType.CONNECT) {
-						const id = this.registry.addConn(
-							{
-								conn: event.conn,
-								peer:
-									fileTransferStateManager.peerHelper.stateBus
-										.lastEvent.peer ??
-									throwExpression(
-										new Error("Unreachable code")
-									),
-							},
-							{
-								auth: {
-									type: FileTransferAuthType.REQUEST,
-									authSecret:
-										fileTransferStateManager.authSecretBus
-											.lastEvent,
-								},
-							}
-						)
+			fileTransferStateManager.peer.eventBus.addSubscriber((event) => {
+				if (event.type === IPeerEventType.MEDIA_CONN) {
+					event.conn.close()
+				} else if (event.type === IPeerEventType.DATA_CONN) {
+					const id = this.registry.addConn(event.conn, {
+						auth: {
+							type: FileTransferAuthType.REQUEST,
+							authSecret:
+								fileTransferStateManager.authSecretBus
+									.lastEvent,
+						},
+					})
 
-						this.registry.updateConfig(id, (cfg) =>
-							produce(cfg, (draft) => {
-								draft.stage =
-									ReceiverAdapterConnStage.AUTHENTICATE_RECEIVE_HEADER
-							})
-						)
-					}
+					this.registry.updateConfig(id, (cfg) =>
+						produce(cfg, (draft) => {
+							draft.stage =
+								ReceiverAdapterConnStage.AUTHENTICATE_RECEIVE_HEADER
+						})
+					)
 				}
-			)
+			})
 	}
 
 	/**

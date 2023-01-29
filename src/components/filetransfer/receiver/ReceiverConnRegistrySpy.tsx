@@ -37,6 +37,7 @@ export const ReceiverConnRegistrySpy = (props: {
 		Object.entries(state)
 			.filter(
 				([_k, v]) =>
+					true ||
 					v.state.status !== ReceiverAdapterConnStatus.CONNECTED
 			)
 			.map(([k, _v]) => k)

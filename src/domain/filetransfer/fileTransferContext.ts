@@ -1,4 +1,4 @@
-import { PeerHelper, generateSecureClientId } from "@teawithsand/tws-peer"
+import { IPeer, PeerJSIPeer, generateSecureClientId } from "@teawithsand/tws-peer"
 import {
 	DefaultStickyEventBus,
 	StickySubscribable,
@@ -10,7 +10,7 @@ export class FileTransferStateManager {
 	private readonly innerAuthSecretBus = new DefaultStickyEventBus(
 		generateSecureClientId()
 	)
-	constructor(public readonly peerHelper: PeerHelper) {}
+	constructor(public readonly peer: PeerJSIPeer) {}
 
 	get authSecretBus(): StickySubscribable<string> {
 		return this.innerAuthSecretBus
@@ -21,7 +21,7 @@ export class FileTransferStateManager {
 	}
 
 	close = () => {
-		this.peerHelper.setConfig(null)
+		this.peer.close()
 	}
 }
 

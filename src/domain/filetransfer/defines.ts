@@ -1,9 +1,6 @@
-import { DataConnection, Peer } from "@teawithsand/tws-peer"
+import { DataConnection, IDataConnection, Peer } from "@teawithsand/tws-peer"
 
-export type FileTransferConn = {
-	conn: DataConnection
-	peer: Peer
-}
+export type FileTransferConn = IDataConnection
 
 export enum FileTransferAuthType {
 	REQUEST = 1,
@@ -71,8 +68,7 @@ export const encodeFileTransferTokenData = (
 			authId,
 			peerId,
 		})
-	)
-		.replace(/[=]*/g, "")
+	).replace(/[=]*/g, "")
 }
 
 export const decodeFileTransferTokenData = (
