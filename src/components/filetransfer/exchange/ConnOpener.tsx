@@ -66,7 +66,7 @@ export const ConnOpener = (props: {
 			<Container>
 				<Alert variant="info">
 					Please start client using button above before exchanging
-					code
+					code. If you want to send files, make sure you have selected at least one.
 				</Alert>
 			</Container>
 		)

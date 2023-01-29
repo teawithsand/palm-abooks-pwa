@@ -48,7 +48,7 @@ export const ReceiverConnRegistrySpy = (props: {
 			{!keys.length
 				? "No connections so far"
 				: keys.map((k) => (
-						<ReceiverConnSpy id={k} registry={registry} />
+						<ReceiverConnSpy key={k} id={k} registry={registry} />
 				  ))}
 		</Container>
 	)
@@ -77,6 +77,7 @@ const ReceiverConnSpy = (props: {
 		initData: { auth },
 		state: { status, totalDoneFraction, headers },
 		config: { stage },
+		error,
 	} = state
 
 	let buttons = null
@@ -159,6 +160,7 @@ const ReceiverConnSpy = (props: {
 				totalDoneFraction,
 				stage,
 				auth,
+				error,
 
 				headers,
 			})}

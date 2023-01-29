@@ -9,6 +9,7 @@ import {
 	MAGIC_END_OF_FILES,
 	fileTransferHeaderFromFileTransferEntry,
 } from "@app/domain/filetransfer/defines"
+import { ReceiverAdapterConnConfig } from "@app/domain/filetransfer/receiverAdapter"
 
 import {
 	ConnRegistryAdapter,
@@ -59,6 +60,11 @@ export class SenderConnAdapter
 			SenderAdapterInitData
 		>
 {
+	modifyConfigOnRemove = (config: SenderConnConfig) =>
+		produce(config, (draft) => {
+			draft.stage = SenderAdapterConnStage.CLOSE
+		})
+
 	makeInitialConfig = (
 		conn: FileTransferConn,
 		initData: SenderAdapterInitData,
@@ -121,9 +127,12 @@ export class SenderConnAdapter
 				conn.send(MAGIC_AUTH_SUCCESS)
 			}
 
-			conn.send(
-				entries.map((e) => fileTransferHeaderFromFileTransferEntry(e))
+			const headers = entries.map((e) =>
+				fileTransferHeaderFromFileTransferEntry(e)
 			)
+			conn.send(headers)
+
+			console.log("Sent headers", headers, "entries", entries)
 
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
@@ -134,6 +143,10 @@ export class SenderConnAdapter
 		}
 
 		const doSend = async () => {
+			if (!isAuthenticated)
+				throw new Error("Unreachable code: not authenticated yet")
+			console.log("starting files sending")
+
 			isSentFiles = true
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
@@ -152,12 +165,14 @@ export class SenderConnAdapter
 
 			let sentSize = 0
 			for (const entry of entries) {
+				console.log("initiated sending of entry", entry)
 				if (isClosedByUser)
 					throw new Error("Sending interrupted by user")
 
 				const { file } = entry
 
-				conn.send(fileTransferHeaderFromFileTransferEntry(entry))
+				const header = fileTransferHeaderFromFileTransferEntry(entry)
+				conn.send(header)
 
 				let ptr = 0
 				const CHUNK_SIZE = 64 * 1024
@@ -173,6 +188,7 @@ export class SenderConnAdapter
 					const arrayBuffer = await chunk.arrayBuffer()
 					sentSize += arrayBuffer.byteLength
 					conn.send(arrayBuffer)
+					console.log("Sent chunk", chunk.size, "of", entry)
 
 					const res = await conn.messageQueue.receive()
 					if (res !== MAGIC_DID_RECEIVE) {
@@ -219,13 +235,13 @@ export class SenderConnAdapter
 					config.stage ===
 					SenderAdapterConnStage.AUTHENTICATE_SEND_HEADERS
 				) {
-					if (isAuthenticated || isSentFiles) continue
+					if (isAuthenticated) continue
 
 					await doAuth()
 				} else if (
 					config.stage === SenderAdapterConnStage.SEND_ENTRIES
 				) {
-					if (isSentFiles || isAuthenticated) continue
+					if (isSentFiles) continue
 					if (!isAuthenticated) await doAuth()
 
 					await doSend()

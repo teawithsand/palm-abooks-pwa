@@ -44,7 +44,9 @@ export const SenderConnRegistrySpy = (props: {
 		<Container>
 			{!keys.length
 				? "No connections so far"
-				: keys.map((k) => <SenderConnSpy id={k} registry={registry} />)}
+				: keys.map((k) => (
+						<SenderConnSpy key={k} id={k} registry={registry} />
+				  ))}
 		</Container>
 	)
 }
@@ -70,6 +72,7 @@ const SenderConnSpy = (props: {
 		initData: { auth, entries },
 		state: { status, totalFraction },
 		config: { stage },
+		error,
 	} = state
 
 	let buttons = null
@@ -138,6 +141,7 @@ const SenderConnSpy = (props: {
 				totalFraction,
 				stage,
 				auth,
+				error,
 
 				entriesCount: entries.length,
 				entriesSumSize: entries.length

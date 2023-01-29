@@ -58,6 +58,11 @@ export class ReceiverConnAdapter
 			ReceiverAdapterInitData
 		>
 {
+	modifyConfigOnRemove = (config: ReceiverAdapterConnConfig) =>
+		produce(config, (draft) => {
+			draft.stage = ReceiverAdapterConnStage.CLOSE
+		})
+
 	makeInitialConfig = () => ({
 		stage: ReceiverAdapterConnStage.WAIT,
 	})
@@ -121,6 +126,7 @@ export class ReceiverConnAdapter
 			// TODO(teawithsand): validate structure of received data via joi or something else
 			// not only structure should match, but size should be int greater than 0 and less than say 2 or 4GB
 			headers = await conn.messageQueue.receive()
+			console.log("Received headers", headers)
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
 					draft.status = ReceiverAdapterConnStatus.RECEIVED_HEADERS
@@ -130,6 +136,9 @@ export class ReceiverConnAdapter
 		}
 
 		const doReceive = async () => {
+			if(!isAuthenticatedAndReceivedHeaders) throw new Error("Unreachable code: not authenticated yet")
+
+			console.log("Starting files accepting")
 			isReceiveFiles = true
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
@@ -149,8 +158,15 @@ export class ReceiverConnAdapter
 				const receivedHeader: FileTransferEntryHeader =
 					await conn.messageQueue.receive()
 
+				console.log(
+					"Starting files accepting; received header",
+					receivedHeader,
+					"to header",
+					header
+				)
+
 				let resultBlob = new Blob([])
-				let bytesLeft = receivedHeader.size
+				let bytesLeft = header.size
 
 				for (;;) {
 					if (bytesLeft === 0) break
@@ -214,14 +230,14 @@ export class ReceiverConnAdapter
 					config.stage ===
 					ReceiverAdapterConnStage.AUTHENTICATE_RECEIVE_HEADER
 				) {
-					if (isAuthenticatedAndReceivedHeaders || isReceiveFiles)
+					if (isAuthenticatedAndReceivedHeaders)
 						continue
 
 					await doAuthAndReceiveHeaders()
 				} else if (
 					config.stage === ReceiverAdapterConnStage.RECEIVE_FILES
 				) {
-					if (isReceiveFiles || isAuthenticatedAndReceivedHeaders)
+					if (isReceiveFiles)
 						continue
 					if (!isAuthenticatedAndReceivedHeaders)
 						await doAuthAndReceiveHeaders()

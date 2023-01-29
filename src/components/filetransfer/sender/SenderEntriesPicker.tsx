@@ -6,7 +6,7 @@ import {
 import { useStickySubscribableSelector } from "@teawithsand/tws-stl-react"
 import arrayMutators from "final-form-arrays"
 import React, { useMemo } from "react"
-import { Form } from "react-bootstrap"
+import { Button, Form } from "react-bootstrap"
 import { Form as FinalForm } from "react-final-form"
 
 type AbookFormAddFilesData = {
@@ -27,7 +27,7 @@ export const SenderEntriesPicker = () => {
 		transferStateManager.peer.stateBus,
 		(state) => !state.isActive
 	)
-	
+
 	return (
 		<FinalForm<AbookFormAddFilesData>
 			onSubmit={(values: AbookFormAddFilesData) => {
@@ -41,25 +41,21 @@ export const SenderEntriesPicker = () => {
 					)
 				}
 			}}
-			// TODO(teawithsand): auto value updating in less hacky way
-			debug={(_, values) => {
-				if (canSetEntries) {
-					senderStateManager.setEntries(
-						(values?.files?.value ?? [])?.map((v: File) => ({
-							file: v,
-							publicName: v.name,
-							sha512hash: "NIY",
-						}))
-					)
-				}
-			}}
 			mutators={{
 				...arrayMutators,
 			}}
 			initialValues={initialValues}
-			render={({ handleSubmit }) => (
+			render={({ handleSubmit, submitting, pristine }) => (
 				<Form onSubmit={handleSubmit}>
 					<FilesFinalField name="files" disabled={!canSetEntries} />
+
+					<Button
+						className="mt-2"
+						disabled={submitting || pristine}
+						type="submit"
+					>
+						Set entries
+					</Button>
 				</Form>
 			)}
 		/>
