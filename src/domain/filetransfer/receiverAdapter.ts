@@ -12,8 +12,6 @@ import {
 import {
 	ConnRegistryAdapter,
 	ConnRegistryAdapterHandle,
-	DefaultPeerDataConnReceiver,
-	makePeerDataConnBus,
 } from "@teawithsand/tws-peer"
 import { BusAwaiter } from "@teawithsand/tws-stl"
 import produce from "immer"
@@ -80,14 +78,7 @@ export class ReceiverConnAdapter
 			ReceiverAdapterInitData
 		>
 	) => {
-		const {
-			conn: { conn, peer },
-			updateState,
-			connConfigBus,
-			initData,
-		} = handle
-		const bus = makePeerDataConnBus(peer, conn)
-		const receiver = new DefaultPeerDataConnReceiver(bus, peer, conn)
+		const { conn, updateState, connConfigBus, initData } = handle
 		const configAwaiter = new BusAwaiter(connConfigBus)
 
 		let isAuthenticatedAndReceivedHeaders = false
@@ -112,9 +103,9 @@ export class ReceiverConnAdapter
 			if (auth.type === FileTransferAuthType.PROVIDE) {
 				conn.send(auth.authSecret)
 
-				await receiver.receiveData() // receive magic
+				const _magic = await conn.messageQueue.receive()
 			} else {
-				const secret = await receiver.receiveData()
+				const secret = await conn.messageQueue.receive()
 				if (typeof secret !== "string" || secret !== auth.authSecret)
 					throw new Error("Invalid auth string")
 
@@ -129,7 +120,7 @@ export class ReceiverConnAdapter
 
 			// TODO(teawithsand): validate structure of received data via joi or something else
 			// not only structure should match, but size should be int greater than 0 and less than say 2 or 4GB
-			headers = await receiver.receiveData()
+			headers = await conn.messageQueue.receive()
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
 					draft.status = ReceiverAdapterConnStatus.RECEIVED_HEADERS
@@ -156,7 +147,7 @@ export class ReceiverConnAdapter
 			for (const header of headers) {
 				// TODO(teawithsand): check received header against header provided
 				const receivedHeader: FileTransferEntryHeader =
-					await receiver.receiveData()
+					await conn.messageQueue.receive()
 
 				let resultBlob = new Blob([])
 				let bytesLeft = receivedHeader.size
@@ -164,7 +155,7 @@ export class ReceiverConnAdapter
 				for (;;) {
 					if (bytesLeft === 0) break
 
-					const chunk = await receiver.receiveData()
+					const chunk = await conn.messageQueue.receive()
 					if (!(chunk instanceof ArrayBuffer)) {
 						throw new Error("bad type")
 					}
@@ -200,7 +191,7 @@ export class ReceiverConnAdapter
 				)
 			}
 
-			const _magic = await receiver.receiveData()
+			const _magic = await conn.messageQueue.receive()
 			// magic on receiving is done. It should ve validated.
 
 			updateState((oldState) =>
@@ -243,9 +234,6 @@ export class ReceiverConnAdapter
 			}
 		} finally {
 			configAwaiter.close()
-			receiver.close()
-			bus.close()
-
 			conn.close()
 		}
 	}
@@ -258,6 +246,6 @@ export class ReceiverConnAdapter
 			ReceiverAdapterInitData
 		>
 	) => {
-		handle.conn.conn.close()
+		handle.conn.close()
 	}
 }

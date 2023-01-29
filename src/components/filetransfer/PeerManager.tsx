@@ -8,9 +8,7 @@ const Container = styled.div``
 
 export const PeerManager = () => {
 	const contextHelper = useFileTransferStateManager()
-	const peerHelperState = useStickySubscribable(
-		contextHelper.peerHelper.stateBus
-	)
+	const peerHelperState = useStickySubscribable(contextHelper.peer.stateBus)
 
 	return (
 		<Container>
@@ -18,27 +16,26 @@ export const PeerManager = () => {
 				<ul>
 					<li>
 						Peer state:{" "}
-						{peerHelperState.peer ? "Active" : "Inactive"}
+						{peerHelperState.isActive ? "Active" : "Inactive"}
 					</li>
-					<li>Error: {peerHelperState.peerState.error?.message}</li>
-					<li>Is closed: {peerHelperState.peerState.isClosed}</li>
+					<li>
+						Error: {peerHelperState.error?.message ?? "No error"}
+					</li>
+					<li>Is closed: {peerHelperState.isClosed ? "T" : "F"}</li>
 				</ul>
 			</div>
 			<div>
 				<Button
 					onClick={() => {
 						contextHelper.regenerateAuthSecret()
-						contextHelper.peerHelper.setConfig({
-							config: null,
-							id: null,
-						})
+						contextHelper.peer.setPeerJsConfig({})
 					}}
 				>
 					(Re)start peer
 				</Button>
 				<Button
 					onClick={() => {
-						contextHelper.peerHelper.setConfig(null)
+						contextHelper.peer.setPeerJsConfig(null)
 					}}
 				>
 					Stop peer

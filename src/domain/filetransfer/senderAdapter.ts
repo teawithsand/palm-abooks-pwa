@@ -13,8 +13,6 @@ import {
 import {
 	ConnRegistryAdapter,
 	ConnRegistryAdapterHandle,
-	DefaultPeerDataConnReceiver,
-	makePeerDataConnBus,
 } from "@teawithsand/tws-peer"
 import { BusAwaiter } from "@teawithsand/tws-stl"
 import produce from "immer"
@@ -90,19 +88,14 @@ export class SenderConnAdapter
 			SenderAdapterInitData
 		>
 	) => {
-		const {
-			conn: { conn, peer },
-			updateState,
-			connConfigBus,
-			initData,
-		} = handle
-		const bus = makePeerDataConnBus(peer, conn)
-		const receiver = new DefaultPeerDataConnReceiver(bus, peer, conn)
-		const configAwaiter = new BusAwaiter(connConfigBus)
+		const { conn, updateState, connConfigBus, initData } = handle
 
 		let isAuthenticated = false
 		let isClosedByUser = false
 		let isSentFiles = false
+
+		const configAwaiter = new BusAwaiter(connConfigBus)
+
 		connConfigBus.addSubscriber((config) => {
 			if (config.stage === SenderAdapterConnStage.CLOSE) {
 				isClosedByUser = true
@@ -119,9 +112,9 @@ export class SenderConnAdapter
 			if (auth.type === FileTransferAuthType.PROVIDE) {
 				conn.send(auth.authSecret)
 
-				await receiver.receiveData() // receive magic
+				await conn.messageQueue.receive() // receive magic
 			} else {
-				const secret = await receiver.receiveData()
+				const secret = await conn.messageQueue.receive()
 				if (typeof secret !== "string" || secret !== auth.authSecret)
 					throw new Error("Invalid auth string")
 
@@ -148,7 +141,7 @@ export class SenderConnAdapter
 				})
 			)
 
-			const ack = await receiver.receiveData()
+			const ack = await conn.messageQueue.receive()
 			if (ack !== MAGIC_ACCEPT_FILES) {
 				throw new Error("Invalid magic received")
 			}
@@ -181,7 +174,7 @@ export class SenderConnAdapter
 					sentSize += arrayBuffer.byteLength
 					conn.send(arrayBuffer)
 
-					const res = await receiver.receiveData()
+					const res = await conn.messageQueue.receive()
 					if (res !== MAGIC_DID_RECEIVE) {
 						throw new Error("Invalid magic received")
 					}
@@ -243,9 +236,6 @@ export class SenderConnAdapter
 			}
 		} finally {
 			configAwaiter.close()
-			receiver.close()
-			bus.close()
-
 			conn.close()
 		}
 	}
@@ -258,6 +248,6 @@ export class SenderConnAdapter
 			SenderAdapterInitData
 		>
 	) => {
-		handle.conn.conn.close()
+		handle.conn.close()
 	}
 }

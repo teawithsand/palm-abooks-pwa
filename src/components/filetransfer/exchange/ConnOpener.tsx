@@ -3,7 +3,7 @@ import { QRAuthCodeReceiver } from "@app/components/filetransfer/exchange/QRAuth
 import { QRAuthCodeSender } from "@app/components/filetransfer/exchange/QRAuthCodeSender"
 import { TextAuthCodeReceiver } from "@app/components/filetransfer/exchange/TextAuthCodeReceiver"
 import { FileTransferTokenData } from "@app/domain/filetransfer"
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { Alert, Form } from "react-bootstrap"
 import styled from "styled-components"
 
@@ -24,16 +24,24 @@ const DisplayContainer = styled.div`
 export const ConnOpener = (props: {
 	disabled?: boolean
 	token: FileTransferTokenData
-	onToken: (token: FileTransferTokenData) => void
+	onToken: (token: FileTransferTokenData) => Promise<void>
 }) => {
 	const { token, onToken: innerOnToken, disabled } = props
 	const [state, setState] = useState<State>(State.PICK)
-
+	const runningCtrRef = useRef(0)
+	const [runningCtr, setRunningCtr] = useState(0)
 	let innerDisplay = null
 
 	const onToken = (token: FileTransferTokenData) => {
 		setState(State.PICK)
-		innerOnToken(token)
+
+		runningCtrRef.current++
+		setRunningCtr(runningCtrRef.current)
+
+		innerOnToken(token).finally(() => {
+			runningCtrRef.current--
+			setRunningCtr(runningCtrRef.current)
+		})
 	}
 
 	if (state === State.SHOW_QR) {
@@ -69,6 +77,10 @@ export const ConnOpener = (props: {
 			<Form.Select
 				value={state}
 				onChange={(e) => {
+					// ignore changes if promise till conn open is pending.
+					// TODO(teawithsand): Please note that some info should be shown
+					if (runningCtr) return
+
 					setState(parseInt(e.target.value) || State.PICK)
 				}}
 			>

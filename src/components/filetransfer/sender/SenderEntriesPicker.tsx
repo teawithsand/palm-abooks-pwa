@@ -24,9 +24,10 @@ export const SenderEntriesPicker = () => {
 	const senderStateManager = useSenderStateManager()
 	const transferStateManager = useFileTransferStateManager()
 	const canSetEntries = useStickySubscribableSelector(
-		transferStateManager.peerHelper.stateBus,
-		(state) => !state.peer
+		transferStateManager.peer.stateBus,
+		(state) => !state.isActive
 	)
+	
 	return (
 		<FinalForm<AbookFormAddFilesData>
 			onSubmit={(values: AbookFormAddFilesData) => {

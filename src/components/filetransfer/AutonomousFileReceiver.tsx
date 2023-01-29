@@ -9,7 +9,7 @@ import {
 	useFileTransferStateManager,
 	useReceiverStateManager,
 } from "@app/domain/filetransfer"
-import { PeerHelper } from "@teawithsand/tws-peer"
+import { PeerJSIPeer } from "@teawithsand/tws-peer"
 import { useStickySubscribable } from "@teawithsand/tws-stl-react"
 import React, { useEffect, useMemo } from "react"
 import styled from "styled-components"
@@ -34,7 +34,7 @@ const InnerFileReceiver = () => {
 	const transferManager = useFileTransferStateManager()
 	const receiverManager = useReceiverStateManager()
 	const authSecret = useStickySubscribable(transferManager.authSecretBus)
-	const peerState = useStickySubscribable(transferManager.peerHelper.stateBus)
+	const peerState = useStickySubscribable(transferManager.peer.stateBus)
 
 	return (
 		<Container>
@@ -74,13 +74,20 @@ const InnerFileReceiver = () => {
 
 export const AutonomousFileReceiver = () => {
 	const fileTransferStateManager = useMemo(
-		() => new FileTransferStateManager(new PeerHelper()),
+		() => new FileTransferStateManager(new PeerJSIPeer()),
 		[]
 	)
 	const receiverStateManager = useMemo(
 		() => new ReceiverStateManager(fileTransferStateManager),
 		[fileTransferStateManager]
 	)
+
+	useEffect(() => {
+		fileTransferStateManager.peer.setConfig({
+			acceptDataConnections: true,
+			acceptMediaConnections: false,
+		})
+	}, [fileTransferStateManager])
 
 	useEffect(() => {
 		return () => {

@@ -6,7 +6,7 @@ import {
 	useFileTransferStateManager,
 	useReceiverStateManager,
 } from "@app/domain/filetransfer"
-import { useStickySubscribableSelector } from "@teawithsand/tws-stl-react"
+import { useStickySubscribable } from "@teawithsand/tws-stl-react"
 import produce from "immer"
 import React from "react"
 
@@ -15,34 +15,27 @@ export const ReceiverConnOpener = () => {
 	const fileTransferStateManager = useFileTransferStateManager()
 	const token = useTokenData()
 
-	const peer = useStickySubscribableSelector(
-		fileTransferStateManager.peerHelper.stateBus,
-		(state) => state.peer
-	)
+	const peer = fileTransferStateManager.peer
+
+	const peerState = useStickySubscribable(peer.stateBus)
 
 	return (
 		<ConnOpener
-			disabled={!peer}
+			disabled={!peerState.isReady || !peerState.id}
 			token={token}
-			onToken={(token) => {
+			onToken={async (token) => {
 				console.log("Token received", token)
 				if (!peer) return
 
-				if (peer.id === token.peerId) return
+				if (peer.stateBus.lastEvent.id === token.peerId) return
 
-				const conn = peer.connect(token.peerId)
-				const id = senderStateManager.registry.addConn(
-					{
-						conn,
-						peer,
+				const conn = await peer.connect(token.peerId)
+				const id = senderStateManager.registry.addConn(conn, {
+					auth: {
+						type: FileTransferAuthType.PROVIDE,
+						authSecret: token.authId,
 					},
-					{
-						auth: {
-							type: FileTransferAuthType.PROVIDE,
-							authSecret: token.authId,
-						},
-					}
-				)
+				})
 
 				senderStateManager.registry.updateConfig(id, (cfg) =>
 					produce(cfg, (draft) => {
