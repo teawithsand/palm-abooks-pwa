@@ -21,7 +21,7 @@ import produce from "immer"
 
 export enum SenderAdapterConnStatus {
 	CONNECTED = 1,
-	AUTHENTICATED = 2,
+	AUTHENTICATED_HEADERS_SENT = 2,
 	SENDING_FILES = 3,
 	DONE = 4,
 }
@@ -43,7 +43,7 @@ export type SenderAdapterConnState = {
 
 export enum SenderAdapterConnStage {
 	WAIT = 1,
-	AUTHENTICATE = 2,
+	AUTHENTICATE_SEND_HEADERS = 2,
 	SEND_ENTRIES = 3,
 	CLOSE = 4,
 }
@@ -128,9 +128,14 @@ export class SenderConnAdapter
 				conn.send(MAGIC_AUTH_SUCCESS)
 			}
 
+			conn.send(
+				entries.map((e) => fileTransferHeaderFromFileTransferEntry(e))
+			)
+
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
-					draft.status = SenderAdapterConnStatus.AUTHENTICATED
+					draft.status =
+						SenderAdapterConnStatus.AUTHENTICATED_HEADERS_SENT
 				})
 			)
 		}
@@ -141,10 +146,6 @@ export class SenderConnAdapter
 				produce(oldState, (draft) => {
 					draft.status = SenderAdapterConnStatus.SENDING_FILES
 				})
-			)
-
-			conn.send(
-				entries.map((e) => fileTransferHeaderFromFileTransferEntry(e))
 			)
 
 			const ack = await receiver.receiveData()
@@ -222,7 +223,8 @@ export class SenderConnAdapter
 				if (config.stage === SenderAdapterConnStage.WAIT) {
 					continue
 				} else if (
-					config.stage === SenderAdapterConnStage.AUTHENTICATE
+					config.stage ===
+					SenderAdapterConnStage.AUTHENTICATE_SEND_HEADERS
 				) {
 					if (isAuthenticated || isSentFiles) continue
 

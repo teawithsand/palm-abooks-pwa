@@ -28,7 +28,6 @@ export enum ReceiverAdapterConnStatus {
 
 export type ReceiverAdapterInitData = {
 	auth: FileTransferAuth
-	entries: FileTransferEntry[]
 }
 
 export type ReceiverAdapterConnState = {
@@ -105,7 +104,7 @@ export class ReceiverConnAdapter
 		})
 
 		// These two must be provided during initialization
-		const { auth, entries } = initData
+		const { auth } = initData
 
 		const doAuthAndReceiveHeaders = async () => {
 			isAuthenticatedAndReceivedHeaders = true
