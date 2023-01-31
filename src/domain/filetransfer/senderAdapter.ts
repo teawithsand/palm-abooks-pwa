@@ -112,13 +112,22 @@ export class SenderConnAdapter
 		// These two must be provided during initialization
 		const { auth, entries } = initData
 
+		const receiveMagic = async (magic: string) => {
+			const res = await conn.messageQueue.receive()
+			if (res !== magic) {
+				throw new Error(
+					`Magic receive filed. Wanted ${magic} got ${res}`
+				)
+			}
+		}
+
 		const doAuth = async () => {
 			isAuthenticated = true
 
 			if (auth.type === FileTransferAuthType.PROVIDE) {
 				conn.send(auth.authSecret)
 
-				await conn.messageQueue.receive() // receive magic
+				await receiveMagic(MAGIC_AUTH_SUCCESS)
 			} else {
 				const secret = await conn.messageQueue.receive()
 				if (typeof secret !== "string" || secret !== auth.authSecret)
@@ -154,10 +163,7 @@ export class SenderConnAdapter
 				})
 			)
 
-			const ack = await conn.messageQueue.receive()
-			if (ack !== MAGIC_ACCEPT_FILES) {
-				throw new Error("Invalid magic received")
-			}
+			await receiveMagic(MAGIC_ACCEPT_FILES)
 
 			const totalSize = entries.length
 				? entries.map((v) => v.file.size).reduce((a, b) => a + b)
@@ -190,10 +196,7 @@ export class SenderConnAdapter
 					conn.send(arrayBuffer)
 					console.log("Sent chunk", chunk.size, "of", entry)
 
-					const res = await conn.messageQueue.receive()
-					if (res !== MAGIC_DID_RECEIVE) {
-						throw new Error("Invalid magic received")
-					}
+					await receiveMagic(MAGIC_DID_RECEIVE)
 
 					updateState((oldState) =>
 						produce(oldState, (draft) => {
@@ -217,6 +220,7 @@ export class SenderConnAdapter
 			}
 
 			conn.send(MAGIC_END_OF_FILES)
+			
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
 					draft.status = SenderAdapterConnStatus.DONE

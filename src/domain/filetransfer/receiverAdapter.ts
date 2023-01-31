@@ -7,6 +7,7 @@ import {
 	MAGIC_ACCEPT_FILES,
 	MAGIC_AUTH_SUCCESS,
 	MAGIC_DID_RECEIVE,
+	MAGIC_END_OF_FILES,
 } from "@app/domain/filetransfer/defines"
 
 import {
@@ -102,13 +103,22 @@ export class ReceiverConnAdapter
 		// These two must be provided during initialization
 		const { auth } = initData
 
+		const receiveMagic = async (magic: string) => {
+			const res = await conn.messageQueue.receive()
+			if (res !== magic) {
+				throw new Error(
+					`Magic receive filed. Wanted ${magic} got ${res}`
+				)
+			}
+		}
+
 		const doAuthAndReceiveHeaders = async () => {
 			isAuthenticatedAndReceivedHeaders = true
 
 			if (auth.type === FileTransferAuthType.PROVIDE) {
 				conn.send(auth.authSecret)
 
-				const _magic = await conn.messageQueue.receive()
+				await receiveMagic(MAGIC_AUTH_SUCCESS)
 			} else {
 				const secret = await conn.messageQueue.receive()
 				if (typeof secret !== "string" || secret !== auth.authSecret)
@@ -136,7 +146,8 @@ export class ReceiverConnAdapter
 		}
 
 		const doReceive = async () => {
-			if(!isAuthenticatedAndReceivedHeaders) throw new Error("Unreachable code: not authenticated yet")
+			if (!isAuthenticatedAndReceivedHeaders)
+				throw new Error("Unreachable code: not authenticated yet")
 
 			console.log("Starting files accepting")
 			isReceiveFiles = true
@@ -207,7 +218,7 @@ export class ReceiverConnAdapter
 				)
 			}
 
-			const _magic = await conn.messageQueue.receive()
+			await receiveMagic(MAGIC_END_OF_FILES)
 			// magic on receiving is done. It should ve validated.
 
 			updateState((oldState) =>
@@ -230,15 +241,13 @@ export class ReceiverConnAdapter
 					config.stage ===
 					ReceiverAdapterConnStage.AUTHENTICATE_RECEIVE_HEADER
 				) {
-					if (isAuthenticatedAndReceivedHeaders)
-						continue
+					if (isAuthenticatedAndReceivedHeaders) continue
 
 					await doAuthAndReceiveHeaders()
 				} else if (
 					config.stage === ReceiverAdapterConnStage.RECEIVE_FILES
 				) {
-					if (isReceiveFiles)
-						continue
+					if (isReceiveFiles) continue
 					if (!isAuthenticatedAndReceivedHeaders)
 						await doAuthAndReceiveHeaders()
 
