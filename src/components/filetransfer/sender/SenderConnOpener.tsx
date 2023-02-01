@@ -26,7 +26,7 @@ export const SenderConnOpener = () => {
 	return (
 		<ConnOpener
 			disabled={
-				!peerState.isReady || !peerState.id || entries.length === 0
+				!peerState.isReady || entries.length === 0
 			}
 			token={token}
 			onToken={async (token) => {

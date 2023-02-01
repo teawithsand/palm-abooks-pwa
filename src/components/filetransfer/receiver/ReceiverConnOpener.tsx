@@ -4,10 +4,9 @@ import {
 	useTokenData,
 } from "@app/components/filetransfer/useToken"
 import {
-	FileTransferAuthType,
 	ReceiverAdapterConnStage,
 	useFileTransferStateManager,
-	useReceiverStateManager,
+	useReceiverStateManager
 } from "@app/domain/filetransfer"
 import { useStickySubscribable } from "@teawithsand/tws-stl-react"
 import produce from "immer"
@@ -25,11 +24,10 @@ export const ReceiverConnOpener = () => {
 
 	return (
 		<ConnOpener
-			disabled={!peerState.isReady || !peerState.id}
+			disabled={!peerState.isReady}
 			token={token}
 			onToken={async (token) => {
 				if (!peer) return
-
 				if (peer.stateBus.lastEvent.id === token.peerId) return
 
 				const conn = await peer.connect(token.peerId)
