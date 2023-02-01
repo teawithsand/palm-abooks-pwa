@@ -75,7 +75,7 @@ const ReceiverConnSpy = (props: {
 	const {
 		isClosed,
 		initData: { auth },
-		state: { status, totalDoneFraction, headers },
+		state: { status, totalDoneFraction, headers, authResult },
 		config: { stage },
 		error,
 	} = state
@@ -161,6 +161,7 @@ const ReceiverConnSpy = (props: {
 				stage,
 				auth,
 				error,
+				authResult,
 
 				headers,
 			})}

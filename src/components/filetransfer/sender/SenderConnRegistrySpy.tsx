@@ -70,7 +70,7 @@ const SenderConnSpy = (props: {
 	const {
 		isClosed,
 		initData: { auth, entries },
-		state: { status, totalFraction },
+		state: { status, totalFraction, authResult },
 		config: { stage },
 		error,
 	} = state
@@ -142,6 +142,7 @@ const SenderConnSpy = (props: {
 				stage,
 				auth,
 				error,
+				authResult,
 
 				entriesCount: entries.length,
 				entriesSumSize: entries.length
