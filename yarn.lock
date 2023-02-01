@@ -2350,10 +2350,10 @@
     dotenv "^16.0.3"
     tsconfig-paths-webpack-plugin "^3.5.2"
 
-"@teawithsand/tws-peer@^0.2.2":
-  version "0.2.2"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-peer/-/tws-peer-0.2.2.tgz"
-  integrity sha512-yGYd8pT+VZWdrmGw5nNQby06tOVMpSf6kAB8RNZXl3Z70Rl9DN5t7ebDrMC6uGiVWZNbKuj2TvfAO2lETYwecA==
+"@teawithsand/tws-peer@^0.2.2-b1":
+  version "0.2.2-b1"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-peer/-/tws-peer-0.2.2-b1.tgz#04873ee667302916c3ab9c2d8222083aac3aee12"
+  integrity sha512-gdEcjLqVlYO5nJAst4W0PV4DmOrMj7iRvbEzlLj0K6D+wokQoaENLemisE2WC5fue3HmFn0ItUvUR20J1qhmXQ==
   dependencies:
     "@teawithsand/tws-stl" "^0.0.18"
     peerjs "^1.4.7"
