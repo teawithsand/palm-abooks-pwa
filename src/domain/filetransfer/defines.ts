@@ -16,11 +16,11 @@ export enum FileTransferAuthType {
 }
 
 export const isFileTransferAuthNameValid = (name: string) => {
-	if (name.length === 0) return false
-	if (name.length > 32) return false
+	if (name.length < 3) return false
+	if (name.length > 64) return false
 
 	// Valid char list
-	if (!/^[a-zA-Z0-9_-]$/.test(name)) return false
+	if (!/^[a-zA-Z0-9_-]+$/.test(name)) return false
 
 	// Can't start or end with _ or -
 	if (/^[_-]+/.test(name)) return false
