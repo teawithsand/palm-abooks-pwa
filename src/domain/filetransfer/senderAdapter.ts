@@ -6,7 +6,6 @@ import {
 	FileTransferEntry,
 	MAGIC_ACCEPT_FILES,
 	MAGIC_DID_RECEIVE,
-	MAGIC_END_OF_FILES,
 	fileTransferHeaderFromFileTransferEntry,
 } from "@app/domain/filetransfer/defines"
 
@@ -150,9 +149,6 @@ export class SenderConnAdapter
 
 				const { file } = entry
 
-				const header = fileTransferHeaderFromFileTransferEntry(entry)
-				conn.send(header)
-
 				let ptr = 0
 				const CHUNK_SIZE = 64 * 1024
 
@@ -191,7 +187,7 @@ export class SenderConnAdapter
 				)
 			}
 
-			conn.send(MAGIC_END_OF_FILES)
+			await helper.exchangeDone()
 
 			updateState((oldState) =>
 				produce(oldState, (draft) => {

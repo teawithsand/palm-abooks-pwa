@@ -12,7 +12,7 @@ import {
 	useStickySubscribableSelector,
 } from "@teawithsand/tws-stl-react"
 import React from "react"
-import { Button, ButtonGroup } from "react-bootstrap"
+import { Button, ButtonGroup, ProgressBar } from "react-bootstrap"
 import styled from "styled-components"
 
 const Container = styled.div`
@@ -32,7 +32,6 @@ export const ReceiverConnRegistrySpy = (props: {
 }) => {
 	const { registry } = props
 	const state = useStickySubscribable(registry.stateBus)
-	console.log({ state })
 	const keys = useStickySubscribableSelector(registry.stateBus, (state) =>
 		Object.entries(state)
 			.filter(
@@ -54,7 +53,21 @@ export const ReceiverConnRegistrySpy = (props: {
 	)
 }
 
-const Entry = styled.div``
+const EntryHeader = styled.h4`
+	padding: 0;
+	margin: 0;
+	font-size: 1.25em;
+`
+
+const Entry = styled.div`
+	border: 1px solid rgba(0, 0, 0, 0.125);
+	border-radius: 0.25em;
+	padding: 0.5em;
+
+	display: grid;
+	grid-auto-flow: row;
+	gap: 1em;
+`
 
 const ReceiverConnSpy = (props: {
 	registry: ConnRegistry<
@@ -79,6 +92,22 @@ const ReceiverConnSpy = (props: {
 		config: { stage },
 		error,
 	} = state
+
+	let statusString = ""
+
+	if (error) {
+		statusString = "Error"
+	} else if (status === ReceiverAdapterConnStatus.CONNECTED) {
+		statusString = "Connected"
+	} else if (status === ReceiverAdapterConnStatus.AUTHENTICATED) {
+		statusString = "Authenticated"
+	} else if (status === ReceiverAdapterConnStatus.RECEIVED_HEADERS) {
+		statusString = "Received offers"
+	} else if (status === ReceiverAdapterConnStatus.RECEIVING_FILES) {
+		statusString = "Pending... Please wait."
+	} else if (status === ReceiverAdapterConnStatus.DONE) {
+		statusString = "Done"
+	}
 
 	let buttons = null
 
@@ -154,18 +183,16 @@ const ReceiverConnSpy = (props: {
 
 	return (
 		<Entry>
-			{JSON.stringify({
-				status,
-				isClosed,
-				totalDoneFraction,
-				stage,
-				auth,
-				error,
-				authResult,
-
-				headers,
-			})}
-			{buttons}
+			<EntryHeader>Status: {statusString}</EntryHeader>
+			{authResult ? (
+				<div>Connection from: {authResult.remotePartyName}</div>
+			) : null}
+			<div>
+				<ProgressBar
+					now={Math.round(totalDoneFraction * 100 * 10) / 10}
+				/>
+			</div>
+			<ButtonGroup>{buttons}</ButtonGroup>
 		</Entry>
 	)
 }

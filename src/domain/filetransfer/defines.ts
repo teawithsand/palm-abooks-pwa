@@ -79,10 +79,10 @@ export interface FileTransferPeerData {
 }
 
 export const MAGIC_ACCEPT_FILES = "MAGIC_ACCEPT_FILE"
-export const MAGIC_END_OF_FILES = "MAGIC_END_OF_FILES"
 export const MAGIC_DID_RECEIVE = "MAGIC_DID_RECEIVE"
 export const MAGIC_AUTH_SUCCESS = "MAGIC_AUTH_SUCCESS"
 export const MAGIC_AUTH_INIT = "MAGIC_AUTH_INIT"
+export const MAGIC_DONE = "MAGIC_DONE"
 
 export type FileTransferTokenData = {
 	peerId: string

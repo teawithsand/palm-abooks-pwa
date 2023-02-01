@@ -6,6 +6,7 @@ import {
 	FileTransferVersion,
 	MAGIC_AUTH_INIT,
 	MAGIC_AUTH_SUCCESS,
+	MAGIC_DONE,
 	isFileTransferAuthNameValid,
 } from "@app/domain/filetransfer/defines"
 import { IDataConnection } from "@teawithsand/tws-peer"
@@ -21,6 +22,11 @@ export class FileTransferHelper {
 		if (res !== magic) {
 			throw new Error(`Magic receive filed. Wanted ${magic} got ${res}`)
 		}
+	}
+
+	exchangeDone = async () => {
+		this.conn.send(MAGIC_DONE)
+		await this.receiveMagic(MAGIC_DONE)
 	}
 
 	exchangeHello = async (): Promise<FileTransferHello> => {

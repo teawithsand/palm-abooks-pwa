@@ -7,7 +7,6 @@ import {
 	FileTransferEntryHeader,
 	MAGIC_ACCEPT_FILES,
 	MAGIC_DID_RECEIVE,
-	MAGIC_END_OF_FILES,
 } from "@app/domain/filetransfer/defines"
 
 import {
@@ -150,10 +149,6 @@ export class ReceiverConnAdapter
 			let totalReceived = 0
 
 			for (const header of headers) {
-				// TODO(teawithsand): check received header against header provided
-				const receivedHeader: FileTransferEntryHeader =
-					await conn.messageQueue.receive()
-
 				let resultBlob = new Blob([])
 				let bytesLeft = header.size
 
@@ -195,7 +190,7 @@ export class ReceiverConnAdapter
 				)
 			}
 
-			await helper.receiveMagic(MAGIC_END_OF_FILES)
+			await helper.exchangeDone()
 			// magic on receiving is done. It should ve validated.
 
 			updateState((oldState) =>

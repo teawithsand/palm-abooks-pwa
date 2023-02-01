@@ -12,7 +12,7 @@ import {
 	useStickySubscribableSelector,
 } from "@teawithsand/tws-stl-react"
 import React from "react"
-import { Button, ButtonGroup } from "react-bootstrap"
+import { Button, ButtonGroup, ProgressBar } from "react-bootstrap"
 import styled from "styled-components"
 
 const Container = styled.div`
@@ -51,6 +51,22 @@ export const SenderConnRegistrySpy = (props: {
 	)
 }
 
+const EntryHeader = styled.h4`
+	padding: 0;
+	margin: 0;
+	font-size: 1.25em;
+`
+
+const Entry = styled.div`
+	border: 1px solid rgba(0, 0, 0, 0.125);
+	border-radius: 0.25em;
+	padding: 0.5em;
+
+	display: grid;
+	grid-auto-flow: row;
+	gap: 1em;
+`
+
 const SenderConnSpy = (props: {
 	registry: ConnRegistry<
 		FileTransferConn,
@@ -74,6 +90,20 @@ const SenderConnSpy = (props: {
 		config: { stage },
 		error,
 	} = state
+
+	let statusString = ""
+
+	if (error) {
+		statusString = "Error"
+	} else if (status === SenderAdapterConnStatus.CONNECTED) {
+		statusString = "Connected"
+	} else if (status === SenderAdapterConnStatus.AUTHENTICATED_HEADERS_SENT) {
+		statusString = "Authenticated"
+	} else if (status === SenderAdapterConnStatus.SENDING_FILES) {
+		statusString = "Pending... Please wait."
+	} else if (status === SenderAdapterConnStatus.DONE) {
+		statusString = "Done"
+	}
 
 	let buttons = null
 
@@ -135,23 +165,14 @@ const SenderConnSpy = (props: {
 
 	return (
 		<Entry>
-			{JSON.stringify({
-				status,
-				isClosed,
-				totalFraction,
-				stage,
-				auth,
-				error,
-				authResult,
-
-				entriesCount: entries.length,
-				entriesSumSize: entries.length
-					? entries.map((v) => v.file.size).reduce((a, b) => a + b)
-					: 0,
-			})}
-			{buttons}
+			<EntryHeader>Status: {statusString}</EntryHeader>
+			{authResult ? (
+				<div>Connection from: {authResult.remotePartyName}</div>
+			) : null}
+			<div>
+				<ProgressBar now={Math.round(totalFraction * 100 * 10) / 10} />
+			</div>
+			<ButtonGroup>{buttons}</ButtonGroup>
 		</Entry>
 	)
 }
-
-const Entry = styled.div``
