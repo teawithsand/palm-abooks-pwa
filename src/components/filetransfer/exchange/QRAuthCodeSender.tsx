@@ -2,7 +2,7 @@ import {
 	FileTransferTokenData,
 	encodeFileTransferTokenData,
 } from "@app/domain/filetransfer"
-import { QRCodeDisplay } from "@teawithsand/tws-peer-react"
+import { QRCodeDisplay } from "@teawithsand/tws-qr"
 import React, { useEffect, useMemo, useState } from "react"
 import styled from "styled-components"
 
