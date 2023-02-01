@@ -14,20 +14,20 @@ export type FileTransferStateManagerState = {
 }
 
 export class FileTransferStateManager {
-	private readonly innerAuthSecretBus =
+	private readonly innerStateBus =
 		new DefaultStickyEventBus<FileTransferStateManagerState>({
 			authSecret: generateSecureClientId(),
 			name: generateUUID(),
 		})
 	constructor(public readonly peer: PeerJSIPeer) {}
 
-	get authSecretBus(): StickySubscribable<FileTransferStateManagerState> {
-		return this.innerAuthSecretBus
+	get stateBus(): StickySubscribable<FileTransferStateManagerState> {
+		return this.innerStateBus
 	}
 
 	regenerateAuthSecret = () => {
-		this.innerAuthSecretBus.emitEvent({
-			...this.innerAuthSecretBus.lastEvent,
+		this.innerStateBus.emitEvent({
+			...this.innerStateBus.lastEvent,
 			authSecret: generateSecureClientId(),
 		})
 	}
@@ -35,8 +35,8 @@ export class FileTransferStateManager {
 	setName = (name: string) => {
 		if (!isFileTransferAuthNameValid(name)) throw new Error("Invalid name")
 
-		this.innerAuthSecretBus.emitEvent({
-			...this.innerAuthSecretBus.lastEvent,
+		this.innerStateBus.emitEvent({
+			...this.innerStateBus.lastEvent,
 			name,
 		})
 	}

@@ -1,5 +1,8 @@
 import { ConnOpener } from "@app/components/filetransfer/exchange/ConnOpener"
-import { useTokenData } from "@app/components/filetransfer/useToken"
+import {
+	useConnectAuthFactory,
+	useTokenData,
+} from "@app/components/filetransfer/useToken"
 import {
 	FileTransferAuthType,
 	ReceiverAdapterConnStage,
@@ -14,6 +17,7 @@ export const ReceiverConnOpener = () => {
 	const senderStateManager = useReceiverStateManager()
 	const fileTransferStateManager = useFileTransferStateManager()
 	const token = useTokenData()
+	const factory = useConnectAuthFactory()
 
 	const peer = fileTransferStateManager.peer
 
@@ -30,10 +34,7 @@ export const ReceiverConnOpener = () => {
 
 				const conn = await peer.connect(token.peerId)
 				const id = senderStateManager.registry.addConn(conn, {
-					auth: {
-						type: FileTransferAuthType.PROVIDE,
-						authSecret: token.authId,
-					},
+					auth: factory(token),
 				})
 
 				senderStateManager.registry.updateConfig(id, (cfg) =>

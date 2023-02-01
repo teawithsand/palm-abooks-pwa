@@ -32,7 +32,7 @@ export class SenderStateManager {
 				if (event.type === IPeerEventType.MEDIA_CONN) {
 					event.conn.close()
 				} else if (event.type === IPeerEventType.DATA_CONN) {
-					const { lastEvent } = fileTransferStateManager.authSecretBus
+					const { lastEvent } = fileTransferStateManager.stateBus
 					const id = this.registry.addConn(event.conn, {
 						auth: {
 							type: FileTransferAuthType.REQUEST,

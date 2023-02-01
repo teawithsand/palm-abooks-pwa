@@ -33,7 +33,7 @@ const SectionBody = styled.div``
 const InnerFileReceiver = () => {
 	const transferManager = useFileTransferStateManager()
 	const receiverManager = useReceiverStateManager()
-	const authSecret = useStickySubscribable(transferManager.authSecretBus)
+	const authSecret = useStickySubscribable(transferManager.stateBus)
 	const peerState = useStickySubscribable(transferManager.peer.stateBus)
 
 	return (

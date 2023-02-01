@@ -1,15 +1,14 @@
 import { ConnOpener } from "@app/components/filetransfer/exchange/ConnOpener"
-import { useTokenData } from "@app/components/filetransfer/useToken"
 import {
-	FileTransferAuthType,
+	useConnectAuthFactory,
+	useTokenData,
+} from "@app/components/filetransfer/useToken"
+import {
 	SenderAdapterConnStage,
 	useFileTransferStateManager,
 	useSenderStateManager,
 } from "@app/domain/filetransfer"
-import {
-	useStickySubscribable,
-	useStickySubscribableSelector,
-} from "@teawithsand/tws-stl-react"
+import { useStickySubscribable } from "@teawithsand/tws-stl-react"
 import produce from "immer"
 import React from "react"
 
@@ -17,6 +16,7 @@ export const SenderConnOpener = () => {
 	const senderStateManager = useSenderStateManager()
 	const fileTransferStateManager = useFileTransferStateManager()
 	const token = useTokenData()
+	const factory = useConnectAuthFactory()
 
 	const peer = fileTransferStateManager.peer
 
@@ -36,10 +36,7 @@ export const SenderConnOpener = () => {
 
 				const conn = await peer.connect(token.peerId)
 				const id = senderStateManager.registry.addConn(conn, {
-					auth: {
-						type: FileTransferAuthType.PROVIDE,
-						authSecret: token.authId,
-					},
+					auth: factory(token),
 					entries,
 				})
 
