@@ -1,3 +1,4 @@
+import { FileTransferHelper } from "@app/domain/filetransfer/adapterCommon"
 import {
 	FileTransferAuth,
 	FileTransferAuthType,
@@ -112,36 +113,18 @@ export class SenderConnAdapter
 		// These two must be provided during initialization
 		const { auth, entries } = initData
 
-		const receiveMagic = async (magic: string) => {
-			const res = await conn.messageQueue.receive()
-			if (res !== magic) {
-				throw new Error(
-					`Magic receive filed. Wanted ${magic} got ${res}`
-				)
-			}
-		}
+		const helper = new FileTransferHelper(conn)
 
 		const doAuth = async () => {
 			isAuthenticated = true
-
-			if (auth.type === FileTransferAuthType.PROVIDE) {
-				conn.send(auth.authSecret)
-
-				await receiveMagic(MAGIC_AUTH_SUCCESS)
-			} else {
-				const secret = await conn.messageQueue.receive()
-				if (typeof secret !== "string" || secret !== auth.authSecret)
-					throw new Error("Invalid auth string")
-
-				conn.send(MAGIC_AUTH_SUCCESS)
-			}
+			await helper.exchangeHello()
+			const res = await helper.doAuthenticate(auth)
+			// TODO(teawithsand): make use of result of auth
 
 			const headers = entries.map((e) =>
 				fileTransferHeaderFromFileTransferEntry(e)
 			)
 			conn.send(headers)
-
-			console.log("Sent headers", headers, "entries", entries)
 
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
@@ -163,7 +146,7 @@ export class SenderConnAdapter
 				})
 			)
 
-			await receiveMagic(MAGIC_ACCEPT_FILES)
+			await helper.receiveMagic(MAGIC_ACCEPT_FILES)
 
 			const totalSize = entries.length
 				? entries.map((v) => v.file.size).reduce((a, b) => a + b)
@@ -196,7 +179,7 @@ export class SenderConnAdapter
 					conn.send(arrayBuffer)
 					console.log("Sent chunk", chunk.size, "of", entry)
 
-					await receiveMagic(MAGIC_DID_RECEIVE)
+					await helper.receiveMagic(MAGIC_DID_RECEIVE)
 
 					updateState((oldState) =>
 						produce(oldState, (draft) => {
@@ -220,7 +203,7 @@ export class SenderConnAdapter
 			}
 
 			conn.send(MAGIC_END_OF_FILES)
-			
+
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
 					draft.status = SenderAdapterConnStatus.DONE

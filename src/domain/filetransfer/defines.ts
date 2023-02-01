@@ -2,12 +2,38 @@ import { DataConnection, IDataConnection, Peer } from "@teawithsand/tws-peer"
 
 export type FileTransferConn = IDataConnection
 
+export enum FileTransferVersion {
+	V1 = 1,
+}
+
+export type FileTransferHello = {
+	version: FileTransferVersion
+}
+
 export enum FileTransferAuthType {
 	REQUEST = 1,
 	PROVIDE = 2,
 }
 
-export type FileTransferAuth =
+export const isFileTransferAuthNameValid = (name: string) => {
+	if (name.length === 0) return false
+	if (name.length > 32) return false
+
+	// Valid char list
+	if (!/^[a-zA-Z0-9_-]$/.test(name)) return false
+
+	// Can't start or end with _ or -
+	if (/^[_-]+/.test(name)) return false
+	if (/[_-]+$/.test(name)) return false
+
+	return true
+}
+
+export type FileTransferAuthResult = {
+	remotePartyName: string
+}
+
+export type FileTransferAuth = (
 	| {
 			type: FileTransferAuthType.PROVIDE
 			authSecret: string
@@ -16,6 +42,12 @@ export type FileTransferAuth =
 			type: FileTransferAuthType.REQUEST
 			authSecret: string
 	  }
+) & {
+	/**
+	 * Name to send to remote party.
+	 */
+	name: string
+}
 
 export interface FileTransferEntry {
 	publicName: string
@@ -53,6 +85,7 @@ export const MAGIC_ACCEPT_FILES = "MAGIC_ACCEPT_FILE"
 export const MAGIC_END_OF_FILES = "MAGIC_END_OF_FILES"
 export const MAGIC_DID_RECEIVE = "MAGIC_DID_RECEIVE"
 export const MAGIC_AUTH_SUCCESS = "MAGIC_AUTH_SUCCESS"
+export const MAGIC_AUTH_INIT = "MAGIC_AUTH_INIT"
 
 export type FileTransferTokenData = {
 	peerId: string

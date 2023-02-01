@@ -1,11 +1,10 @@
+import { FileTransferHelper } from "@app/domain/filetransfer/adapterCommon"
 import {
 	FileTransferAuth,
-	FileTransferAuthType,
 	FileTransferConn,
 	FileTransferEntry,
 	FileTransferEntryHeader,
 	MAGIC_ACCEPT_FILES,
-	MAGIC_AUTH_SUCCESS,
 	MAGIC_DID_RECEIVE,
 	MAGIC_END_OF_FILES,
 } from "@app/domain/filetransfer/defines"
@@ -103,29 +102,13 @@ export class ReceiverConnAdapter
 		// These two must be provided during initialization
 		const { auth } = initData
 
-		const receiveMagic = async (magic: string) => {
-			const res = await conn.messageQueue.receive()
-			if (res !== magic) {
-				throw new Error(
-					`Magic receive filed. Wanted ${magic} got ${res}`
-				)
-			}
-		}
+		const helper = new FileTransferHelper(conn)
 
 		const doAuthAndReceiveHeaders = async () => {
 			isAuthenticatedAndReceivedHeaders = true
-
-			if (auth.type === FileTransferAuthType.PROVIDE) {
-				conn.send(auth.authSecret)
-
-				await receiveMagic(MAGIC_AUTH_SUCCESS)
-			} else {
-				const secret = await conn.messageQueue.receive()
-				if (typeof secret !== "string" || secret !== auth.authSecret)
-					throw new Error("Invalid auth string")
-
-				conn.send(MAGIC_AUTH_SUCCESS)
-			}
+			await helper.exchangeHello()
+			const res = await helper.doAuthenticate(auth)
+			// TODO(teawithsand): make use of res
 
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
@@ -149,7 +132,6 @@ export class ReceiverConnAdapter
 			if (!isAuthenticatedAndReceivedHeaders)
 				throw new Error("Unreachable code: not authenticated yet")
 
-			console.log("Starting files accepting")
 			isReceiveFiles = true
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
@@ -218,7 +200,7 @@ export class ReceiverConnAdapter
 				)
 			}
 
-			await receiveMagic(MAGIC_END_OF_FILES)
+			await helper.receiveMagic(MAGIC_END_OF_FILES)
 			// magic on receiving is done. It should ve validated.
 
 			updateState((oldState) =>
