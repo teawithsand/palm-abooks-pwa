@@ -24,7 +24,6 @@ export const ReceiverConnOpener = () => {
 			disabled={!peerState.isReady || !peerState.id}
 			token={token}
 			onToken={async (token) => {
-				console.log("Token received", token)
 				if (!peer) return
 
 				if (peer.stateBus.lastEvent.id === token.peerId) return

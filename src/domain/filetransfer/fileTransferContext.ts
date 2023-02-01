@@ -1,23 +1,44 @@
-import { IPeer, PeerJSIPeer, generateSecureClientId } from "@teawithsand/tws-peer"
+import { isFileTransferAuthNameValid } from "@app/domain/filetransfer/defines"
+import { PeerJSIPeer, generateSecureClientId } from "@teawithsand/tws-peer"
 import {
 	DefaultStickyEventBus,
 	StickySubscribable,
+	generateUUID,
 	throwExpression,
 } from "@teawithsand/tws-stl"
 import { createContext, useContext } from "react"
 
+export type FileTransferStateManagerState = {
+	authSecret: string
+	name: string
+}
+
 export class FileTransferStateManager {
-	private readonly innerAuthSecretBus = new DefaultStickyEventBus(
-		generateSecureClientId()
-	)
+	private readonly innerAuthSecretBus =
+		new DefaultStickyEventBus<FileTransferStateManagerState>({
+			authSecret: generateSecureClientId(),
+			name: generateUUID(),
+		})
 	constructor(public readonly peer: PeerJSIPeer) {}
 
-	get authSecretBus(): StickySubscribable<string> {
+	get authSecretBus(): StickySubscribable<FileTransferStateManagerState> {
 		return this.innerAuthSecretBus
 	}
 
 	regenerateAuthSecret = () => {
-		this.innerAuthSecretBus.emitEvent(generateSecureClientId())
+		this.innerAuthSecretBus.emitEvent({
+			...this.innerAuthSecretBus.lastEvent,
+			authSecret: generateSecureClientId(),
+		})
+	}
+
+	setName = (name: string) => {
+		if (!isFileTransferAuthNameValid(name)) throw new Error("Invalid name")
+
+		this.innerAuthSecretBus.emitEvent({
+			...this.innerAuthSecretBus.lastEvent,
+			name,
+		})
 	}
 
 	close = () => {

@@ -51,13 +51,11 @@ export type FileTransferAuth = (
 
 export interface FileTransferEntry {
 	publicName: string
-	sha512hash: string
 	file: File
 }
 
 export interface FileTransferEntryHeader {
 	publicName: string
-	sha512hash: string
 	size: number
 }
 
@@ -65,7 +63,6 @@ export const fileTransferHeaderFromFileTransferEntry = (
 	entry: FileTransferEntry
 ): FileTransferEntryHeader => ({
 	publicName: entry.publicName,
-	sha512hash: entry.sha512hash,
 	size: entry.file.size,
 })
 

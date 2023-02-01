@@ -1,6 +1,7 @@
 import { FileTransferHelper } from "@app/domain/filetransfer/adapterCommon"
 import {
 	FileTransferAuth,
+	FileTransferAuthResult,
 	FileTransferConn,
 	FileTransferEntry,
 	FileTransferEntryHeader,
@@ -31,6 +32,7 @@ export type ReceiverAdapterInitData = {
 export type ReceiverAdapterConnState = {
 	status: ReceiverAdapterConnStatus
 
+	authResult: FileTransferAuthResult | null
 	headers: FileTransferEntryHeader[]
 
 	currentEntryDoneFraction: number
@@ -69,6 +71,7 @@ export class ReceiverConnAdapter
 
 	makeInitialState = (): ReceiverAdapterConnState => ({
 		status: ReceiverAdapterConnStatus.CONNECTED,
+		authResult: null,
 		currentEntryDoneFraction: 0,
 		doneEntries: [],
 		headers: [],
@@ -108,18 +111,18 @@ export class ReceiverConnAdapter
 			isAuthenticatedAndReceivedHeaders = true
 			await helper.exchangeHello()
 			const res = await helper.doAuthenticate(auth)
-			// TODO(teawithsand): make use of res
 
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
 					draft.status = ReceiverAdapterConnStatus.AUTHENTICATED
+					draft.authResult = res
 				})
 			)
 
 			// TODO(teawithsand): validate structure of received data via joi or something else
 			// not only structure should match, but size should be int greater than 0 and less than say 2 or 4GB
 			headers = await conn.messageQueue.receive()
-			console.log("Received headers", headers)
+
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
 					draft.status = ReceiverAdapterConnStatus.RECEIVED_HEADERS
@@ -150,13 +153,6 @@ export class ReceiverConnAdapter
 				// TODO(teawithsand): check received header against header provided
 				const receivedHeader: FileTransferEntryHeader =
 					await conn.messageQueue.receive()
-
-				console.log(
-					"Starting files accepting; received header",
-					receivedHeader,
-					"to header",
-					header
-				)
 
 				let resultBlob = new Blob([])
 				let bytesLeft = header.size
@@ -194,7 +190,6 @@ export class ReceiverConnAdapter
 						draft.doneEntries.push({
 							file: new File([resultBlob], header.publicName),
 							publicName: header.publicName,
-							sha512hash: header.sha512hash,
 						})
 					})
 				)

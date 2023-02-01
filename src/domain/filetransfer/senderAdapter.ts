@@ -1,16 +1,14 @@
 import { FileTransferHelper } from "@app/domain/filetransfer/adapterCommon"
 import {
 	FileTransferAuth,
-	FileTransferAuthType,
+	FileTransferAuthResult,
 	FileTransferConn,
 	FileTransferEntry,
 	MAGIC_ACCEPT_FILES,
-	MAGIC_AUTH_SUCCESS,
 	MAGIC_DID_RECEIVE,
 	MAGIC_END_OF_FILES,
 	fileTransferHeaderFromFileTransferEntry,
 } from "@app/domain/filetransfer/defines"
-import { ReceiverAdapterConnConfig } from "@app/domain/filetransfer/receiverAdapter"
 
 import {
 	ConnRegistryAdapter,
@@ -33,6 +31,8 @@ export type SenderAdapterInitData = {
 
 export type SenderAdapterConnState = {
 	status: SenderAdapterConnStatus
+
+	authResult: FileTransferAuthResult | null
 
 	doneCount: number
 	currentEntryIndex: number
@@ -66,21 +66,13 @@ export class SenderConnAdapter
 			draft.stage = SenderAdapterConnStage.CLOSE
 		})
 
-	makeInitialConfig = (
-		conn: FileTransferConn,
-		initData: SenderAdapterInitData,
-		id: string
-	) => ({
+	makeInitialConfig = () => ({
 		stage: SenderAdapterConnStage.WAIT,
 	})
 
-	makeInitialState = (
-		conn: FileTransferConn,
-		config: SenderConnConfig,
-		initData: SenderAdapterInitData,
-		id: string
-	): SenderAdapterConnState => ({
+	makeInitialState = (): SenderAdapterConnState => ({
 		status: SenderAdapterConnStatus.CONNECTED,
+		authResult: null,
 		currentEntryFraction: 0,
 		currentEntryIndex: -1,
 		doneCount: 0,
@@ -119,7 +111,6 @@ export class SenderConnAdapter
 			isAuthenticated = true
 			await helper.exchangeHello()
 			const res = await helper.doAuthenticate(auth)
-			// TODO(teawithsand): make use of result of auth
 
 			const headers = entries.map((e) =>
 				fileTransferHeaderFromFileTransferEntry(e)
@@ -130,6 +121,7 @@ export class SenderConnAdapter
 				produce(oldState, (draft) => {
 					draft.status =
 						SenderAdapterConnStatus.AUTHENTICATED_HEADERS_SENT
+					draft.authResult = res
 				})
 			)
 		}
@@ -137,7 +129,6 @@ export class SenderConnAdapter
 		const doSend = async () => {
 			if (!isAuthenticated)
 				throw new Error("Unreachable code: not authenticated yet")
-			console.log("starting files sending")
 
 			isSentFiles = true
 			updateState((oldState) =>
@@ -154,7 +145,6 @@ export class SenderConnAdapter
 
 			let sentSize = 0
 			for (const entry of entries) {
-				console.log("initiated sending of entry", entry)
 				if (isClosedByUser)
 					throw new Error("Sending interrupted by user")
 
@@ -177,7 +167,6 @@ export class SenderConnAdapter
 					const arrayBuffer = await chunk.arrayBuffer()
 					sentSize += arrayBuffer.byteLength
 					conn.send(arrayBuffer)
-					console.log("Sent chunk", chunk.size, "of", entry)
 
 					await helper.receiveMagic(MAGIC_DID_RECEIVE)
 

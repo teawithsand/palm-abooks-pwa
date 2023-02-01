@@ -24,7 +24,6 @@ export const QRAuthCodeReceiver = (props: {
 			}
 
 			if (token) {
-				console.log("Got token", token)
 				onToken(token)
 			}
 		},

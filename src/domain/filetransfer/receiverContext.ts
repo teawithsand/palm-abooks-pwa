@@ -21,12 +21,13 @@ export class ReceiverStateManager {
 				if (event.type === IPeerEventType.MEDIA_CONN) {
 					event.conn.close()
 				} else if (event.type === IPeerEventType.DATA_CONN) {
+					const { lastEvent } = fileTransferStateManager.authSecretBus
+
 					const id = this.registry.addConn(event.conn, {
 						auth: {
 							type: FileTransferAuthType.REQUEST,
-							authSecret:
-								fileTransferStateManager.authSecretBus
-									.lastEvent,
+							authSecret: lastEvent.authSecret,
+							name: lastEvent.name,
 						},
 					})
 
