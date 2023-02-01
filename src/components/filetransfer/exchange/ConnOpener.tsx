@@ -1,7 +1,7 @@
-import { TextAuthCodeSender } from "@app/components/filetransfer/exchange/TextAuthCodeSender"
 import { QRAuthCodeReceiver } from "@app/components/filetransfer/exchange/QRAuthCodeReceiver"
 import { QRAuthCodeSender } from "@app/components/filetransfer/exchange/QRAuthCodeSender"
 import { TextAuthCodeReceiver } from "@app/components/filetransfer/exchange/TextAuthCodeReceiver"
+import { TextAuthCodeSender } from "@app/components/filetransfer/exchange/TextAuthCodeSender"
 import { FileTransferTokenData } from "@app/domain/filetransfer"
 import React, { useRef, useState } from "react"
 import { Alert, Form } from "react-bootstrap"
@@ -66,7 +66,8 @@ export const ConnOpener = (props: {
 			<Container>
 				<Alert variant="info">
 					Please start client using button above before exchanging
-					code. If you want to send files, make sure you have selected at least one.
+					code. If you want to send files, make sure you have selected
+					at least one.
 				</Alert>
 			</Container>
 		)
@@ -74,22 +75,24 @@ export const ConnOpener = (props: {
 
 	return (
 		<Container>
-			<Form.Select
-				value={state}
-				onChange={(e) => {
-					// ignore changes if promise till conn open is pending.
-					// TODO(teawithsand): Please note that some info should be shown
-					if (runningCtr) return
+			<Form.Group>
+				<Form.Select
+					value={state}
+					onChange={(e) => {
+						// ignore changes if promise till conn open is pending.
+						// TODO(teawithsand): Please note that some info should be shown
+						if (runningCtr) return
 
-					setState(parseInt(e.target.value) || State.PICK)
-				}}
-			>
-				<option value={State.PICK}>Pick connect method</option>
-				<option value={State.SHOW_CODE}>Show code</option>
-				<option value={State.SHOW_QR}>Show QR</option>
-				<option value={State.ENTER_CODE}>Enter code</option>
-				<option value={State.SCAN_QR}>Scan QR</option>
-			</Form.Select>
+						setState(parseInt(e.target.value) || State.PICK)
+					}}
+				>
+					<option value={State.PICK}>Pick connect method</option>
+					<option value={State.SHOW_CODE}>Show code</option>
+					<option value={State.SHOW_QR}>Show QR</option>
+					<option value={State.ENTER_CODE}>Enter code</option>
+					<option value={State.SCAN_QR}>Scan QR</option>
+				</Form.Select>
+			</Form.Group>
 			<DisplayContainer>{innerDisplay}</DisplayContainer>
 		</Container>
 	)
