@@ -1,20 +1,15 @@
 import { PeerManager } from "@app/components/filetransfer/PeerManager"
-import { QRAuthCodeSender } from "@app/components/filetransfer/exchange/QRAuthCodeSender"
 import { SenderConnOpener } from "@app/components/filetransfer/sender/SenderConnOpener"
 import { SenderConnRegistrySpy } from "@app/components/filetransfer/sender/SenderConnRegistrySpy"
+import { SenderContextProvider } from "@app/components/filetransfer/sender/SenderContextProvider"
 import { SenderEntriesPicker } from "@app/components/filetransfer/sender/SenderEntriesPicker"
 import {
 	FileTransferEntry,
-	FileTransferStateManager,
-	FileTransferStateManagerContext,
-	SenderStateManager,
-	SenderStateManagerContext,
 	useFileTransferStateManager,
 	useSenderStateManager,
 } from "@app/domain/filetransfer"
-import { PeerJSIPeer } from "@teawithsand/tws-peer"
 import { useStickySubscribable } from "@teawithsand/tws-stl-react"
-import React, { useEffect, useMemo } from "react"
+import React from "react"
 import styled from "styled-components"
 
 const Container = styled.div`
@@ -77,46 +72,9 @@ export const AutonomousFileSender = (props: {
 	entries?: FileTransferEntry[] | null | undefined
 }) => {
 	const { entries } = props
-	const fileTransferStateManager = useMemo(
-		() => new FileTransferStateManager(new PeerJSIPeer()),
-		[]
-	)
-	const senderStateManager = useMemo(
-		() => new SenderStateManager(fileTransferStateManager),
-		[fileTransferStateManager]
-	)
-
-	useEffect(() => {
-		fileTransferStateManager.peer.setConfig({
-			acceptDataConnections: true,
-			acceptMediaConnections: false,
-		})
-	}, [fileTransferStateManager])
-
-
-	useEffect(() => {
-		return () => {
-			senderStateManager.close()
-		}
-	}, [senderStateManager])
-
-	useEffect(() => {
-		return () => {
-			fileTransferStateManager.close()
-		}
-	}, [fileTransferStateManager])
-
-	useEffect(() => {
-		if (entries) senderStateManager.setEntries(entries)
-	}, [entries, senderStateManager])
-
 	return (
-		<SenderStateManagerContext.Provider value={senderStateManager}>
-			<FileTransferStateManagerContext.Provider
-				value={fileTransferStateManager}
-			>
-				<InnerFileSender />
-			</FileTransferStateManagerContext.Provider>
-		</SenderStateManagerContext.Provider>
+		<SenderContextProvider entries={entries ?? undefined}>
+			<InnerFileSender />
+		</SenderContextProvider>
 	)
 }

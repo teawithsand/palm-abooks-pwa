@@ -1,17 +1,13 @@
 import { PeerManager } from "@app/components/filetransfer/PeerManager"
 import { ReceiverConnOpener } from "@app/components/filetransfer/receiver/ReceiverConnOpener"
 import { ReceiverConnRegistrySpy } from "@app/components/filetransfer/receiver/ReceiverConnRegistrySpy"
+import { ReceiverContextProvider } from "@app/components/filetransfer/receiver/ReceiverContextProvider"
 import {
-	FileTransferStateManager,
-	FileTransferStateManagerContext,
-	ReceiverStateManager,
-	ReceiverStateManagerContext,
 	useFileTransferStateManager,
 	useReceiverStateManager,
 } from "@app/domain/filetransfer"
-import { PeerJSIPeer } from "@teawithsand/tws-peer"
 import { useStickySubscribable } from "@teawithsand/tws-stl-react"
-import React, { useEffect, useMemo } from "react"
+import React from "react"
 import styled from "styled-components"
 
 const Container = styled.div`
@@ -73,41 +69,9 @@ const InnerFileReceiver = () => {
 }
 
 export const AutonomousFileReceiver = () => {
-	const fileTransferStateManager = useMemo(
-		() => new FileTransferStateManager(new PeerJSIPeer()),
-		[]
-	)
-	const receiverStateManager = useMemo(
-		() => new ReceiverStateManager(fileTransferStateManager),
-		[fileTransferStateManager]
-	)
-
-	useEffect(() => {
-		fileTransferStateManager.peer.setConfig({
-			acceptDataConnections: true,
-			acceptMediaConnections: false,
-		})
-	}, [fileTransferStateManager])
-
-	useEffect(() => {
-		return () => {
-			receiverStateManager.close()
-		}
-	}, [receiverStateManager])
-
-	useEffect(() => {
-		return () => {
-			fileTransferStateManager.close()
-		}
-	}, [fileTransferStateManager])
-
 	return (
-		<ReceiverStateManagerContext.Provider value={receiverStateManager}>
-			<FileTransferStateManagerContext.Provider
-				value={fileTransferStateManager}
-			>
-				<InnerFileReceiver />
-			</FileTransferStateManagerContext.Provider>
-		</ReceiverStateManagerContext.Provider>
+		<ReceiverContextProvider>
+			<InnerFileReceiver />
+		</ReceiverContextProvider>
 	)
 }
