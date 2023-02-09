@@ -1,4 +1,8 @@
 import {
+	ReceiverFileList,
+	ReceiverFileListEntry,
+} from "@app/components/filetransfer/receiver/ReceiverFileList"
+import {
 	FileTransferConn,
 	ReceiverAdapterConnConfig,
 	ReceiverAdapterConnStage,
@@ -7,11 +11,12 @@ import {
 	ReceiverAdapterInitData,
 } from "@app/domain/filetransfer"
 import { ConnRegistry } from "@teawithsand/tws-peer"
+import { DownloadApiHelper, generateUUID } from "@teawithsand/tws-stl"
 import {
 	useStickySubscribable,
 	useStickySubscribableSelector,
 } from "@teawithsand/tws-stl-react"
-import React from "react"
+import React, { useMemo } from "react"
 import { Button, ButtonGroup, ProgressBar } from "react-bootstrap"
 import styled from "styled-components"
 
@@ -69,6 +74,27 @@ const Entry = styled.div`
 	gap: 1em;
 `
 
+export const isSaveAsSupported =
+	typeof window !== "undefined" && "showSaveFilePicker" in window
+
+export const saveAsUtil = async (blob: Blob | File, name: string) => {
+	const id = generateUUID()
+	const handle = await (window as any).showSaveFilePicker({
+		suggestedName: name,
+		id,
+		types: {
+			description: `File: ${name}`,
+			accept: {},
+		},
+	})
+
+	const writable = await handle.createWritable()
+	await writable.write(blob)
+	await writable.close()
+
+	handle.close()
+}
+
 const ReceiverConnSpy = (props: {
 	registry: ConnRegistry<
 		FileTransferConn,
@@ -88,7 +114,14 @@ const ReceiverConnSpy = (props: {
 	const {
 		isClosed,
 		initData: { auth },
-		state: { status, totalDoneFraction, headers, authResult },
+		state: {
+			status,
+			totalDoneFraction,
+			headers,
+			authResult,
+			doneEntries,
+			currentEntryDoneFraction,
+		},
 		config: { stage },
 		error,
 	} = state
@@ -181,11 +214,56 @@ const ReceiverConnSpy = (props: {
 		)
 	}
 
+	let entries: ReceiverFileListEntry[] | null = useMemo(() => {
+		if (!headers) return null
+
+		console.log({
+			doneEntries,
+			sz: doneEntries.length,
+			currentEntryDoneFraction,
+		})
+
+		return headers.map((h, i) => {
+			let doneFraction = 0
+			if (doneEntries.length > i) {
+				doneFraction = 1
+			} else if (i === doneEntries.length) {
+				doneFraction = currentEntryDoneFraction
+			}
+			return {
+				header: h,
+				doneFraction,
+				onDownload: doneEntries[i]
+					? () => {
+							DownloadApiHelper.instance
+								.blob(doneEntries[i].file)
+								.download(doneEntries[i].publicName)
+					  }
+					: undefined,
+				onSaveAs:
+					doneEntries[i] && isSaveAsSupported
+						? () => {
+								DownloadApiHelper.instance
+									.blob(doneEntries[i].file)
+									.save(doneEntries[i].publicName)
+						  }
+						: undefined,
+				onPreview: doneEntries[i]
+					? () => {
+							DownloadApiHelper.instance
+								.blob(doneEntries[i].file)
+								.open()
+					  }
+					: undefined,
+			}
+		})
+	}, [headers, doneEntries, currentEntryDoneFraction])
+
 	return (
 		<Entry>
 			<EntryHeader>Status: {statusString}</EntryHeader>
 			{authResult ? (
-				<div>Connection from: {authResult.remotePartyName}</div>
+				<div>Connection from: "<b>{authResult.remotePartyName}</b>"</div>
 			) : null}
 			<div>
 				<ProgressBar
@@ -193,6 +271,7 @@ const ReceiverConnSpy = (props: {
 				/>
 			</div>
 			<ButtonGroup>{buttons}</ButtonGroup>
+			{entries ? <ReceiverFileList entries={entries} /> : null}
 		</Entry>
 	)
 }

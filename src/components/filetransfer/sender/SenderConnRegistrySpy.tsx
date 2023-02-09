@@ -167,7 +167,9 @@ const SenderConnSpy = (props: {
 		<Entry>
 			<EntryHeader>Status: {statusString}</EntryHeader>
 			{authResult ? (
-				<div>Connection from: {authResult.remotePartyName}</div>
+				<div>
+					Connection from: "<b>{authResult.remotePartyName}</b>"
+				</div>
 			) : null}
 			<div>
 				<ProgressBar now={Math.round(totalFraction * 100 * 10) / 10} />
