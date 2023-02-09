@@ -1,3 +1,4 @@
+import { ReceiverAppendToAbook } from "@app/components/filetransfer/receiver/ReceiverAppendToAbook"
 import { ReceiverDownloadAll } from "@app/components/filetransfer/receiver/ReceiverDownloadAll"
 import {
 	ReceiverFileList,
@@ -289,6 +290,12 @@ const ReceiverConnSpy = (props: {
 				<>
 					<Header>Download all files</Header>
 					<ReceiverDownloadAll entries={doneEntries} />
+				</>
+			) : null}
+				{doneEntries && status === ReceiverAdapterConnStatus.DONE ? (
+				<>
+					<Header>Save files to existing ABook</Header>
+					<ReceiverAppendToAbook entries={doneEntries} />
 				</>
 			) : null}
 			<Header>Transfer management</Header>
