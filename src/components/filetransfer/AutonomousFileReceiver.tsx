@@ -58,12 +58,6 @@ const InnerFileReceiver = () => {
 					/>
 				</SectionBody>
 			</Section>
-			<Section>
-				<SectionTitle>
-					4. Save received files to local device
-				</SectionTitle>
-				<SectionBody>NIY</SectionBody>
-			</Section>
 		</Container>
 	)
 }

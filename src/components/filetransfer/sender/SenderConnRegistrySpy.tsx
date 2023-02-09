@@ -123,7 +123,7 @@ const SenderConnSpy = (props: {
 		)
 	} else if (status === SenderAdapterConnStatus.AUTHENTICATED_HEADERS_SENT) {
 		buttons = (
-			<ButtonGroup>
+			<>
 				<Button
 					variant="success"
 					onClick={() => {
@@ -145,7 +145,7 @@ const SenderConnSpy = (props: {
 				>
 					Deny
 				</Button>
-			</ButtonGroup>
+			</>
 		)
 	} else if (status === SenderAdapterConnStatus.SENDING_FILES) {
 		buttons = (

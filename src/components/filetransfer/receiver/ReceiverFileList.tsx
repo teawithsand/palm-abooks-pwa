@@ -86,6 +86,18 @@ const Header = styled.div`
 	font-weight: bold;
 `
 
+const Subheader = styled.div``
+
+const OuterContainer = styled.div`
+	border: 1px solid rgba(0, 0, 0, 0.125);
+	border-radius: 0.25em;
+	padding: 0.5em;
+
+	display: grid;
+	grid-auto-flow: row;
+	gap: 0.75em;
+`
+
 export const ReceiverFileList = (props: {
 	entries: ReceiverFileListEntry[]
 }) => {
@@ -99,7 +111,7 @@ export const ReceiverFileList = (props: {
 	)
 
 	return (
-		<div>
+		<OuterContainer>
 			<Header>
 				Total: {formatFileSize(totalSize)}; {entries.length} entries
 			</Header>
@@ -108,6 +120,6 @@ export const ReceiverFileList = (props: {
 					<Entry index={i} entry={v} key={i} />
 				))}
 			</List>
-		</div>
+		</OuterContainer>
 	)
 }

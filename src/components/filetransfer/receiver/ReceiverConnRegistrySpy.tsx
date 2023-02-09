@@ -1,3 +1,4 @@
+import { ReceiverDownloadAll } from "@app/components/filetransfer/receiver/ReceiverDownloadAll"
 import {
 	ReceiverFileList,
 	ReceiverFileListEntry,
@@ -25,6 +26,11 @@ const Container = styled.div`
 	grid-auto-flow: row;
 	gap: 1em;
 	grid-template-columns: auto;
+`
+
+const Header = styled.h3`
+	font-size: 1.33em;
+	font-weight: bold;
 `
 
 export const ReceiverConnRegistrySpy = (props: {
@@ -160,7 +166,7 @@ const ReceiverConnSpy = (props: {
 		)
 	} else if (status === ReceiverAdapterConnStatus.RECEIVED_HEADERS) {
 		buttons = (
-			<ButtonGroup>
+			<>
 				<Button
 					variant="success"
 					onClick={() => {
@@ -182,7 +188,7 @@ const ReceiverConnSpy = (props: {
 				>
 					Deny
 				</Button>
-			</ButtonGroup>
+			</>
 		)
 	} else if (status === ReceiverAdapterConnStatus.RECEIVING_FILES) {
 		buttons = (
@@ -263,15 +269,30 @@ const ReceiverConnSpy = (props: {
 		<Entry>
 			<EntryHeader>Status: {statusString}</EntryHeader>
 			{authResult ? (
-				<div>Connection from: "<b>{authResult.remotePartyName}</b>"</div>
+				<div>
+					Connection from: "<b>{authResult.remotePartyName}</b>"
+				</div>
 			) : null}
 			<div>
 				<ProgressBar
 					now={Math.round(totalDoneFraction * 100 * 10) / 10}
 				/>
 			</div>
+
+			{entries ? (
+				<>
+					<Header>File list</Header>
+					<ReceiverFileList entries={entries} />
+				</>
+			) : null}
+			{doneEntries && status === ReceiverAdapterConnStatus.DONE ? (
+				<>
+					<Header>Download all files</Header>
+					<ReceiverDownloadAll entries={doneEntries} />
+				</>
+			) : null}
+			<Header>Transfer management</Header>
 			<ButtonGroup>{buttons}</ButtonGroup>
-			{entries ? <ReceiverFileList entries={entries} /> : null}
 		</Entry>
 	)
 }
