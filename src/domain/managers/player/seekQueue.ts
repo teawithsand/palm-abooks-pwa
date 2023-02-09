@@ -116,12 +116,16 @@ export class SeekQueue {
 	}
 
 	private tryApplySeekData = (state: Readonly<PlayerManagerState>) => {
+		const entriesBag =
+			state.whatToPlayData?.entriesBag ?? new PlayableEntriesBag([])
 		const rd: RelativeSeekResolutionData = {
 			currentPosition: state.innerState.position,
 			currentSourceKey: state.innerState.config.sourceKey,
-			entriesBag:
-				state.whatToPlayData?.entriesBag ?? new PlayableEntriesBag([]),
-			metadataBag: state.whatToPlayData?.metadata ?? new MetadataBag([]),
+			entriesBag: entriesBag, 
+			metadataBag:
+				state.whatToPlayData?.metadata ??
+				// lengths must match
+				new MetadataBag(entriesBag.entries.map(() => null)),
 		}
 
 		const now = getNowPerformanceTimestamp()
