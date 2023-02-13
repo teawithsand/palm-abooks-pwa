@@ -2,6 +2,7 @@ import { PeerManager } from "@app/components/filetransfer/PeerManager"
 import { ReceiverConnOpener } from "@app/components/filetransfer/receiver/ReceiverConnOpener"
 import { ReceiverConnRegistrySpy } from "@app/components/filetransfer/receiver/ReceiverConnRegistrySpy"
 import { ReceiverContextProvider } from "@app/components/filetransfer/receiver/ReceiverContextProvider"
+import { ReceiverStateController } from "@app/components/filetransfer/receiver/ReceiverStateController"
 import {
 	useFileTransferStateManager,
 	useReceiverStateManager,
@@ -34,20 +35,7 @@ const InnerFileReceiver = () => {
 
 	return (
 		<Container>
-			<Section>
-				<SectionTitle>1. Enable communication</SectionTitle>
-				<SectionBody>
-					<PeerManager />
-				</SectionBody>
-			</Section>
-			<Section>
-				<SectionTitle>
-					2. Scan OR show code to make connection
-				</SectionTitle>
-				<SectionBody>
-					<ReceiverConnOpener />
-				</SectionBody>
-			</Section>
+			<ReceiverStateController />
 			<Section>
 				<SectionTitle>
 					3. Accept connections to perform file transfers

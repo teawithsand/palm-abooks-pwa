@@ -1,8 +1,7 @@
-import { PeerManager } from "@app/components/filetransfer/PeerManager"
-import { SenderConnOpener } from "@app/components/filetransfer/sender/SenderConnOpener"
 import { SenderConnRegistrySpy } from "@app/components/filetransfer/sender/SenderConnRegistrySpy"
 import { SenderContextProvider } from "@app/components/filetransfer/sender/SenderContextProvider"
 import { SenderEntriesPicker } from "@app/components/filetransfer/sender/SenderEntriesPicker"
+import { SenderStateController } from "@app/components/filetransfer/sender/SenderStateController"
 import {
 	FileTransferEntry,
 	useFileTransferStateManager,
@@ -37,28 +36,15 @@ const InnerFileSender = () => {
 	return (
 		<Container>
 			<Section>
-				<SectionTitle>1. Pick files to send</SectionTitle>
+				<SectionTitle>Pick files to send</SectionTitle>
 				<SectionBody>
 					<SenderEntriesPicker />
 				</SectionBody>
 			</Section>
-			<Section>
-				<SectionTitle>2. Enable communication</SectionTitle>
-				<SectionBody>
-					<PeerManager />
-				</SectionBody>
-			</Section>
+			<SenderStateController />
 			<Section>
 				<SectionTitle>
-					3. Scan OR show code to make connection
-				</SectionTitle>
-				<SectionBody>
-					<SenderConnOpener />
-				</SectionBody>
-			</Section>
-			<Section>
-				<SectionTitle>
-					4. Accept connections to perform file transfers
+					Accept connections to perform file transfers
 				</SectionTitle>
 				<SectionBody>
 					<SenderConnRegistrySpy registry={senderManager.registry} />

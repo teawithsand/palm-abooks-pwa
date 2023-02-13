@@ -51,7 +51,7 @@ export type FileTransferAuth = (
 
 export interface FileTransferEntry {
 	publicName: string
-	file: File
+	file: Blob
 }
 
 export interface FileTransferEntryHeader {
