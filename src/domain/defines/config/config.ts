@@ -10,6 +10,8 @@ export type GlobalPlayerConfig = {
 	preservePitchForSpeed: boolean
 	isSleepEnabled: boolean
 
+	lastFileTransferName: string
+
 	seekActions: {
 		mediaSession: PlayerSeekAction
 		short: PlayerSeekAction
@@ -30,20 +32,22 @@ export const INIT_GLOBAL_PLAYER_CONFIG: GlobalPlayerConfig = {
 		turnVolumeDownStartLevel: 1,
 	},
 
+	lastFileTransferName: "",
+
 	seekActions: {
 		mediaSession: {
 			type: PlayerSeekActionType.SEEK_RELATIVE,
 			offsetMillis: 10 * 1000,
 		},
-	
+
 		short: {
 			type: PlayerSeekActionType.SEEK_RELATIVE,
 			offsetMillis: 10 * 1000,
 		},
-	
+
 		long: {
 			type: PlayerSeekActionType.SEEK_RELATIVE,
 			offsetMillis: 60 * 1000,
 		},
-	}
+	},
 }

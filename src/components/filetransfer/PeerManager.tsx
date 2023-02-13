@@ -7,10 +7,29 @@ import {
 	useStickySubscribableSelector,
 } from "@teawithsand/tws-stl-react"
 import React, { useEffect, useState } from "react"
-import { Button, Form } from "react-bootstrap"
+import { Alert, Button, ButtonGroup, Form } from "react-bootstrap"
 import styled from "styled-components"
 
-const Container = styled.div``
+const Container = styled.div`
+	display: grid;
+	grid-auto-flow: row;
+	gap: 0.5em;
+`
+
+const StateDisplay = () => {
+	const contextHelper = useFileTransferStateManager()
+	const peerHelperState = useStickySubscribable(contextHelper.peer.stateBus)
+
+	if (!peerHelperState.isActive || peerHelperState.isClosed) {
+		return <Alert variant="info">Connectivity disabled</Alert>
+	} else if (peerHelperState.error) {
+		return <Alert variant="error">An error occurred</Alert> // TODO(teawithsand): run error explainer here
+	} else if (!peerHelperState.isReady) {
+		return <Alert variant="info">Initializing...</Alert>
+	} else {
+		return <Alert variant="success">Connectivity ready!</Alert>
+	}
+}
 
 export const PeerManager = () => {
 	const contextHelper = useFileTransferStateManager()
@@ -37,49 +56,46 @@ export const PeerManager = () => {
 
 	return (
 		<Container>
-			<div>
-				<ul>
-					<li>
-						Peer state:{" "}
-						{peerHelperState.isActive ? "Active" : "Inactive"}
-					</li>
-					<li>
-						Error: {peerHelperState.error?.message ?? "No error"}
-					</li>
-					<li>Is closed: {peerHelperState.isClosed ? "T" : "F"}</li>
-				</ul>
-			</div>
-			<div>
-				<Form.Group>
-					<Form.Control
-						disabled={peerHelperState.isActive}
-						type="text"
-						value={innerName}
-						onChange={(e) => {
-							setName(e.target.value)
-						}}
-						isInvalid={!isFileTransferAuthNameValid(innerName)}
-					/>
-				</Form.Group>
-			</div>
-			<div>
+			<StateDisplay />
+			<Form.Group className="mb-2">
+				<Form.Label>Client's name</Form.Label>
+				<Form.Control
+					disabled={peerHelperState.isActive}
+					type="text"
+					value={innerName}
+					onChange={(e) => {
+						const value = e.target.value
+						setName(value)
+					}}
+					isInvalid={!isFileTransferAuthNameValid(innerName)}
+				/>
+			</Form.Group>
+
+			<ButtonGroup>
 				<Button
+					className="w-100"
 					disabled={!isFileTransferAuthNameValid(innerName)}
 					onClick={() => {
 						contextHelper.regenerateAuthSecret()
 						contextHelper.peer.setPeerJsConfig({})
 					}}
 				>
-					(Re)start peer
+					{peerHelperState.isActive
+						? "Reset"
+						: "Initialize(requires internet connection)"}
 				</Button>
-				<Button
-					onClick={() => {
-						contextHelper.peer.setPeerJsConfig(null)
-					}}
-				>
-					Stop peer
-				</Button>
-			</div>
+				{peerHelperState.isActive ? (
+					<Button
+						className="w-100"
+						variant="danger"
+						onClick={() => {
+							contextHelper.peer.setPeerJsConfig(null)
+						}}
+					>
+						Disable
+					</Button>
+				) : null}
+			</ButtonGroup>
 		</Container>
 	)
 }

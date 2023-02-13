@@ -5,6 +5,7 @@ import {
 	SenderStateManager,
 	SenderStateManagerContext,
 } from "@app/domain/filetransfer"
+import { useAppManager } from "@app/domain/managers/app"
 import { PeerJSIPeer } from "@teawithsand/tws-peer"
 import React, { ReactNode, useEffect, useMemo } from "react"
 
@@ -13,10 +14,11 @@ export const SenderContextProvider = (props: {
 	children?: ReactNode
 }) => {
 	const { entries } = props
-    
+    const configManager = useAppManager().configManager
+
 	const fileTransferStateManager = useMemo(
-		() => new FileTransferStateManager(new PeerJSIPeer()),
-		[]
+		() => new FileTransferStateManager(new PeerJSIPeer(), configManager),
+		[configManager]
 	)
 	const senderStateManager = useMemo(
 		() => new SenderStateManager(fileTransferStateManager),

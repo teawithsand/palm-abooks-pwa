@@ -1,4 +1,5 @@
 import { isFileTransferAuthNameValid } from "@app/domain/filetransfer/defines"
+import { ConfigManager } from "@app/domain/managers/config"
 import { PeerJSIPeer, generateSecureClientId } from "@teawithsand/tws-peer"
 import {
 	DefaultStickyEventBus,
@@ -19,7 +20,37 @@ export class FileTransferStateManager {
 			authSecret: generateSecureClientId(),
 			name: generateUUID(),
 		})
-	constructor(public readonly peer: PeerJSIPeer) {}
+	constructor(
+		public readonly peer: PeerJSIPeer,
+		configManager: ConfigManager
+	) {
+		let loaded = false
+
+		configManager.globalPlayerConfig.bus.addSubscriber(
+			(config, canceler) => {
+				if (!config) return
+				canceler()
+
+				if (config.lastFileTransferName) {
+					this.innerStateBus.emitEvent({
+						...this.innerStateBus.lastEvent,
+						name: config.lastFileTransferName,
+					})
+				}
+
+				loaded = true
+			}
+		)
+
+		this.innerStateBus.addSubscriber((state) => {
+			if (loaded) {
+				configManager.globalPlayerConfig.update((draft) => {
+					draft.lastFileTransferName = state.name
+				})
+				// configManager.globalPlayerConfig.save()
+			}
+		})
+	}
 
 	get stateBus(): StickySubscribable<FileTransferStateManagerState> {
 		return this.innerStateBus

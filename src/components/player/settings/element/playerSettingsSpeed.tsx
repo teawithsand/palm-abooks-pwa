@@ -1,6 +1,5 @@
 import { INIT_GLOBAL_PLAYER_CONFIG } from "@app/domain/defines/config/config"
 import { useAppManager } from "@app/domain/managers/app"
-import { useUiPlayerData } from "@app/domain/ui/player"
 import { useStickySubscribableSelector } from "@teawithsand/tws-stl-react"
 import React from "react"
 import { Button, Form } from "react-bootstrap"
@@ -11,6 +10,9 @@ const Container = styled.div`
 `
 
 const rangeGrowFactor = 20
+
+// TODO(teawithsand): refactor Form.Check used in order to provide proper label HTML element usage
+// so text next to checkboxes are clickable
 
 export const PlayerSettingsSpeedSection = () => {
 	const app = useAppManager()
