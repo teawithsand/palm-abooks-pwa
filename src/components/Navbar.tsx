@@ -25,7 +25,7 @@ export const Navbar = (props: {
 		storageInfoPath,
 		playerPlaylistPath,
 		playerOptionsPath,
-		sendLocalFilesPath,
+		sendFilesPath: sendLocalFilesPath,
 		receiveFilesPath,
 	} = useAppPaths()
 
