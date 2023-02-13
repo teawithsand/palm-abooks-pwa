@@ -32,6 +32,7 @@ export type ReceiverAdapterConnState = {
 	status: ReceiverAdapterConnStatus
 
 	authResult: FileTransferAuthResult | null
+	untypedHeaders: any | null
 	headers: FileTransferEntryHeader[]
 
 	currentEntryDoneFraction: number
@@ -75,6 +76,7 @@ export class ReceiverConnAdapter
 		doneEntries: [],
 		headers: [],
 		totalDoneFraction: 0,
+		untypedHeaders: null,
 	})
 
 	handle = async (
@@ -121,11 +123,16 @@ export class ReceiverConnAdapter
 			// TODO(teawithsand): validate structure of received data via joi or something else
 			// not only structure should match, but size should be int greater than 0 and less than say 2 or 4GB
 			headers = await conn.messageQueue.receive()
+			// clean any prototypes, if such were added due to some bug
+			const untypedHeaders = JSON.parse(
+				JSON.stringify(await conn.messageQueue.receive())
+			)
 
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
 					draft.status = ReceiverAdapterConnStatus.RECEIVED_HEADERS
 					draft.headers = headers
+					draft.untypedHeaders = untypedHeaders
 				})
 			)
 		}
@@ -152,6 +159,8 @@ export class ReceiverConnAdapter
 				let resultBlob = new Blob([])
 				let bytesLeft = header.size
 
+				const untypedFileHeader = await conn.messageQueue.receive()
+
 				for (;;) {
 					if (bytesLeft === 0) break
 
@@ -166,8 +175,6 @@ export class ReceiverConnAdapter
 					resultBlob = new Blob([resultBlob, chunk])
 
 					conn.send(MAGIC_DID_RECEIVE)
-
-					// TODO(teawithsand): check sha512hash of result here
 
 					updateState((oldState) =>
 						produce(oldState, (draft) => {
@@ -185,6 +192,7 @@ export class ReceiverConnAdapter
 						draft.doneEntries.push({
 							file: new File([resultBlob], header.publicName),
 							publicName: header.publicName,
+							untypedHeader: untypedFileHeader,
 						})
 					})
 				)

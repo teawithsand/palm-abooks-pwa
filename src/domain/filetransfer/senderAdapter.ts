@@ -26,6 +26,7 @@ export enum SenderAdapterConnStatus {
 export type SenderAdapterInitData = {
 	auth: FileTransferAuth
 	entries: FileTransferEntry[]
+	untypedHeader?: any
 }
 
 export type SenderAdapterConnState = {
@@ -115,6 +116,7 @@ export class SenderConnAdapter
 				fileTransferHeaderFromFileTransferEntry(e)
 			)
 			conn.send(headers)
+			conn.send(initData.untypedHeader ?? "") // can't send null or undefined, so send empty string instead
 
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
@@ -147,10 +149,12 @@ export class SenderConnAdapter
 				if (isClosedByUser)
 					throw new Error("Sending interrupted by user")
 
-				const { file } = entry
+				const { file, untypedHeader } = entry
 
 				let ptr = 0
-				const CHUNK_SIZE = 64 * 1024
+				const CHUNK_SIZE = 32 * 1024
+
+				conn.send(untypedHeader ?? "") // can't send null or undefined, so send empty string instead
 
 				for (;;) {
 					if (isClosedByUser)

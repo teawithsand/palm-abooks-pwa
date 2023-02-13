@@ -50,8 +50,10 @@ export type FileTransferAuth = (
 }
 
 export interface FileTransferEntry {
+	// TODO(teawithsand): move public name to untypedHeader, as it's not needed here anymore
 	publicName: string
 	file: Blob
+	untypedHeader?: any // optional for sake of senders, which may omit that field
 }
 
 export interface FileTransferEntryHeader {
