@@ -114,14 +114,14 @@ export const FilesFinalField = (props: {
 									))}
 								</tbody>
 							</Table>
-							<h3>
+							<h5>
 								Total{" "}
 								{formatFileSize(
 									fields.value
 										.map((v) => v.size)
 										.reduce((pv, cv) => pv + cv, 0)
 								)}
-							</h3>
+							</h5>
 							{stats.usageData ? (
 								<div>
 									Current space left:{" "}
