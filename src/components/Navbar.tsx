@@ -25,6 +25,8 @@ export const Navbar = (props: {
 		storageInfoPath,
 		playerPlaylistPath,
 		playerOptionsPath,
+		sendLocalFilesPath,
+		receiveFilesPath,
 	} = useAppPaths()
 
 	return (
@@ -90,18 +92,6 @@ export const Navbar = (props: {
 									{translations.playerDropdown.playerUi}
 								</NavDropdown.Item>
 							</LinkContainer>
-
-							{/*
-							NIY
-							<NavDropdown.Item
-								onClick={() => {
-									navigate(playerPath)
-								}}
-							>
-								{translations.playerDropdown.playLocal}
-							</NavDropdown.Item>
-
-							*/}
 							<NavDropdown.Item
 								onClick={() => {
 									navigate(playerPlaylistPath)
@@ -122,6 +112,18 @@ export const Navbar = (props: {
 							<LinkContainer to={storageInfoPath}>
 								<NavDropdown.Item>
 									Storage info
+								</NavDropdown.Item>
+							</LinkContainer>
+						</NavDropdown>
+						<NavDropdown title={"Transfer"} align={"end"}>
+							<LinkContainer to={receiveFilesPath}>
+								<NavDropdown.Item>
+									Receive files
+								</NavDropdown.Item>
+							</LinkContainer>
+							<LinkContainer to={sendLocalFilesPath}>
+								<NavDropdown.Item>
+									Send local files
 								</NavDropdown.Item>
 							</LinkContainer>
 						</NavDropdown>
