@@ -223,13 +223,7 @@ const ReceiverConnSpy = (props: {
 
 	let entries: ReceiverFileListEntry[] | null = useMemo(() => {
 		if (!headers) return null
-
-		console.log({
-			doneEntries,
-			sz: doneEntries.length,
-			currentEntryDoneFraction,
-		})
-
+		
 		return headers.map((h, i) => {
 			let doneFraction = 0
 			if (doneEntries.length > i) {
