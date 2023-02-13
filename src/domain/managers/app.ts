@@ -79,7 +79,7 @@ export class AppManager {
 
 		this.configManager.globalPersistentPlayerState.bus.addSubscriber(
 			(config, canceler) => {
-				if (config !== undefined) {
+				if (config) {
 					canceler()
 
 					if (config.lastPlayed) {
@@ -95,7 +95,7 @@ export class AppManager {
 
 		this.configManager.globalPlayerConfig.bus.addSubscriber(
 			(config, canceler) => {
-				if (config !== undefined) {
+				if (config) {
 					// HACK: canceller has to be called here in order to prevent infinite recursion
 					// as sleep manager updates config, we would trigger that update(even though it's no-op update)
 					// and go through another iteration of this listener

@@ -7,7 +7,7 @@ import {
 	PersistentGlobalPlayerState,
 } from "@app/domain/defines/config/state"
 import {
-	EmptyStickyEventBus,
+	DefaultStickyEventBus,
 	Lock,
 	MutexLockAdapter,
 	StickySubscribable,
@@ -71,8 +71,9 @@ function objectEquals(x: any, y: any): boolean {
 }
 
 export class GenericConfigManager<T extends Record<string, any>> {
-	public readonly innerBus: EmptyStickyEventBus<T>
-	public get bus(): StickySubscribable<T | undefined> {
+	private readonly innerBus: DefaultStickyEventBus<T | null> =
+		new DefaultStickyEventBus<T | null>(null)
+	get bus(): StickySubscribable<T | null> {
 		return this.innerBus
 	}
 
@@ -82,33 +83,37 @@ export class GenericConfigManager<T extends Record<string, any>> {
 	public readonly busPromise: Promise<StickySubscribable<T>>
 
 	get loaded(): boolean {
-		return this.bus.lastEvent !== undefined
+		return this.bus.lastEvent !== null
 	}
 
 	constructor(key: string, initialValue: T) {
-		this.innerBus = new EmptyStickyEventBus<T>()
-
-		let prevConfig = this.bus.lastEvent
+		let prevConfig: T | null = null
 
 		let modified = false
 		const mutex = new Lock(new MutexLockAdapter())
 
 		const loadedPromise = mutex.withLock(async () => {
-			this.innerBus.emitEvent(
-				{
+			try {
+				const config = {
 					// hack to make sure that all new fields are added
 					// it's NOT here to implement backward compatibility or sth, it's more of debugging helper for dev releases
-					...initialValue, 
-					...(await forage.getItem<T>(key)),
-				} ?? initialValue
-			)
+					...initialValue,
+					...((await forage.getItem<T>(key)) ?? {}),
+				}
+				prevConfig = config
+
+				this.innerBus.emitEvent(config)
+			} catch (e) {
+				console.error(e)
+				throw e
+			}
 		})
 		this.loadedPromise = loadedPromise
 
 		this.busPromise = (async () => {
 			await loadedPromise
 
-			if (this.bus.lastEvent === undefined)
+			if (!this.bus.lastEvent)
 				throw new Error(
 					"Last event must not be undefine by now; unreachable code"
 				)
@@ -116,8 +121,8 @@ export class GenericConfigManager<T extends Record<string, any>> {
 			return this.bus as StickySubscribable<T> // do this casting, as we are sure that bus has event by now
 		})()
 
-		const syncConfig = async (cfg: T | undefined = this.bus.lastEvent) => {
-			if (cfg === undefined || !modified) return
+		const syncConfig = async (cfg: T | null = this.bus.lastEvent) => {
+			if (!cfg || !modified) return
 
 			await mutex.withLock(async () => {
 				if (modified) {
@@ -176,8 +181,8 @@ export class GenericConfigManager<T extends Record<string, any>> {
 	 * Throws if config is not loaded.
 	 */
 	getOrThrow = (): T => {
-		const { lastEvent } = this.bus
-		if (lastEvent === undefined) {
+		const { lastEvent } = this.innerBus
+		if (!lastEvent) {
 			throw new Error(`Config was not loaded yet`)
 		}
 
