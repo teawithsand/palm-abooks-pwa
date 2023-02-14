@@ -72,32 +72,34 @@ export class PlayableEntryPlayerSourceResolver extends BasePlayerSourceResolver<
 		source: PlayableEntry
 	): BasePlayerSourceResolverExtractedData {
 		if (source.type === PlayableEntryType.FILE_ENTRY) {
-			const { data } = source.entry
-			if (data.dataType === FileEntryType.INTERNAL_FILE) {
+			const { content } = source.entry
+			if (content.dataType === FileEntryType.INTERNAL_FILE) {
 				return {
 					id: source.id,
 					type: "blob-loader",
 					loader: async () => {
 						return (
 							(await this.database.getInternalFileBlob(
-								data.internalFileId
+								content.internalFileId
 							)) ??
 							throwExpression(
 								new Error(
-									`Cant't resolve internal file entry with id ${data.internalFileId}`
+									`Cant't resolve internal file entry with id ${content.internalFileId}`
 								)
 							)
 						)
 					},
 				}
-			} else if (data.dataType === FileEntryType.URL) {
+			} else if (content.dataType === FileEntryType.URL) {
 				return {
 					type: "url",
 					id: source.id,
-					url: data.url,
+					url: content.url,
 				}
 			} else {
-				throw new Error(`Unknown data type ${(data as any).dataType}`)
+				throw new Error(
+					`Unknown data type ${(content as any).dataType}`
+				)
 			}
 		} else if (source.type === PlayableEntryType.ARBITRARY_URL) {
 			return {

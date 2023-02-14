@@ -4,9 +4,15 @@ import {
 } from "@app/domain/defines/abookFile"
 import { guessDisposition } from "@app/domain/storage/disposition"
 import { Serializer } from "@app/util/transform"
-import { MetadataLoadingResult } from "@teawithsand/tws-player"
+import {
+	Metadata,
+	MetadataLoadingResult,
+	MetadataLoadingResultType,
+} from "@teawithsand/tws-player"
 
-export type FileEntryMetadata = {
+export type FileEntryEntityData = {
+	id: string
+
 	/**
 	 * File name or something like that. Does not have to be unique(although it should).
 	 * Has to identify file for user.
@@ -20,7 +26,7 @@ export type FileEntryMetadata = {
 	musicMetadata: MetadataLoadingResult | null // unset for non-music ofc
 }
 
-export type FileEntryContent =
+export type FileEntryEntityContent =
 	| {
 			dataType: FileEntryContentType.INTERNAL_FILE
 			internalFileId: string
@@ -31,6 +37,7 @@ export type FileEntryContent =
 	  }
 
 export interface StoredFileEntryEntity {
+	id: string
 	name: string
 	size: number | null // null if not known
 	mime: string | null // null or empty if not known
@@ -38,11 +45,11 @@ export interface StoredFileEntryEntity {
 	disposition: FileEntryDisposition | null // used to override guessed disposition from mime
 
 	musicMetadata: MetadataLoadingResult | null // unset for non-music ofc
-	fileData: FileEntryContent
+	fileData: FileEntryEntityContent
 }
 
 export class FileEntryEntity {
-	public static readonly Serializer: Serializer<
+	public static readonly serializer: Serializer<
 		FileEntryEntity,
 		StoredFileEntryEntity
 	> = {
@@ -54,36 +61,41 @@ export class FileEntryEntity {
 					musicMetadata: input.musicMetadata,
 					name: input.name,
 					size: input.size,
+					id: input.id,
 				},
 				input.fileData
 			),
 		serialize: (input) => ({
-			...input.metadata,
+			...input.data,
 			fileData: input.content,
 		}),
 	}
 
 	constructor(
-		private metadata: FileEntryMetadata,
-		public readonly content: FileEntryContent
+		public readonly data: FileEntryEntityData,
+		public readonly content: FileEntryEntityContent
 	) {}
 
-	serialize = () => FileEntryEntity.Serializer.serialize(this)
+	serialize = () => FileEntryEntity.serializer.serialize(this)
+
+	get id(): string {
+		return this.data.id
+	}
 
 	get size(): number | null {
-		return this.metadata.size
+		return this.data.size
 	}
 
 	get name(): string {
-		return this.metadata.name
+		return this.data.name
 	}
 
 	get disposition(): FileEntryDisposition | null {
-		return this.metadata.disposition
+		return this.data.disposition
 	}
 
 	get mime(): string | null {
-		return this.metadata.mime
+		return this.data.mime
 	}
 
 	get dispositionOrGuess(): FileEntryDisposition {
@@ -94,5 +106,17 @@ export class FileEntryEntity {
 				name: this.name,
 			})
 		)
+	}
+
+	get musicMetadataLoadingResult() {
+		return this.data.musicMetadata
+	}
+
+	get musicMetadata(): Metadata | null {
+		const res = this.data.musicMetadata
+		if (!res) return null
+		if (res.type !== MetadataLoadingResultType.OK) return null
+
+		return res.metadata
 	}
 }

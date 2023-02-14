@@ -7,6 +7,9 @@ import { getFileEntryDisposition } from "@app/domain/storage/disposition"
 import { Metadata, MetadataLoadingResultType } from "@teawithsand/tws-player"
 import { useMemo } from "react"
 
+/**
+ * @deprecated Now deprecated, since we have better stuff like entities, which can do same thing but better
+ */
 export type FileEntryShowData = {
 	id: string
 	name: string
@@ -19,6 +22,9 @@ export type FileEntryShowData = {
 	storedLocally: boolean
 }
 
+/**
+ * @deprecated Now deprecated, since we have better stuff like entities, which can do same thing but better
+ */
 export const makeFileEntryShowData = (e: FileEntry): FileEntryShowData => {
 	let musicMetadata: Metadata | null = null
 	if (e.metadata?.musicMetadata?.type === MetadataLoadingResultType.OK) {

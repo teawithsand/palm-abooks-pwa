@@ -12,6 +12,9 @@ import { useMemo } from "react"
 
 export const DEFAULT_IMAGE_COVER_URL = "http://placekitten.com/300/300"
 
+/**
+ * @deprecated to be replaced with entities stuff and hooks for file entry urls
+ */
 export type AbookShowData = {
 	abook: Abook
 	metadataBag: MetadataBag
@@ -21,10 +24,16 @@ export type AbookShowData = {
 	duration: number
 }
 
+/**
+ * @deprecated to be replaced with entities stuff and hooks for file entry urls
+ */
 export type AbookShowDataOptions = {
 	loadCoverUrl: boolean
 }
 
+/**
+ * @deprecated to be replaced with entities stuff and hooks for file entry urls
+ */
 const fakeEntry: FileEntry = {
 	id: generateUUID(),
 	data: {
@@ -40,6 +49,9 @@ const fakeEntry: FileEntry = {
 	},
 }
 
+/**
+ * @deprecated to be replaced with entities stuff and hooks for file entry urls
+ */
 export const makeAbookShowData = (abook: Abook): AbookShowData => {
 	const musicEntries = abook.entries.filter(
 		(e) => getFileEntryDisposition(e) === FileEntryDisposition.MUSIC
@@ -66,6 +78,9 @@ export const makeAbookShowData = (abook: Abook): AbookShowData => {
 	}
 }
 
+/**
+ * @deprecated to be replaced with entities stuff and hooks for file entry urls
+ */
 export const useAbookShowData = (abook: Abook) =>
 	useMemo(() => makeAbookShowData(abook), [abook])
 

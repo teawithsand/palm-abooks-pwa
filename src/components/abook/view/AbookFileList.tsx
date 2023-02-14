@@ -1,6 +1,7 @@
 import { ConstSizeNumber } from "@app/components/util/ConstSizeNumber"
 import { List } from "@app/components/util/List"
 import { FileEntry } from "@app/domain/defines/abookFile"
+import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
 import { makeFileEntryShowData } from "@app/domain/ui/fileEntry"
 import { useAppTranslationSelector } from "@app/trans/AppTranslation"
 import { isTimeNumber } from "@teawithsand/tws-player"
@@ -58,7 +59,7 @@ const BottomInfo = styled.div`
 `
 
 const AbookFileEntryDisplay = (props: {
-	entry: FileEntry
+	entry: FileEntryEntity
 	index: number
 	length: number
 	onRef?: any
@@ -66,7 +67,6 @@ const AbookFileEntryDisplay = (props: {
 }) => {
 	const { entry } = props
 
-	const showData = makeFileEntryShowData(entry)
 	const trans = useAppTranslationSelector((s) => s.abook)
 
 	return (
@@ -79,17 +79,15 @@ const AbookFileEntryDisplay = (props: {
 			<OrdinalNumber>
 				<ConstSizeNumber n={props.index + 1} maxNumber={props.length} />
 			</OrdinalNumber>
-			<TopInfo>{showData.name}</TopInfo>
+			<TopInfo>{entry.name}</TopInfo>
 			<BottomInfo>
-				{trans.formatFileEntryDisposition(showData.fileDisposition)}{" "}
-				{showData.size !== null && showData.size >= 0
-					? formatFileSize(showData.size)
+				{trans.formatFileEntryDisposition(entry.dispositionOrGuess)}{" "}
+				{entry.size !== null && entry.size >= 0
+					? formatFileSize(entry.size)
 					: null}{" "}
-				{typeof showData.musicMetadata?.duration === "number" &&
-				isTimeNumber(showData.musicMetadata.duration)
-					? formatDurationSeconds(
-							showData.musicMetadata.duration / 1000
-					  )
+				{typeof entry.musicMetadata?.duration === "number" &&
+				isTimeNumber(entry.musicMetadata.duration)
+					? formatDurationSeconds(entry.musicMetadata.duration / 1000)
 					: null}
 			</BottomInfo>
 		</OuterContainer>
@@ -97,9 +95,9 @@ const AbookFileEntryDisplay = (props: {
 }
 
 export const AbookFileList = (props: {
-	entries: FileEntry[]
-	onEntriesReorder?: undefined | ((newEntries: FileEntry[]) => void)
-	onEntryDeleteConfirmed?: (e: FileEntry, i: number) => void
+	entries: FileEntryEntity[]
+	onEntriesReorder?: undefined | ((newEntries: FileEntryEntity[]) => void)
+	onEntryDeleteConfirmed?: (e: FileEntryEntity, i: number) => void
 }) => {
 	const { entries, onEntriesReorder } = props
 

@@ -6,7 +6,6 @@ import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver
 import {
 	DefaultMetadataLoader,
 	MetadataBag,
-	MetadataLoader,
 	MetadataLoadingResult,
 	MetadataLoadingResultType,
 } from "@teawithsand/tws-player"
@@ -24,7 +23,7 @@ export class MetadataLoadHelper {
 		const bag = new MetadataBag(
 			entries.map((v) => {
 				if (v.type === PlayableEntryType.FILE_ENTRY)
-					return v.entry.metadata.musicMetadata
+					return v.entry.musicMetadataLoadingResult
 				return null
 			})
 		)

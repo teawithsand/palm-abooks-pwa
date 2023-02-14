@@ -1,8 +1,8 @@
-import { Abook } from "@app/domain/defines/abook"
+import { AbookEntity } from "@app/domain/defines/entity/abook"
 import { useAppManager } from "@app/domain/managers/app"
 import { useQuery } from "@tanstack/react-query"
 
-export const useQueryAbookById = (id: string): Abook | null => {
+export const useQueryAbookById = (id: string): AbookEntity | null => {
 	const app = useAppManager()
 	const result = useQuery(["abook", "get", id], async () => {
 		const access = await app.abookDb.abookWriteAccess(id)
@@ -16,7 +16,7 @@ export const useQueryAbookById = (id: string): Abook | null => {
 	return result.data ?? null
 }
 
-export const useQueryAbookList = (): Abook[] => {
+export const useQueryAbookList = (): AbookEntity[] => {
 	const app = useAppManager()
 
 	const result = useQuery(["abook", "list"], async () => {

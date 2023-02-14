@@ -209,7 +209,7 @@ export class PositionSavingManager {
 			}
 			variants[PositionType.FILE_NAME_AND_LOCAL_OFFSET] = {
 				type: PositionType.FILE_NAME_AND_LOCAL_OFFSET,
-				fileName: currentEntry.entry.metadata.name,
+				fileName: currentEntry.entry.name,
 				positionMs: position,
 			}
 		}

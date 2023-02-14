@@ -20,14 +20,12 @@ export const SenderConnOpener = () => {
 
 	const peer = fileTransferStateManager.peer
 
-	const entries = useStickySubscribable(senderStateManager.dataBus)
+	const data = useStickySubscribable(senderStateManager.dataBus)
 	const peerState = useStickySubscribable(peer.stateBus)
 
 	return (
 		<ConnOpener
-			disabled={
-				!peerState.isReady
-			}
+			disabled={!peerState.isReady}
 			token={token}
 			onToken={async (token) => {
 				if (!peer) return
@@ -37,7 +35,7 @@ export const SenderConnOpener = () => {
 				const conn = await peer.connect(token.peerId)
 				const id = senderStateManager.registry.addConn(conn, {
 					auth: factory(token),
-					entries,
+					...data,
 				})
 
 				senderStateManager.registry.updateConfig(id, (cfg) =>

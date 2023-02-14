@@ -1,20 +1,17 @@
 import { AbookFileList } from "@app/components/abook/view/AbookFileList"
-import { Abook } from "@app/domain/defines/abook"
-import { FileEntry } from "@app/domain/defines/abookFile"
+import { AbookEntity } from "@app/domain/defines/entity/abook"
+import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
+import { useFileEntryEntityUrl } from "@app/domain/defines/entity/fileEntryHook"
 import { WhatToPlayLocatorType } from "@app/domain/defines/whatToPlay/locator"
 import { useAppManager } from "@app/domain/managers/app"
-import {
-	DEFAULT_IMAGE_COVER_URL,
-	useAbookShowData,
-	useImageFileEntryUrl,
-} from "@app/domain/ui/abook"
+import { DEFAULT_IMAGE_COVER_URL } from "@app/domain/ui/abook"
 import { useAppPaths } from "@app/paths"
 import { LinkContainer } from "@app/util/LinkContainer"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import {
-	breakpointMediaDown,
 	BREAKPOINT_MD,
 	BREAKPOINT_SM,
+	breakpointMediaDown,
 } from "@teawithsand/tws-stl-react"
 import { navigate } from "gatsby"
 import React from "react"
@@ -139,11 +136,10 @@ const ActionsList = styled.div`
 `
 
 export const AbookView = (props: {
-	abook: Abook
-	onEntriesReorder?: (newEntries: FileEntry[]) => void
+	abook: AbookEntity
+	onEntriesReorder?: (newEntries: FileEntryEntity[]) => void
 }) => {
 	const { abook } = props
-	const { metadata } = abook
 	const {
 		abookEditMetadataPath,
 		abookDeletePath,
@@ -152,25 +148,36 @@ export const AbookView = (props: {
 		abookEntriesDeletePath,
 		playerUiPath: playerPath,
 	} = useAppPaths()
-	const { imageEntries, musicEntries, duration } = useAbookShowData(abook)
+	const {
+		coverImageEntry,
+		musicEntries,
+		duration,
+		title,
+		authorName,
+		description,
+	} = abook
 	const app = useAppManager()
 
-	const coverUrl =
-		useImageFileEntryUrl(imageEntries) || DEFAULT_IMAGE_COVER_URL
+	const coverUrl = useFileEntryEntityUrl(coverImageEntry)
 
 	return (
 		<Grid>
 			<Header>
 				<InfoList>
-					<li>Title: {metadata.title}</li>
-					<li>Author name: {metadata.authorName || "-"}</li>
-					<li>Duration: {formatDurationSeconds(duration / 1000)}</li>
+					<li>Title: {title}</li>
+					{authorName ? <li>Author name: {authorName}</li> : null}
+					{duration !== null ? (
+						<li>
+							Duration: {formatDurationSeconds(duration / 1000)}
+						</li>
+					) : null}
 					<li>Music files: {musicEntries.length}</li>
-					<li>
-						Description: {metadata.description || "No description"}
-					</li>
+					<li>Description: {description || "No description"}</li>
 				</InfoList>
-				<CoverImage src={coverUrl} alt="Abook cover image" />
+				<CoverImage
+					src={coverUrl ?? DEFAULT_IMAGE_COVER_URL}
+					alt="Abook cover image"
+				/>
 				<ActionsList>
 					<LinkContainer to={abookEditMetadataPath(abook.id)}>
 						<Button href="#">Edit metadata</Button>

@@ -1,4 +1,5 @@
 import { FileEntry } from "@app/domain/defines/abookFile"
+import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
 
 export enum PlayableEntryType {
 	FILE_ENTRY = 1,
@@ -11,7 +12,7 @@ export type PlayableEntry = {
 } & (
 	| {
 			type: PlayableEntryType.FILE_ENTRY
-			entry: FileEntry
+			entry: FileEntryEntity
 	  }
 	| {
 			type: PlayableEntryType.ARBITRARY_BLOB

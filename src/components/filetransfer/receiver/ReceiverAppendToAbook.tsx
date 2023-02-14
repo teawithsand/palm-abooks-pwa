@@ -1,9 +1,8 @@
-import { Abook } from "@app/domain/defines/abook"
-import { FileEntry, FileEntryType } from "@app/domain/defines/abookFile"
+import { AbookEntity } from "@app/domain/defines/entity/abook"
 import { FileTransferEntry } from "@app/domain/filetransfer"
 import { useAppManager } from "@app/domain/managers/app"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { generateUUID } from "@teawithsand/tws-stl"
+import { useMutationAbookAddFileTransferEntity } from "@app/domain/storage/mutations/abookAddFileTransferEntries"
+import { useQuery } from "@tanstack/react-query"
 import React, { useState } from "react"
 import { Alert, Button, Form } from "react-bootstrap"
 import styled from "styled-components"
@@ -20,7 +19,7 @@ const Container = styled.div`
 export const ReceiverAppendToAbook = (props: {
 	entries: FileTransferEntry[]
 }) => {
-	const [pickedAbook, setPickedAbook] = useState<Abook | null>(null)
+	const [pickedAbook, setPickedAbook] = useState<AbookEntity | null>(null)
 	const app = useAppManager()
 	const {
 		isError,
@@ -36,45 +35,7 @@ export const ReceiverAppendToAbook = (props: {
 		}
 	)
 
-	const saveMutation = useMutation(
-		async (args: {
-			transferEntries: FileTransferEntry[]
-			abook: Abook
-		}) => {
-			const { abook, transferEntries } = args
-			const abookAccess = await app.abookDb.abookWriteAccess(abook.id)
-
-			try {
-				for (const transferEntry of transferEntries) {
-					if (transferEntry.file.size === 0) return
-					
-					await abookAccess.addInternalFile(
-						transferEntry.file,
-						(draft, newFileId) => {
-							const entry: FileEntry = {
-								id: generateUUID(),
-								metadata: {
-									name: transferEntry.publicName,
-									mime: "application/binary",
-									size: transferEntry.file.size,
-									disposition: null, // this is for overrides, by default use dynamic disposition
-									musicMetadata: null,
-								},
-								data: {
-									dataType: FileEntryType.INTERNAL_FILE,
-									internalFileId: newFileId,
-								},
-							}
-
-							draft.entries.push(entry)
-						}
-					)
-				}
-			} finally {
-				abookAccess.release()
-			}
-		}
-	)
+	const mutation = useMutationAbookAddFileTransferEntity()
 
 	// TODO(teawithsand): proper error handling/explaining to user
 	if (isLoading || isError) return <></>
@@ -90,18 +51,18 @@ export const ReceiverAppendToAbook = (props: {
 		)
 	}
 
-	if (saveMutation.isSuccess) {
+	if (mutation.isSuccess) {
 		if (!pickedAbook) return <></>
 		return (
 			<Alert variant="success">
-				Saved files to "<b>{pickedAbook.metadata.title}</b>"
+				Saved files to "<b>{pickedAbook.displayName}</b>"
 			</Alert>
 		)
 	}
 
 	return (
 		<Container>
-			{saveMutation.isError ? (
+			{mutation.isError ? (
 				<Alert variant="error">Saved files to ABook.</Alert>
 			) : null}
 			<Form.Group>
@@ -117,14 +78,14 @@ export const ReceiverAppendToAbook = (props: {
 				>
 					<option>Pick ABook</option>
 					{abooks.map((v) => (
-						<option value={v.id}>{v.metadata.title}</option>
+						<option value={v.id}>{v.displayName}</option>
 					))}
 				</Form.Select>
 				{pickedAbook ? (
 					<Button
 						onClick={() => {
 							if (!pickedAbook) return
-							saveMutation.mutateAsync({
+							mutation.mutateAsync({
 								abook: pickedAbook,
 								transferEntries: props.entries,
 							})

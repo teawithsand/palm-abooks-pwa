@@ -1,4 +1,6 @@
 import { Abook } from "@app/domain/defines/abook"
+import { AbookEntity } from "@app/domain/defines/entity/abook"
+import { useFileEntryEntityUrl } from "@app/domain/defines/entity/fileEntryHook"
 import { useAppManager } from "@app/domain/managers/app"
 import {
 	DEFAULT_IMAGE_COVER_URL,
@@ -62,17 +64,16 @@ const CardPropertiesBody = styled.ul`
 	padding: 0;
 `
 
-export const AbookSmallCard = (props: { abook: Abook }) => {
+export const AbookSmallCard = (props: { abook: AbookEntity }) => {
 	const { abook } = props
-	const { metadata } = abook
 	const app = useAppManager()
-	const name = abook.metadata.title
+	const name = abook.displayName
 	const { abookShowPath } = useAppPaths()
 
-	const { imageEntries, musicEntries, duration } = useAbookShowData(abook)
+	const { coverImageEntry, musicEntries, duration } = abook
 
 	const coverUrl =
-		useImageFileEntryUrl(imageEntries) || DEFAULT_IMAGE_COVER_URL
+		useFileEntryEntityUrl(coverImageEntry) || DEFAULT_IMAGE_COVER_URL
 
 	return (
 		<Card>
@@ -82,19 +83,19 @@ export const AbookSmallCard = (props: { abook: Abook }) => {
 			<CardRightPanel>
 				<CardHeader>{name}</CardHeader>
 				<CardPropertiesBody>
-					{metadata.authorName ? (
-						<li>Author: {metadata.authorName}</li>
+					{abook.authorName ? (
+						<li>Author: {abook.authorName}</li>
 					) : null}
-					{metadata.addedAt ? (
+					{abook.addedAt ? (
 						<li>
 							Added at:{" "}
-							{new Date(metadata.addedAt).toLocaleString("pl-PL")}
+							{new Date(abook.addedAt).toLocaleString("pl-PL")}
 						</li>
 					) : null}
-					{metadata.lastPlayedAt ? (
+					{abook.lastPlayedAt ? (
 						<li>
 							Last played at:{" "}
-							{new Date(metadata.lastPlayedAt).toLocaleString(
+							{new Date(abook.lastPlayedAt).toLocaleString(
 								"pl-PL"
 							)}
 						</li>
@@ -102,7 +103,9 @@ export const AbookSmallCard = (props: { abook: Abook }) => {
 						<li>Never played</li>
 					)}
 					{duration ? (
-						<li>Duration: {formatDurationSeconds(duration / 1000)}</li>
+						<li>
+							Duration: {formatDurationSeconds(duration / 1000)}
+						</li>
 					) : (
 						<li>Duration not loaded or there is no files</li>
 					)}

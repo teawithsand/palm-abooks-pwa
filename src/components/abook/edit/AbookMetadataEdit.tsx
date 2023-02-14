@@ -1,5 +1,5 @@
 import { AbookFormMetadata } from "@app/components/abook/form/editMetadata"
-import { Abook } from "@app/domain/defines/abook"
+import { AbookEntity } from "@app/domain/defines/entity/abook"
 import { useAppManager } from "@app/domain/managers/app"
 import { useAppPaths } from "@app/paths"
 import { useNavigate } from "@app/util/navigate"
@@ -12,9 +12,8 @@ const Grid = styled.div`
 	gap: 1em;
 `
 
-export const AbookMetadataEdit = (props: { abook: Abook }) => {
+export const AbookMetadataEdit = (props: { abook: AbookEntity }) => {
 	const { abook } = props
-	const { metadata } = abook
 	const { abookShowPath } = useAppPaths()
 	const navigate = useNavigate()
 	const app = useAppManager()
@@ -28,9 +27,9 @@ export const AbookMetadataEdit = (props: { abook: Abook }) => {
 					const access = await app.abookDb.abookWriteAccess(abook.id)
 					try {
 						await access.update((draft) => {
-							draft.metadata.authorName = data.author
-							draft.metadata.title = data.title
-							draft.metadata.description = data.description
+							draft.authorName = data.author.trim()
+							draft.title = data.title.trim()
+							draft.description = data.description.trim()
 						})
 					} finally {
 						access.release()
@@ -39,9 +38,9 @@ export const AbookMetadataEdit = (props: { abook: Abook }) => {
 					navigate(abookShowPath(abook.id))
 				}}
 				initialData={{
-					author: metadata.authorName,
-					description: metadata.description,
-					title: metadata.title,
+					author: abook.authorName,
+					description: abook.description,
+					title: abook.title,
 				}}
 			/>
 		</Grid>

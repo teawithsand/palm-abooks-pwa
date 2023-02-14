@@ -1,12 +1,11 @@
-import { AbookFormMetadata } from "@app/components/abook/form/editMetadata"
-import { Abook } from "@app/domain/defines/abook"
+import { AbookEntity } from "@app/domain/defines/entity/abook"
 import { useAppManager } from "@app/domain/managers/app"
 import { useAppPaths } from "@app/paths"
+import { LinkContainer } from "@app/util/LinkContainer"
 import { useNavigate } from "@app/util/navigate"
 import React from "react"
-import styled from "styled-components"
 import { Button } from "react-bootstrap"
-import { LinkContainer } from "@app/util/LinkContainer"
+import styled from "styled-components"
 
 const Grid = styled.div`
 	display: grid;
@@ -35,9 +34,8 @@ const OptionsBar = styled.div`
 	}
 `
 
-export const AbookDelete = (props: { abook: Abook }) => {
+export const AbookDelete = (props: { abook: AbookEntity }) => {
 	const { abook } = props
-	const { metadata } = abook
 	const { abookListPath } = useAppPaths()
 	const navigate = useNavigate()
 	const app = useAppManager()
@@ -45,11 +43,11 @@ export const AbookDelete = (props: { abook: Abook }) => {
 	return (
 		<Grid>
 			<Heading>
-				Are you sure you want to delete "{metadata.title}" by "
-				{metadata.authorName}"
+				Are you sure you want to delete "{abook.title}" by "
+				{abook.authorName}"
 			</Heading>
-			{metadata.description ? (
-				<DescriptionRow>{metadata.description}</DescriptionRow>
+			{abook.description ? (
+				<DescriptionRow>{abook.description}</DescriptionRow>
 			) : null}
 			<hr />
 			<OptionsBar>

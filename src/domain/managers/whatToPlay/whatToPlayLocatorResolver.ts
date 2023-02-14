@@ -1,5 +1,5 @@
-import { Abook } from "@app/domain/defines/abook"
 import { FileEntryDisposition } from "@app/domain/defines/abookFile"
+import { AbookEntity } from "@app/domain/defines/entity/abook"
 import {
 	PlayableEntry,
 	PlayableEntryType,
@@ -14,7 +14,6 @@ import {
 } from "@app/domain/defines/whatToPlay/locator"
 import { PlayableEntriesBag } from "@app/domain/managers/playableEntriesBag"
 import { AbookDb } from "@app/domain/storage/db"
-import { getFileEntryDisposition } from "@app/domain/storage/disposition"
 import { MetadataBag, SourcePlayerError } from "@teawithsand/tws-player"
 import { generateUUID } from "@teawithsand/tws-stl"
 
@@ -27,9 +26,9 @@ export class WhatToPlayLocatorResolverImpl
 {
 	constructor(private readonly db: AbookDb) {}
 
-	private fromAbook = (abook: Abook): WhatToPlayData => {
+	private fromAbook = (abook: AbookEntity): WhatToPlayData => {
 		const musicEntries = abook.entries.filter(
-			(e) => getFileEntryDisposition(e) === FileEntryDisposition.MUSIC
+			(e) => e.dispositionOrGuess === FileEntryDisposition.MUSIC
 		)
 
 		const entries: PlayableEntry[] = musicEntries.map((e) => ({
@@ -43,7 +42,7 @@ export class WhatToPlayLocatorResolverImpl
 			id: generateUUID(),
 			abook,
 			metadata: new MetadataBag(
-				musicEntries.map((e) => e.metadata.musicMetadata)
+				musicEntries.map((e) => e.musicMetadataLoadingResult)
 			),
 			entries,
 			entriesBag: new PlayableEntriesBag(entries),

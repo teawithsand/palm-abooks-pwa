@@ -29,7 +29,7 @@ export class PositionAndSeekDataResolver {
 			const targetEntry = data.entriesBag.entries.find(
 				(e) =>
 					e.type === PlayableEntryType.FILE_ENTRY &&
-					e.entry.metadata.name === position.fileName
+					e.entry.name === position.fileName
 			)
 			if (!targetEntry) return null
 

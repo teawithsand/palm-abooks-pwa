@@ -1,5 +1,5 @@
 import { strippedListStyles } from "@app/components/util/List"
-import { Abook } from "@app/domain/defines/abook"
+import { AbookEntity } from "@app/domain/defines/entity/abook"
 import { useAppManager } from "@app/domain/managers/app"
 import { useAppPaths } from "@app/paths"
 import { navigate } from "gatsby"
@@ -38,7 +38,7 @@ const Row = styled.div`
 	}
 `
 
-export const AbookEntriesDelete = (props: { abook: Abook }) => {
+export const AbookEntriesDelete = (props: { abook: AbookEntity }) => {
 	// TODO(teawithsand): prevent concurrent modification of same abook.
 	//  add some kind of barrier component, which utilizes weblocks
 
@@ -108,7 +108,7 @@ export const AbookEntriesDelete = (props: { abook: Abook }) => {
 													},
 												}}
 											/>
-											<div>{entry.metadata.name}</div>
+											<div>{entry.name}</div>
 										</Row>
 									)
 								})

@@ -104,10 +104,11 @@ export const PlayerEntriesList = (props: {
 	// TODO(teawithsand): make this more performant by adding intermediate level component for row
 	return (
 		<List>
-			{ui.entries.map((entry, index) => {
-				let name = `Entry #${entry.id}`
+			{ui.entries.map((element, index) => {
+				let name = `Entry #${element.id}`
 
-				const isPlaying = entry.id === ui.currentPosition.currentEntryId
+				const isPlaying =
+					element.id === ui.currentPosition.currentEntryId
 
 				let duration: number | null = null
 
@@ -129,15 +130,15 @@ export const PlayerEntriesList = (props: {
 					name = `${metadata.metadata.artist || "No artist"} - ${
 						metadata.metadata.title
 					}`
-				} else if (entry.type === PlayableEntryType.FILE_ENTRY) {
-					name = entry.entry.metadata.name
-				} else if (entry.type === PlayableEntryType.ARBITRARY_BLOB) {
+				} else if (element.type === PlayableEntryType.FILE_ENTRY) {
+					name = element.entry.name
+				} else if (element.type === PlayableEntryType.ARBITRARY_BLOB) {
 					name =
-						entry.blob instanceof File
-							? entry.blob.name
-							: `Sound blob #${entry.id}`
-				} else if (entry.type === PlayableEntryType.ARBITRARY_URL) {
-					name = entry.url
+						element.blob instanceof File
+							? element.blob.name
+							: `Sound blob #${element.id}`
+				} else if (element.type === PlayableEntryType.ARBITRARY_URL) {
+					name = element.url
 				}
 
 				// Hack: calculate padding for these entries, so that we
@@ -188,7 +189,7 @@ export const PlayerEntriesList = (props: {
 						key={index}
 						$isPlaying={isPlaying}
 						onClick={() => {
-							onEntryClick(entry.id, entry)
+							onEntryClick(element.id, element)
 						}}
 						$clickable={true}
 					>

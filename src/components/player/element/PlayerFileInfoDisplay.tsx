@@ -28,7 +28,7 @@ export const PlayerFileInfoDisplay = () => {
 	const entry = ui?.currentPosition.entry
 	if (entry) {
 		if (entry.type === PlayableEntryType.FILE_ENTRY) {
-			name = entry.entry.metadata.name
+			name = entry.entry.name
 		} else if (
 			entry.type === PlayableEntryType.ARBITRARY_BLOB &&
 			entry.blob instanceof File
@@ -48,7 +48,7 @@ export const PlayerFileInfoDisplay = () => {
 		content = "Nothing to play"
 	} else {
 		if (ui.whatToPlayData.type === WhatToPlayDataType.ABOOK) {
-			content = `Now playing: ${ui.whatToPlayData.abook.metadata.title}/${name}`
+			content = `Now playing: ${ui.whatToPlayData.abook.displayName}/${name}`
 		} else {
 			content = ""
 		}

@@ -1,10 +1,13 @@
 import { AbookFormCreate } from "@app/components/abook/form/create"
-import { Abook } from "@app/domain/defines/abook"
 import {
-	FileEntry,
 	FileEntryDisposition,
 	FileEntryType,
 } from "@app/domain/defines/abookFile"
+import { AbookEntity, AbookEntityData } from "@app/domain/defines/entity/abook"
+import {
+	FileEntryEntity,
+	FileEntryEntityData,
+} from "@app/domain/defines/entity/fileEntry"
 import { useAppManager } from "@app/domain/managers/app"
 import { FilePlayerSourceResolver } from "@app/domain/managers/resolver"
 import { guessFileDisposition } from "@app/domain/storage/disposition"
@@ -16,11 +19,13 @@ import {
 	MetadataLoadingResultType,
 } from "@teawithsand/tws-player"
 import {
+	TimestampMs,
 	generateUUID,
 	getNowTimestamp,
-	TimestampMs,
 } from "@teawithsand/tws-stl"
 import React from "react"
+
+// TODO(teawithsand): unify that creation procedure; make it part of abook write access maybe
 
 export const AbookLocalCreate = () => {
 	const navigate = useNavigate()
@@ -39,18 +44,16 @@ export const AbookLocalCreate = () => {
 					new FilePlayerSourceResolver()
 				)
 
-				const abook: Abook = {
+				const abook: AbookEntityData = {
 					id,
 					position: null,
 
-					metadata: {
-						addedAt: getNowTimestamp(),
-						authorName: data.author,
-						title: data.title,
-						description: data.description,
-						lastPlayedAt: 0 as TimestampMs,
-						publishedYear: 0,
-					},
+					addedAt: getNowTimestamp(),
+					authorName: data.author,
+					title: data.title,
+					description: data.description,
+					lastPlayedAt: 0 as TimestampMs,
+					publishedYear: 0,
 
 					entries: [],
 				}
@@ -86,7 +89,7 @@ export const AbookLocalCreate = () => {
 					}
 				}
 
-				await app.abookDb.createAbook(abook)
+				await app.abookDb.createAbook(new AbookEntity(abook))
 				const abookAccess = await app.abookDb.abookWriteAccess(abook.id)
 
 				try {
@@ -96,24 +99,24 @@ export const AbookLocalCreate = () => {
 							await abookAccess.addInternalFile(
 								f,
 								(draft, newFileId) => {
-									const entry: FileEntry = {
+									const entry: FileEntryEntityData = {
 										id: generateUUID(),
-										metadata: {
-											name: f.name,
-											mime: f.type,
-											size: f.size,
-											disposition: null, // this is for overrides, by default use dynamic disposition
-											musicMetadata:
-												metadataMap.get(i) ?? null,
-										},
-										data: {
+
+										name: f.name,
+										mime: f.type,
+										size: f.size,
+										disposition: null, // this is for overrides, by default use dynamic disposition
+										musicMetadata:
+											metadataMap.get(i) ?? null,
+									}
+
+									draft.entries.push(
+										new FileEntryEntity(entry, {
 											dataType:
 												FileEntryType.INTERNAL_FILE,
 											internalFileId: newFileId,
-										},
-									}
-
-									draft.entries.push(entry)
+										})
+									)
 								}
 							)
 						} finally {

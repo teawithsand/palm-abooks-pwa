@@ -9,44 +9,45 @@ import { useEffect, useState } from "react"
  * Never loads value if internal file format is used and corresponding blob is not stored in db.
  */
 export const useFileEntryEntityUrl = (
-	entry: FileEntryEntity
+	entry: FileEntryEntity | null
 ): string | null => {
 	const app = useAppManager()
 	const [url, setUrl] = useState<string | null>(null) // default image here
 
-	if (entry.content.dataType === FileEntryType.URL) {
-		return entry.content.url
-	}
-
 	// TODO(teawithsand): make this code less bloated via external helper hooks like useBlob
 	useEffect(() => {
 		setUrl(null)
+		if (!entry) {
+			return
+		} else if (entry.content.dataType === FileEntryType.INTERNAL_FILE) {
+			let isValid = true
+			let url: string | null = null
 
-		let isValid = true
-		let url: string | null = null
+			if (entry.content.dataType === FileEntryType.INTERNAL_FILE) {
+				const id = entry.content.internalFileId
+				const promise = async () => {
+					const blob = await app.abookDb.getInternalFileBlob(id)
+					if (!blob) return
 
-		if (entry.content.dataType === FileEntryType.INTERNAL_FILE) {
-			const id = entry.content.internalFileId
-			const promise = async () => {
-				const blob = await app.abookDb.getInternalFileBlob(id)
-				if (!blob) return
-
-				const innerUrl = URL.createObjectURL(blob)
-				if (isValid) {
-					url = innerUrl
-					setUrl(innerUrl)
-				} else {
-					URL.revokeObjectURL(innerUrl)
+					const innerUrl = URL.createObjectURL(blob)
+					if (isValid) {
+						url = innerUrl
+						setUrl(innerUrl)
+					} else {
+						URL.revokeObjectURL(innerUrl)
+					}
 				}
+
+				promise()
 			}
 
-			promise()
-		}
-
-		return () => {
-			if (typeof url === "string") URL.revokeObjectURL(url)
-			isValid = false
-			setUrl(null)
+			return () => {
+				if (typeof url === "string") URL.revokeObjectURL(url)
+				isValid = false
+				setUrl(null)
+			}
+		} else if (entry.content.dataType === FileEntryType.URL) {
+			setUrl(entry.content.url)
 		}
 	}, [app, entry, setUrl])
 

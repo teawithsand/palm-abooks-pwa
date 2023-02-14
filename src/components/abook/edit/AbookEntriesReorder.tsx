@@ -1,6 +1,8 @@
 import { AbookFileList } from "@app/components/abook/view/AbookFileList"
 import { Abook } from "@app/domain/defines/abook"
 import { FileEntry } from "@app/domain/defines/abookFile"
+import { AbookEntity } from "@app/domain/defines/entity/abook"
+import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
 import { useAppManager } from "@app/domain/managers/app"
 import { useAppPaths } from "@app/paths"
 import { useNavigate } from "@app/util/navigate"
@@ -21,7 +23,7 @@ const MyForm = styled(Form)`
 	gap: 1em;
 `
 
-export const AbookEntriesReorder = (props: { abook: Abook }) => {
+export const AbookEntriesReorder = (props: { abook: AbookEntity }) => {
 	// TODO(teawithsand): prevent concurrent modification of same abook.
 	//  add some kind of barrier component, which utilizes web locks
 
@@ -33,7 +35,7 @@ export const AbookEntriesReorder = (props: { abook: Abook }) => {
 	const submitted = useRef(false)
 
 	const [reorderedEntries, setReorderedEntries] = useState<
-		FileEntry[] | null
+		FileEntryEntity[] | null
 	>(null)
 
 	return (

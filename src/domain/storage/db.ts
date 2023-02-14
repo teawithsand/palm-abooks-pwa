@@ -14,6 +14,18 @@ import {
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
+import {
+	AbookEntityData,
+	AbookEntity,
+	StoredAbookEntity,
+} from "@app/domain/defines/entity/abook"
+import {
+	DefaultMetadataLoader,
+	MetadataLoadingResult,
+} from "@teawithsand/tws-player"
+import { FilePlayerSourceResolver } from "@app/domain/managers/resolver"
+import { loadMetadataToResultHack } from "@app/util/metadataLoadingResult"
+import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
 
 export const AbookDbLock = new MiddlewareKeyedLocks(
 	GLOBAL_WEB_KEYED_LOCKS,
@@ -22,12 +34,12 @@ export const AbookDbLock = new MiddlewareKeyedLocks(
 
 const eqSet = <T>(xs: Set<T>, ys: Set<T>) =>
 	xs.size === ys.size && [...xs].every((x) => ys.has(x))
-const extractAbookInternalFileIds = (abook: Abook): Set<string> =>
+const extractAbookInternalFileIds = (abook: AbookEntity): Set<string> =>
 	new Set(
 		abook.entries
 			.map((v) =>
-				v.data.dataType === FileEntryType.INTERNAL_FILE
-					? v.data.internalFileId
+				v.content.dataType === FileEntryType.INTERNAL_FILE
+					? v.content.internalFileId
 					: undefined
 			)
 			.filter((v) => typeof v === "string")
@@ -38,30 +50,37 @@ export class AbookWriteAccess {
 
 	constructor(
 		private readonly db: AbookDb,
-		private abook: Abook,
+		private abook: AbookEntity,
 		private readonly releaser: () => void
 	) {}
 
-	getAbook = (): Readonly<Abook> => {
-		return { ...this.abook }
+	getAbook = (): Readonly<AbookEntity> => {
+		return this.abook
 	}
 
 	/**
 	 * Note: user of this function MUST NOT drop locally stored entries
 	 */
 	private innerUpdate = async (
-		mutator: (draft: Draft<Abook>) => void,
-		checker?: (oldAbook: Abook, newAbook: Abook) => void
+		mutator: (draft: Draft<AbookEntityData>) => void,
+		checker?: (oldAbook: AbookEntity, newAbook: AbookEntity) => void
 	) => {
 		this.checkReleased()
 
-		const newAbook = produce(this.abook, (draft) => {
+		const newAbookData = produce(this.abook.data, (draft) => {
 			mutator(draft)
 		})
 
+		const newAbook = new AbookEntity(newAbookData)
+
 		if (checker) checker(this.abook, newAbook)
 
-		await this.db.abooks.put(newAbook)
+		if (this.abook.id !== newAbook.id)
+			throw new Error(
+				"Id was changed during abook update, which is not valid operation"
+			)
+
+		await this.db.abooks.put(newAbook.serialize())
 		this.abook = newAbook
 
 		this.db.onStorageModified()
@@ -95,7 +114,7 @@ export class AbookWriteAccess {
 	/**
 	 * Note: user of this function MUST NOT drop locally stored entries
 	 */
-	update = async (mutator: (draft: Draft<Abook>) => void) => {
+	update = async (mutator: (draft: Draft<AbookEntityData>) => void) => {
 		await this.innerUpdate(mutator, (oldAbook, newAbook) => {
 			const oldAbookLocalFiles = extractAbookInternalFileIds(oldAbook)
 			const newAbookLocalFiles = extractAbookInternalFileIds(newAbook)
@@ -139,9 +158,11 @@ export class AbookWriteAccess {
 
 					const entry = this.abook.entries[entryIndex]
 
-					if (entry.data.dataType === FileEntryType.INTERNAL_FILE) {
+					if (
+						entry.content.dataType === FileEntryType.INTERNAL_FILE
+					) {
 						await this.db.internalFiles.delete(
-							entry.data.internalFileId
+							entry.content.internalFileId
 						)
 					}
 
@@ -155,9 +176,50 @@ export class AbookWriteAccess {
 		this.db.onStorageModified()
 	}
 
+	addInternalFileExt = async (
+		name: string,
+		blob: Blob,
+		mutator?: (
+			draft: Draft<AbookEntityData>,
+			entry: FileEntryEntity
+		) => void
+	) => {
+		const metadataLoader = new DefaultMetadataLoader(
+			new FilePlayerSourceResolver()
+		)
+		// Please note that this has to be done OUTSIDE addInternalFile callback, as it must be synchronous/await only
+		// db promises
+		const metadata = await loadMetadataToResultHack(metadataLoader, blob)
+
+		this.addInternalFile(blob, (draft, newFileId) => {
+			const entry = new FileEntryEntity(
+				{
+					id: generateUUID(),
+					disposition: null,
+					mime: blob.type,
+					musicMetadata: metadata,
+					name,
+					size: blob.size,
+				},
+				{
+					dataType: FileEntryType.INTERNAL_FILE,
+					internalFileId: newFileId,
+				}
+			)
+			if (mutator) {
+				mutator(draft, entry)
+			} else {
+				draft.entries.push(entry)
+			}
+		})
+	}
+
+	/**
+	 * @deprecated Instead use extended version, which handles more stuff including loading metadata.
+	 */
 	addInternalFile = async (
-		blob: Blob | File,
-		mutator: (draft: Draft<Abook>, newFileId: string) => void
+		blob: Blob,
+		mutator: (draft: Draft<AbookEntityData>, newFileId: string) => void
 	) => {
 		this.checkReleased()
 
@@ -213,7 +275,7 @@ export class AbookWriteAccess {
 }
 
 export class AbookDb extends Dexie {
-	abooks!: Table<Abook, string>
+	abooks!: Table<StoredAbookEntity, string>
 	internalFiles!: Table<InternalFile, string>
 
 	public readonly locks = AbookDbLock
@@ -239,29 +301,33 @@ export class AbookDb extends Dexie {
 		this.storageSizeManager.requestStatsUpdate()
 	}
 
-	createAbook = async (abook: Abook) => {
-		await this.abooks.add(abook)
+	createAbook = async (abook: AbookEntity) => {
+		await this.abooks.add(abook.serialize())
 		this.onStorageModified()
 	}
 
-	readAbook = async (id: AbookId): Promise<Abook | null> => {
-		return (await this.abooks.where("id").equals(id).first()) ?? null
+	readAbook = async (id: AbookId): Promise<AbookEntity | null> => {
+		const raw = (await this.abooks.where("id").equals(id).first()) ?? null
+		if (!raw) return null
+		return AbookEntity.serializer.deserialize(raw)
 	}
 
 	listAbooks = async (
 		offset: number = 0,
 		limit?: number
-	): Promise<Abook[]> => {
+	): Promise<AbookEntity[]> => {
 		let q = this.abooks.offset(offset)
 		if (typeof limit === "number" || typeof limit === "bigint") {
 			q = q.limit(limit)
 		}
-		return await q.toArray()
+		return (await q.toArray()).map((v) =>
+			AbookEntity.serializer.deserialize(v)
+		)
 	}
 
 	abookWriteAccess = async (id: AbookId): Promise<AbookWriteAccess> => {
-		const abook = await this.abooks.get(id)
-		if (!abook)
+		const rawAbook = await this.abooks.get(id)
+		if (!rawAbook)
 			throw new Error(
 				`Abook with id ${id} was not found for obtaining access`
 			)
@@ -269,7 +335,21 @@ export class AbookDb extends Dexie {
 		const lock = this.locks.getRWLock(id, {})
 		const releaser = await lock.lockWrite()
 
+		const abook = AbookEntity.serializer.deserialize(rawAbook)
+
 		return new AbookWriteAccess(this, abook, releaser)
+	}
+
+	runWithAbookWriteAccess = async <T>(
+		id: AbookId,
+		callback: (access: AbookWriteAccess) => Promise<T>
+	): Promise<T> => {
+		const access = await this.abookWriteAccess(id)
+		try {
+			return await callback(access)
+		} finally {
+			access.release()
+		}
 	}
 
 	/**
@@ -278,7 +358,7 @@ export class AbookDb extends Dexie {
 	 *
 	 * TODO(teawithsand): use caching resolver instead. It was already implemented in tws-player.
 	 */
-	getInternalFileBlob = async (id: string): Promise<Blob | File | null> => {
+	getInternalFileBlob = async (id: string): Promise<Blob | null> => {
 		const file = (await this.internalFiles.get(id)) ?? null
 		return file?.blob ?? null
 	}
