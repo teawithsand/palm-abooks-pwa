@@ -40,6 +40,9 @@ export type FileEntryData =
 			url: string
 	  }
 
+/**
+ * @deprecated to be replaced with new entity model
+ */
 export type FileEntry = {
 	id: FileEntryId // Unique ID of this file entry, generally used for purposes of position storing
 	metadata: FileEntryMetadata

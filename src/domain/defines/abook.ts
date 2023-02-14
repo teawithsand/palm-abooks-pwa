@@ -4,6 +4,9 @@ import { TimestampMs } from "@teawithsand/tws-stl"
 
 export type AbookId = string
 
+/**
+ * @deprecated to be replaced with new entity model
+ */
 export interface AbookMetadata {
 	title: string // empty if not provided
 	authorName: string // empty if not provided
@@ -13,6 +16,9 @@ export interface AbookMetadata {
 	lastPlayedAt: TimestampMs // defaults to 0
 }
 
+/**
+ * @deprecated to be replaced with new entity model
+ */
 export interface Abook {
 	id: AbookId
 	metadata: AbookMetadata
