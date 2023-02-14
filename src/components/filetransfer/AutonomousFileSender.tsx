@@ -41,6 +41,7 @@ const InnerFileSender = () => {
 					<SenderEntriesPicker />
 				</SectionBody>
 			</Section>
+			<hr />
 			<SenderStateController />
 			<Section>
 				<SectionTitle>
