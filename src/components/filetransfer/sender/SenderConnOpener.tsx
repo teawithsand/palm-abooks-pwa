@@ -20,7 +20,7 @@ export const SenderConnOpener = () => {
 
 	const peer = fileTransferStateManager.peer
 
-	const entries = useStickySubscribable(senderStateManager.entriesBus)
+	const entries = useStickySubscribable(senderStateManager.dataBus)
 	const peerState = useStickySubscribable(peer.stateBus)
 
 	return (

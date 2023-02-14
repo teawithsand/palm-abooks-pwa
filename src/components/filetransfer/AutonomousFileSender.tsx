@@ -3,7 +3,7 @@ import { SenderContextProvider } from "@app/components/filetransfer/sender/Sende
 import { SenderEntriesPicker } from "@app/components/filetransfer/sender/SenderEntriesPicker"
 import { SenderStateController } from "@app/components/filetransfer/sender/SenderStateController"
 import {
-	FileTransferEntry,
+	FileTransferData,
 	useFileTransferStateManager,
 	useSenderStateManager,
 } from "@app/domain/filetransfer"
@@ -55,11 +55,11 @@ const InnerFileSender = () => {
 }
 
 export const AutonomousFileSender = (props: {
-	entries?: FileTransferEntry[] | null | undefined
+	entries?: FileTransferData | null | undefined
 }) => {
 	const { entries } = props
 	return (
-		<SenderContextProvider entries={entries ?? undefined}>
+		<SenderContextProvider data={entries ?? undefined}>
 			<InnerFileSender />
 		</SenderContextProvider>
 	)

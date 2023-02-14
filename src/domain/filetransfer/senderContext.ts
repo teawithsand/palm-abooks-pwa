@@ -17,11 +17,19 @@ import {
 import produce from "immer"
 import { createContext, useContext } from "react"
 
+export interface FileTransferData {
+	entries: FileTransferEntry[]
+	untypedHeader: any
+}
+
 export class SenderStateManager {
 	public readonly registry = new ConnRegistry(new SenderConnAdapter())
-	private readonly innerEntriesBus = new DefaultStickyEventBus<
-		FileTransferEntry[]
-	>([])
+	private readonly innerDataBus = new DefaultStickyEventBus<FileTransferData>(
+		{
+			entries: [],
+			untypedHeader: undefined,
+		}
+	)
 
 	private fileTransferStateManagerSubscriptionCanceller: SubscriptionCanceler | null =
 		null
@@ -39,7 +47,8 @@ export class SenderStateManager {
 							authSecret: lastEvent.authSecret,
 							name: lastEvent.name,
 						},
-						entries: this.entriesBus.lastEvent,
+						entries: this.dataBus.lastEvent.entries,
+						untypedHeader: this.dataBus.lastEvent.untypedHeader,
 					})
 
 					this.registry.updateConfig(id, (cfg) =>
@@ -52,12 +61,15 @@ export class SenderStateManager {
 			})
 	}
 
-	get entriesBus(): StickySubscribable<FileTransferEntry[]> {
-		return this.innerEntriesBus
+	get dataBus(): StickySubscribable<FileTransferData> {
+		return this.innerDataBus
 	}
 
-	setEntries = (entries: FileTransferEntry[]) => {
-		this.innerEntriesBus.emitEvent(entries)
+	setFileTransferData = (data: FileTransferData) => {
+		this.innerDataBus.emitEvent({
+			...data,
+			entries: [...data.entries],
+		})
 	}
 
 	/**

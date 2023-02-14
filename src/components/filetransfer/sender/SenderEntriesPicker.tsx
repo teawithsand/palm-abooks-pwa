@@ -32,13 +32,13 @@ export const SenderEntriesPicker = () => {
 		<FinalForm<AbookFormAddFilesData>
 			onSubmit={(values: AbookFormAddFilesData) => {
 				if (canSetEntries) {
-					senderStateManager.setEntries(
-						(values?.files ?? [])?.map((v) => ({
+						senderStateManager.setFileTransferData({
+							entries: (values?.files ?? [])?.map((v) => ({
 							file: v,
 							publicName: v.name,
-							sha512hash: "NIY",
-						}))
-					)
+							})),
+							untypedHeader: undefined,
+						})
 				}
 			}}
 			mutators={{
