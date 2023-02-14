@@ -23,7 +23,7 @@ const StateDisplay = () => {
 	if (!peerHelperState.isActive || peerHelperState.isClosed) {
 		return <Alert variant="info">Connectivity disabled</Alert>
 	} else if (peerHelperState.error) {
-		return <Alert variant="error">An error occurred</Alert> // TODO(teawithsand): run error explainer here
+		return <Alert variant="danger">An error occurred</Alert> // TODO(teawithsand): run error explainer here
 	} else if (!peerHelperState.isReady) {
 		return <Alert variant="info">Initializing...</Alert>
 	} else {
