@@ -13,9 +13,6 @@
 		"paths": {
 			"@app/*": ["*"]
 		},
-		"types": [
-			"DOM",
-		],
 		"resolveJsonModule": true,
 		"experimentalDecorators": true,
 		"downlevelIteration": true,
