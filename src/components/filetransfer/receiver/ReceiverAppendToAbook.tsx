@@ -37,30 +37,38 @@ export const ReceiverAppendToAbook = (props: {
 	)
 
 	const saveMutation = useMutation(
-		async (args: { files: File[]; abook: Abook }) => {
-			const { abook, files } = args
+		async (args: {
+			transferEntries: FileTransferEntry[]
+			abook: Abook
+		}) => {
+			const { abook, transferEntries } = args
 			const abookAccess = await app.abookDb.abookWriteAccess(abook.id)
 
 			try {
-				for (const f of files) {
-					await abookAccess.addInternalFile(f, (draft, newFileId) => {
-						const entry: FileEntry = {
-							id: generateUUID(),
-							metadata: {
-								name: f.name,
-								mime: "application/binary",
-								size: f.size,
-								disposition: null, // this is for overrides, by default use dynamic disposition
-								musicMetadata: null,
-							},
-							data: {
-								dataType: FileEntryType.INTERNAL_FILE,
-								internalFileId: newFileId,
-							},
-						}
+				for (const transferEntry of transferEntries) {
+					if (transferEntry.file.size === 0) return
+					
+					await abookAccess.addInternalFile(
+						transferEntry.file,
+						(draft, newFileId) => {
+							const entry: FileEntry = {
+								id: generateUUID(),
+								metadata: {
+									name: transferEntry.publicName,
+									mime: "application/binary",
+									size: transferEntry.file.size,
+									disposition: null, // this is for overrides, by default use dynamic disposition
+									musicMetadata: null,
+								},
+								data: {
+									dataType: FileEntryType.INTERNAL_FILE,
+									internalFileId: newFileId,
+								},
+							}
 
-						draft.entries.push(entry)
-					})
+							draft.entries.push(entry)
+						}
+					)
 				}
 			} finally {
 				abookAccess.release()
@@ -118,7 +126,7 @@ export const ReceiverAppendToAbook = (props: {
 							if (!pickedAbook) return
 							saveMutation.mutateAsync({
 								abook: pickedAbook,
-								files: props.entries.map((v) => v.file),
+								transferEntries: props.entries,
 							})
 						}}
 					>
