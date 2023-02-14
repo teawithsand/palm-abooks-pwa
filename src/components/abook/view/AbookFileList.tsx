@@ -11,10 +11,11 @@ import {
 } from "@teawithsand/tws-stl"
 import { Sortable } from "@teawithsand/tws-ui"
 import React, { useMemo } from "react"
-import { Button } from "react-bootstrap"
 import styled from "styled-components"
 
 const Parent = styled(List)``
+
+// TODO(teawithsand): refactor this to use subgrid
 
 const OuterContainer = styled.li`
 	display: grid;

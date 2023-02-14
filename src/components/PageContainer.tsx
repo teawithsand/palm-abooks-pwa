@@ -1,12 +1,10 @@
 import { Footer } from "@app/components/Footer"
 import { Navbar } from "@app/components/Navbar"
-import {
-	DialogBoundary,
-	ErrorBoundary,
-	LoadingSpinner,
-} from "@teawithsand/tws-stl-react"
+import { AppErrorBoundary } from "@app/components/boundary/error"
+import { AppLoadingBoundary } from "@app/components/boundary/loading"
+import { DialogBoundary } from "@teawithsand/tws-stl-react"
 import { ProvideFixedLanguage } from "@teawithsand/tws-trans"
-import React, { ReactNode, Suspense } from "react"
+import React, { ReactNode } from "react"
 import { Container } from "react-bootstrap"
 import styled, { createGlobalStyle, css } from "styled-components"
 
@@ -139,9 +137,9 @@ export const PageContainer = (
 	}
 
 	inner = (
-		<ErrorBoundary fallback={<>An error occurred</>}>
-			<Suspense fallback={<LoadingSpinner />}>{inner}</Suspense>
-		</ErrorBoundary>
+		<AppErrorBoundary>
+			<AppLoadingBoundary>{inner}</AppLoadingBoundary>
+		</AppErrorBoundary>
 	)
 
 	if (options.type !== PageContainerType.RAW)
