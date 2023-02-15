@@ -195,7 +195,7 @@ export const AbookView = (props: {
 						Play
 					</Button>
 					<LinkContainer to={abookDeletePath(abook.id)}>
-						<Button href="#" variant="danger" onClick={() => {}}>
+						<Button href="#" variant="danger">
 							Delete
 						</Button>
 					</LinkContainer>
