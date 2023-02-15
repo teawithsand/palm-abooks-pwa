@@ -31,6 +31,7 @@ export const Navbar = (props: {
 
 	return (
 		<Bar
+			sticky="top"
 			collapseOnSelect
 			expand="lg"
 			bg="dark"
