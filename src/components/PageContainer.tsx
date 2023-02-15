@@ -158,9 +158,7 @@ export const PageContainer = (
 	inner = (
 		<>
 			<GlobalStyle />
-			<ProvideFixedLanguage language="en-US">
-				<DialogBoundary>{inner}</DialogBoundary>
-			</ProvideFixedLanguage>
+			<DialogBoundary>{inner}</DialogBoundary>
 		</>
 	)
 

@@ -5,6 +5,7 @@ import { wrapNoSSR } from "@teawithsand/tws-stl-react"
 import { SSRProvider } from "react-bootstrap"
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
+import { ProvideFixedLanguage } from "@teawithsand/tws-trans"
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -23,10 +24,13 @@ const queryClient = new QueryClient({
 const InnerLayout = (props: { children: ReactNode }) => {
 	return (
 		<SSRProvider>
-			<DndProvider backend={HTML5Backend}> {/* TODO(teawithsand): auto backend switching for touch devices */}
-				<QueryClientProvider client={queryClient}>
-					{props.children}
-				</QueryClientProvider>
+			<DndProvider backend={HTML5Backend}>
+				{/* TODO(teawithsand): auto backend switching for touch devices */}
+				<ProvideFixedLanguage language="en-US">
+					<QueryClientProvider client={queryClient}>
+						{props.children}
+					</QueryClientProvider>
+				</ProvideFixedLanguage>
 			</DndProvider>
 		</SSRProvider>
 	)
