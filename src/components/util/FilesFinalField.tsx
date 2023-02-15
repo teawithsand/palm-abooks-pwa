@@ -25,10 +25,15 @@ export const FilesFinalField = (props: {
 	label?: string
 	name: string
 	disabled?: boolean
+	accept?: string | string[]
 }) => {
-	const { name, label, disabled = false } = props
+	const { name, label, disabled = false, accept: rawTypeSpec } = props
 	const app = useAppManager()
 	const stats = useStickySubscribable(app.storageSizeManager.storageStatsBus)
+
+	const typeSpec: string =
+		(typeof rawTypeSpec === "string" ? rawTypeSpec : rawTypeSpec?.join(",")) ??
+		abookFilesMimesAndExtensions.join(",")
 
 	return (
 		<>
@@ -46,7 +51,7 @@ export const FilesFinalField = (props: {
 					{({ input }) => {
 						return (
 							<Form.Control
-								accept={abookFilesMimesAndExtensions.join(",")}
+								accept={typeSpec || undefined}
 								type="file"
 								disabled={disabled}
 								{...{

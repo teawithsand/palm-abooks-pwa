@@ -11,6 +11,7 @@ export interface AppPaths extends Paths {
 	abookManagementPath: string
 	storageInfoPath: string
 	versionPath: string
+	playerPlayLocal: string
 
 	abookShowPath: (id: string) => string
 	abookEditMetadataPath: (id: string) => string
@@ -58,6 +59,7 @@ const paths: AppPaths = {
 	playerUiPath: "/player",
 	playerPlaylistPath: "/player/playlist",
 	playerOptionsPath: "/player/options",
+	playerPlayLocal: "/player/play-local"
 }
 
 const config: UseLanguagePrefixedPathsConfig = {
