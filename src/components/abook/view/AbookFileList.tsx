@@ -1,8 +1,6 @@
 import { ConstSizeNumber } from "@app/components/util/ConstSizeNumber"
 import { List } from "@app/components/util/List"
-import { FileEntry } from "@app/domain/defines/abookFile"
 import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
-import { makeFileEntryShowData } from "@app/domain/ui/fileEntry"
 import { useAppTranslationSelector } from "@app/trans/AppTranslation"
 import { isTimeNumber } from "@teawithsand/tws-player"
 import {

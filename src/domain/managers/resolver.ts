@@ -1,4 +1,5 @@
-import { FileEntry, FileEntryType } from "@app/domain/defines/abookFile"
+import { FileEntryType } from "@app/domain/defines/abookFile"
+import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
 import {
 	PlayableEntry,
 	PlayableEntryType,
@@ -25,15 +26,15 @@ export class FilePlayerSourceResolver extends BasePlayerSourceResolver<
 	}
 }
 
-export class FileEntryPlayerSourceResolver extends BasePlayerSourceResolver<FileEntry> {
+export class FileEntryPlayerSourceResolver extends BasePlayerSourceResolver<FileEntryEntity> {
 	constructor(public readonly database: AbookDb) {
 		super()
 	}
 
 	protected extractData(
-		source: FileEntry
+		source: FileEntryEntity
 	): BasePlayerSourceResolverExtractedData {
-		const { data } = source
+		const { content: data } = source
 		if (data.dataType === FileEntryType.INTERNAL_FILE) {
 			return {
 				id: source.id,

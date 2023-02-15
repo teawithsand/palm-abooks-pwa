@@ -1,5 +1,4 @@
 import { AbookSmallCard } from "@app/components/abook/list/AbookSmallCard"
-import { Abook } from "@app/domain/defines/abook"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import React from "react"
 import styled from "styled-components"

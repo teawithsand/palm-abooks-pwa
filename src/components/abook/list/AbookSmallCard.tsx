@@ -1,12 +1,7 @@
-import { Abook } from "@app/domain/defines/abook"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import { useFileEntryEntityUrl } from "@app/domain/defines/entity/fileEntryHook"
 import { useAppManager } from "@app/domain/managers/app"
-import {
-	DEFAULT_IMAGE_COVER_URL,
-	useAbookShowData,
-	useImageFileEntryUrl,
-} from "@app/domain/ui/abook"
+import { DEFAULT_IMAGE_COVER_URL } from "@app/domain/ui/abook"
 import { useAppPaths } from "@app/paths"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import { Link } from "gatsby"

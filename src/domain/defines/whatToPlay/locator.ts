@@ -1,4 +1,4 @@
-import { Abook, AbookId } from "@app/domain/defines/abook"
+import { AbookId } from "@app/domain/defines/abook"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 
 export enum WhatToPlayLocatorType {

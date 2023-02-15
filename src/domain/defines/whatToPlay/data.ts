@@ -1,10 +1,6 @@
-import { Abook } from "@app/domain/defines/abook"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import { PlayableEntry } from "@app/domain/defines/player/playableEntry"
-import {
-	PositionVariants,
-	SavedPositionVariants,
-} from "@app/domain/defines/position"
+import { SavedPositionVariants } from "@app/domain/defines/position"
 import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { PlayableEntriesBag } from "@app/domain/managers/playableEntriesBag"
 import { MetadataBag } from "@teawithsand/tws-player"

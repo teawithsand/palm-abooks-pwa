@@ -1,31 +1,28 @@
-import { Abook, AbookId } from "@app/domain/defines/abook"
+import { AbookId } from "@app/domain/defines/abook"
 import Dexie, { Table } from "dexie"
 
 import { FileEntryType } from "@app/domain/defines/abookFile"
 import {
+	AbookEntity,
+	AbookEntityData,
+	StoredAbookEntity,
+} from "@app/domain/defines/entity/abook"
+import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
+import {
 	InternalFile,
 	InternalFileOwnerDataType,
 } from "@app/domain/defines/externalFile"
+import { FilePlayerSourceResolver } from "@app/domain/managers/resolver"
+import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
+import { loadMetadataToResultHack } from "@app/util/metadataLoadingResult"
+import { DefaultMetadataLoader } from "@teawithsand/tws-player"
 import {
-	generateUUID,
 	GLOBAL_WEB_KEYED_LOCKS,
 	MiddlewareKeyedLocks,
+	generateUUID,
 	throwExpression,
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
-import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
-import {
-	AbookEntityData,
-	AbookEntity,
-	StoredAbookEntity,
-} from "@app/domain/defines/entity/abook"
-import {
-	DefaultMetadataLoader,
-	MetadataLoadingResult,
-} from "@teawithsand/tws-player"
-import { FilePlayerSourceResolver } from "@app/domain/managers/resolver"
-import { loadMetadataToResultHack } from "@app/util/metadataLoadingResult"
-import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
 
 export const AbookDbLock = new MiddlewareKeyedLocks(
 	GLOBAL_WEB_KEYED_LOCKS,

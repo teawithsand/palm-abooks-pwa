@@ -1,4 +1,4 @@
-import { FileEntryDisposition, FileEntry } from "@app/domain/defines/abookFile"
+import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 
 export const guessDisposition = (data: {
 	mime: string
@@ -26,20 +26,3 @@ export const guessFileDisposition = (file: File) =>
 		mime: file.type,
 		name: file.name,
 	})
-
-/**
- * @deprecated to be replaced with new entity design
- */
-export const guessFileEntryDisposition = (
-	entry: FileEntry
-): FileEntryDisposition =>
-	guessDisposition({
-		name: entry.metadata.name,
-		mime: entry.metadata.mime ?? "",
-	})
-
-/**
- * @deprecated to be replaced with new entity design
- */
-export const getFileEntryDisposition = (e: FileEntry): FileEntryDisposition =>
-	e.metadata.disposition ?? guessFileEntryDisposition(e)
