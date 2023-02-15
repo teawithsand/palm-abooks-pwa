@@ -9,7 +9,8 @@ import {
 } from "@teawithsand/tws-trans"
 
 export interface CommonTranslationInfo {
-	autorPageLink: string
+	autorPageUrl: string
+	authorContactUrl: string
 }
 
 export interface AppTranslation {
@@ -45,6 +46,7 @@ export interface AppTranslation {
 		miscHelpDropdown: {
 			title: string
 			storageInfo: string
+			versionAuthorInfo: string
 		}
 	}
 }

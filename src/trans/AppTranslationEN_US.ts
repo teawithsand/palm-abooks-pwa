@@ -5,7 +5,8 @@ import { readCommonConfig } from "@teawithsand/tws-trans"
 const AppTranslationEN_US: AppTranslation = {
 	config: readCommonConfig(),
 	info: {
-		autorPageLink: "https://teawithsand.com",
+		autorPageUrl: "https://teawithsand.com",
+		authorContactUrl: "https://teawithsand.com/contact",
 	},
 	abook: {
 		formatFileEntryDisposition: (disposition) => {
@@ -36,6 +37,7 @@ const AppTranslationEN_US: AppTranslation = {
 		miscHelpDropdown: {
 			title: "Help/Misc",
 			storageInfo: "Storage info",
+			versionAuthorInfo: "Version / Author / Credits",
 		},
 		pageTitle: "PalmABooks PWA",
 		homePage: "Home",

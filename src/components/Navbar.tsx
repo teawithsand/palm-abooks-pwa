@@ -23,6 +23,7 @@ export const Navbar = (props: {
 		abookAddLocalPath: localAddABookPath,
 		playerUiPath: playerPath,
 		storageInfoPath,
+		versionPath,
 		playerPlaylistPath,
 		playerOptionsPath,
 		sendFilesPath: sendLocalFilesPath,
@@ -131,6 +132,14 @@ export const Navbar = (props: {
 							<LinkContainer to={storageInfoPath}>
 								<NavDropdown.Item>
 									{translations.miscHelpDropdown.storageInfo}
+								</NavDropdown.Item>
+							</LinkContainer>
+							<LinkContainer to={versionPath}>
+								<NavDropdown.Item>
+									{
+										translations.miscHelpDropdown
+											.versionAuthorInfo
+									}
 								</NavDropdown.Item>
 							</LinkContainer>
 						</NavDropdown>
