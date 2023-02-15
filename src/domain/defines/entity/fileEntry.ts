@@ -99,13 +99,22 @@ export class FileEntryEntity {
 	}
 
 	get dispositionOrGuess(): FileEntryDisposition {
-		return (
-			this.disposition ??
-			guessDisposition({
-				mime: this.mime ?? "",
-				name: this.name,
-			})
-		)
+		if (this.content.dataType === FileEntryContentType.URL) {
+			return (
+				this.disposition ??
+				guessDisposition({
+					url: this.content.url,
+				})
+			)
+		} else {
+			return (
+				this.disposition ??
+				guessDisposition({
+					mime: this.mime ?? "",
+					name: this.name,
+				})
+			)
+		}
 	}
 
 	get musicMetadataLoadingResult() {
