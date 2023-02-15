@@ -1,7 +1,9 @@
 import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 import { AppTranslation } from "@app/trans/AppTranslation"
+import { readCommonConfig } from "@teawithsand/tws-trans"
 
 const AppTranslationEN_US: AppTranslation = {
+	config: readCommonConfig(),
 	info: {
 		autorPageLink: "https://teawithsand.com",
 	},
@@ -21,6 +23,7 @@ const AppTranslationEN_US: AppTranslation = {
 			addLocalABook: "Add ABook from local device",
 			listABooks: "List ABooks",
 			managementPanel: "ABook management panel",
+			sendLocalFiles: "Send local files",
 		},
 		playerDropdown: {
 			title: "Player",

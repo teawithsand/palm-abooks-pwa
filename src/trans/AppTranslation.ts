@@ -1,6 +1,7 @@
 import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 import AppTranslationEN_US from "@app/trans/AppTranslationEN_US"
 import {
+	CommonConfig,
 	createTranslatorContext,
 	Language,
 	makeTranslationHooks,
@@ -12,6 +13,7 @@ export interface CommonTranslationInfo {
 }
 
 export interface AppTranslation {
+	config: CommonConfig
 	info: CommonTranslationInfo
 	error: {
 		unknown: string
@@ -39,15 +41,15 @@ export interface AppTranslation {
 	}
 }
 
-const translations = new Map<Language, AppTranslation>()
+const translations = new Map<Language, () => AppTranslation>()
 
-translations.set("en-US", AppTranslationEN_US)
+translations.set("en-US", () => AppTranslationEN_US)
 
-export const TranslatorContext = createTranslatorContext<AppTranslation>(
+export const TranslatorContext = createTranslatorContext<AppTranslation, void>(
 	new Translator(translations, "en-US")
 )
 
-const hooks = makeTranslationHooks(TranslatorContext)
+const hooks = makeTranslationHooks(TranslatorContext, () => undefined)
 
 export const useAppTranslation = hooks.useTranslation
 export const useAppTranslationSelector = hooks.useTranslationSelector
