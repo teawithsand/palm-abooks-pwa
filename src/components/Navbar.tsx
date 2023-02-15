@@ -82,6 +82,23 @@ export const Navbar = (props: {
 									}
 								</NavDropdown.Item>
 							</LinkContainer>
+							<NavDropdown.Divider />
+							<LinkContainer to={receiveFilesPath}>
+								<NavDropdown.Item>
+									{
+										translations.abookLibraryDropdown
+											.receiveFiles
+									}
+								</NavDropdown.Item>
+							</LinkContainer>
+							<LinkContainer to={sendLocalFilesPath}>
+								<NavDropdown.Item>
+									{
+										translations.abookLibraryDropdown
+											.sendFiles
+									}
+								</NavDropdown.Item>
+							</LinkContainer>
 						</NavDropdown>
 
 						<NavDropdown
@@ -93,38 +110,27 @@ export const Navbar = (props: {
 									{translations.playerDropdown.playerUi}
 								</NavDropdown.Item>
 							</LinkContainer>
-							<NavDropdown.Item
-								onClick={() => {
-									navigate(playerPlaylistPath)
-								}}
-							>
-								Playlist
-							</NavDropdown.Item>
+							<LinkContainer to={playerPlaylistPath}>
+								<NavDropdown.Item>
+									{translations.playerDropdown.playlist}
+								</NavDropdown.Item>
+							</LinkContainer>
 							<NavDropdown.Item
 								onClick={() => {
 									navigate(playerOptionsPath)
 								}}
 							>
-								Options
+								{translations.playerDropdown.options}
 							</NavDropdown.Item>
 						</NavDropdown>
 
-						<NavDropdown title={"Misc"} align={"end"}>
+						<NavDropdown
+							title={translations.miscHelpDropdown.title}
+							align={"end"}
+						>
 							<LinkContainer to={storageInfoPath}>
 								<NavDropdown.Item>
-									Storage info
-								</NavDropdown.Item>
-							</LinkContainer>
-						</NavDropdown>
-						<NavDropdown title={"Transfer"} align={"end"}>
-							<LinkContainer to={receiveFilesPath}>
-								<NavDropdown.Item>
-									Receive files
-								</NavDropdown.Item>
-							</LinkContainer>
-							<LinkContainer to={sendLocalFilesPath}>
-								<NavDropdown.Item>
-									Send local files
+									{translations.miscHelpDropdown.storageInfo}
 								</NavDropdown.Item>
 							</LinkContainer>
 						</NavDropdown>

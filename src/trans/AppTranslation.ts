@@ -30,13 +30,21 @@ export interface AppTranslation {
 			managementPanel: string
 			addLocalABook: string
 			listABooks: string
-			sendLocalFiles: string
+			sendFiles: string
+			receiveFiles: string
 		}
 
 		playerDropdown: {
 			title: string
 			playLocal: string
 			playerUi: string
+			playlist: string
+			options: string
+		}
+
+		miscHelpDropdown: {
+			title: string
+			storageInfo: string
 		}
 	}
 }
