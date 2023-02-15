@@ -46,14 +46,13 @@ const AppInfoPage = () => {
 				<h3>About me & project</h3>
 				<p>
 					Long story short, they call me Teawithsand. I have a blog at{" "}
-					<a href={info.autorPageUrl}>teawithsand.com</a>.
+					<a href={info.autorPageUrl}>teawithsand.com</a>
 				</p>
 				<p>
 					For contact info go to{" "}
 					<a href={info.authorContactUrl}>
 						https://teawithsand.com/contact
 					</a>
-					.
 				</p>
 				<p>
 					Right now this app is free and ad free, so please enjoy
