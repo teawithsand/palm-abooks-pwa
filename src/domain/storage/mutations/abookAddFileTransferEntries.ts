@@ -1,7 +1,7 @@
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import { FileTransferEntry } from "@app/domain/filetransfer"
 import { useAppManager } from "@app/domain/managers/app"
-import { UseMutationOptions, useMutation } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 
 export interface AbookAddFileTransferEntityMutationArgs {
 	transferEntries: FileTransferEntry[]
