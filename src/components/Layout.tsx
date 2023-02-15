@@ -6,6 +6,7 @@ import { SSRProvider } from "react-bootstrap"
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 import { ProvideFixedLanguage } from "@teawithsand/tws-trans"
+import { RawLocation, wrapLocationProvider } from "@app/util/useLocation"
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -21,7 +22,7 @@ const queryClient = new QueryClient({
 	},
 })
 
-const InnerLayout = (props: { children: ReactNode }) => {
+const InnerLayout = (props: { children: ReactNode; location: RawLocation }) => {
 	return (
 		<SSRProvider>
 			<DndProvider backend={HTML5Backend}>
@@ -36,4 +37,4 @@ const InnerLayout = (props: { children: ReactNode }) => {
 	)
 }
 
-export const Layout = wrapNoSSR(InnerLayout)
+export const Layout = wrapNoSSR(wrapLocationProvider(InnerLayout))
