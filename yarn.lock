@@ -2376,11 +2376,12 @@
     html5-qrcode "^2.3.4"
     qrcode "^1.5.1"
 
-"@teawithsand/tws-stl-react@^0.0.1":
-  version "0.0.1"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl-react/-/tws-stl-react-0.0.1.tgz"
-  integrity sha512-lecF4hC9l5OWZfnXseU1zab84EnwLwhtTdCrJ1ohY3M7yoddF8LgZ37LnlEAw/Js398aEivb+OnbryQ8Dq9/6w==
+"@teawithsand/tws-stl-react@^0.0.4":
+  version "0.0.4"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl-react/-/tws-stl-react-0.0.4.tgz#6bdd63b00d9f186726c38eaf14a91222539743c2"
+  integrity sha512-R52UKQy9nKuNfZtcLEt3uPgcs+vVL0zeJ61gtHVHt/bysD5AXIfIb9zu4LGsz4NZCzHsn2ELdvpKvZV91bWRog==
   dependencies:
+    "@teawithsand/tws-stl" "^0.0.9"
     react-error-boundary "^3.1.4"
 
 "@teawithsand/tws-stl-react@^0.0.5":
@@ -2401,11 +2402,6 @@
   resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.18.tgz"
   integrity sha512-jkEsGb1ZZw4LmK+IoFNggepjadT1+z0/tYl3zHxTABlv6iaHj7JVdOhx6vSfu7gShY6602Ao8h4lKiHFoHSD8Q==
 
-"@teawithsand/tws-stl@^0.0.2":
-  version "0.0.2"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.2.tgz"
-  integrity sha512-H7JB1DAeczZOyj0aFSp7qE67E42KQNvsZH3nszzDwTR38LKtOS9cyshN3MKRZBUO5JsoV/a/cStvbhl2PIDV6Q==
-
 "@teawithsand/tws-stl@^0.0.21":
   version "0.0.21"
   resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.21.tgz#4db76e54180894689acfd1221bc91655284a3204"
@@ -2416,13 +2412,13 @@
   resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.9.tgz"
   integrity sha512-pGJuL4mJjI+3E/iPnvewjNUOLtSmR7T977hzGDRG8oFKg5mwjV7pV7AyFCz6USzN6tipKx2TliHh7QwxS6I6+g==
 
-"@teawithsand/tws-trans@^0.0.2":
-  version "0.0.2"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-trans/-/tws-trans-0.0.2.tgz"
-  integrity sha512-oZr70+hUa5Hfl7Jp2UY1SWEvP2mhujaPjYyouYYJUAkyHpbkf82ufm0vO6q92oBCYBRkEHArgfjSYli/Z4jPhQ==
+"@teawithsand/tws-trans@^0.1.3":
+  version "0.1.3"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-trans/-/tws-trans-0.1.3.tgz#1645ec57c1295b685293ae50a0842185100bd2d5"
+  integrity sha512-M9UoZXUPHn4JKrmOYYz41CD+UvnojPaKlcmDJfZGN77wZYMwa74RUDghHOte+xQm8WtzOrGFfJgxGn8fV+96Qw==
   dependencies:
-    "@teawithsand/tws-stl" "^0.0.2"
-    "@teawithsand/tws-stl-react" "^0.0.1"
+    "@teawithsand/tws-stl" "^0.0.9"
+    "@teawithsand/tws-stl-react" "^0.0.4"
 
 "@teawithsand/tws-ui@^0.0.10":
   version "0.0.10"
@@ -9958,19 +9954,9 @@ react-side-effect@^2.1.0:
   resolved "http://verdaccio:4873/react-side-effect/-/react-side-effect-2.1.2.tgz"
   integrity sha512-PVjOcvVOyIILrYoyGEpDN3vmYNLdy1CajSFNt4TDsVQC5KpTijDvWVoR+/7Rz2xT978D8/ZtFceXxzsPwZEDvw==
 
-react-transition-group@^4.4.2:
+react-transition-group@^4.4.2, react-transition-group@^4.4.5:
   version "4.4.5"
   resolved "http://verdaccio:4873/react-transition-group/-/react-transition-group-4.4.5.tgz"
-  integrity sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==
-  dependencies:
-    "@babel/runtime" "^7.5.5"
-    dom-helpers "^5.0.1"
-    loose-envify "^1.4.0"
-    prop-types "^15.6.2"
-
-react-transition-group@^4.4.5:
-  version "4.4.5"
-  resolved "http://verdaccio:4873/react-transition-group/-/react-transition-group-4.4.5.tgz#e53d4e3f3344da8521489fbef8f2581d42becdd1"
   integrity sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==
   dependencies:
     "@babel/runtime" "^7.5.5"
