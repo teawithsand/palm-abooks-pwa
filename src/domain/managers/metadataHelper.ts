@@ -46,8 +46,6 @@ export class MetadataLoading {
 		private readonly entries: PlayableEntry[],
 		private readonly loader: DefaultMetadataLoader<PlayableEntry>
 	) {
-		this.init()
-
 		this.innerBus = new DefaultStickyEventBus<{
 			bag: MetadataBag
 			doneEntries: number
@@ -57,6 +55,8 @@ export class MetadataLoading {
 			doneEntries: 0,
 			done: false,
 		})
+
+		this.init()
 	}
 	get bus(): StickySubscribable<{
 		bag: MetadataBag
