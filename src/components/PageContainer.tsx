@@ -38,7 +38,8 @@ const PageNavbar = styled(Navbar)`
 const PageTitle = styled.h1`
 	grid-row: r-title;
 
-	margin-top: 1.5em;
+	margin-top: 1em;
+	margin-bottom: 1em;
 	text-align: center;
 `
 
