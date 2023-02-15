@@ -3,7 +3,6 @@ import { Navbar } from "@app/components/Navbar"
 import { AppErrorBoundary } from "@app/components/boundary/error"
 import { AppLoadingBoundary } from "@app/components/boundary/loading"
 import { DialogBoundary } from "@teawithsand/tws-stl-react"
-import { ProvideFixedLanguage } from "@teawithsand/tws-trans"
 import React, { ReactNode } from "react"
 import { Container } from "react-bootstrap"
 import styled, { createGlobalStyle, css } from "styled-components"
@@ -55,7 +54,7 @@ const InnerPageContainer = styled(Container)`
 
 const PageBody = (props: {
 	children?: ReactNode
-	title?: string
+	title?: string | null
 	hasContainer?: boolean
 	isFixedHeight?: boolean
 	hasFooter?: boolean
@@ -67,7 +66,9 @@ const PageBody = (props: {
 			$hasTitle={!!props.title}
 		>
 			{props.hasNavbar ? <PageNavbar /> : null}
-			{!!props.title ? <PageTitle>{props.title}</PageTitle> : null}
+			{props.title === null ? null : (
+				<PageTitle>{props.title || ""}</PageTitle>
+			)}
 			{props.hasContainer ? (
 				<InnerPageContainer>{props.children}</InnerPageContainer>
 			) : (
@@ -96,6 +97,7 @@ export enum PageContainerType {
 	NORMAL = 0,
 	FIXED_HEIGHT = 1,
 	RAW = 2,
+	NORMAL_NO_TOP_PADDING = 3,
 }
 
 export type PageContainerProps = {
@@ -112,6 +114,9 @@ export type PageContainerProps = {
 	| {
 			type: PageContainerType.RAW
 	  }
+	| {
+			type: PageContainerType.NORMAL_NO_TOP_PADDING
+	  }
 )
 
 export const PageContainer = (
@@ -127,8 +132,11 @@ export const PageContainer = (
 	let inner = options.children
 	let title = undefined
 	if (options.type === PageContainerType.NORMAL) {
-		title = options.title
+		title = options.title || ""
+	} else if (options.type === PageContainerType.NORMAL_NO_TOP_PADDING) {
+		title = null
 	} else if (options.type === PageContainerType.FIXED_HEIGHT) {
+		title = null
 		inner = (
 			<>
 				<FixedBodyGlobalStyle />
