@@ -1,5 +1,8 @@
 import { PlayableEntryType } from "@app/domain/defines/player/playableEntry"
-import { AbsoluteSeekResolutionData, RelativeSeekResolutionData } from "@app/domain/defines/player/seek"
+import {
+	AbsoluteSeekResolutionData,
+	RelativeSeekResolutionData,
+} from "@app/domain/defines/player/seek"
 import {
 	Position,
 	PositionType,
@@ -77,7 +80,10 @@ export class PositionAndSeekDataResolver {
 		}
 
 		if (sd.type === SeekType.ABSOLUTE_TO_FILE) {
-			return sd
+			return {
+				playableEntryId: sd.playableEntryId,
+				positionMs: sd.positionMs,
+			}
 		} else if (sd.type === SeekType.ABSOLUTE_IN_FILE) {
 			if (data.currentSourceKey === null) return null
 
