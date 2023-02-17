@@ -8,11 +8,7 @@ import { DEFAULT_IMAGE_COVER_URL } from "@app/domain/ui/abook"
 import { useAppPaths } from "@app/paths"
 import { LinkContainer } from "@app/util/LinkContainer"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
-import {
-	BREAKPOINT_MD,
-	BREAKPOINT_SM,
-	breakpointMediaDown,
-} from "@teawithsand/tws-stl-react"
+import { BREAKPOINT_SM, breakpointMediaDown } from "@teawithsand/tws-stl-react"
 import { navigate } from "gatsby"
 import React from "react"
 import { Button } from "react-bootstrap"
@@ -128,10 +124,6 @@ const ActionsList = styled.div`
 
 	& > * {
 		flex: 1 0 32%;
-
-		@media ${breakpointMediaDown(BREAKPOINT_MD)} {
-			flex: 1 0 100%;
-		}
 	}
 `
 
@@ -179,9 +171,6 @@ export const AbookView = (props: {
 					alt="Abook cover image"
 				/>
 				<ActionsList>
-					<LinkContainer to={abookEditMetadataPath(abook.id)}>
-						<Button href="#">Edit metadata</Button>
-					</LinkContainer>
 					<Button
 						variant="success"
 						onClick={() => {
@@ -194,11 +183,7 @@ export const AbookView = (props: {
 					>
 						Play
 					</Button>
-					<LinkContainer to={abookDeletePath(abook.id)}>
-						<Button href="#" variant="danger">
-							Delete
-						</Button>
-					</LinkContainer>
+
 					<LinkContainer to={abookReorderEntriesPath(abook.id)}>
 						<Button href="#">Reorder files</Button>
 					</LinkContainer>
@@ -207,9 +192,18 @@ export const AbookView = (props: {
 							Add files from local machine
 						</Button>
 					</LinkContainer>
+					<LinkContainer to={abookEditMetadataPath(abook.id)}>
+						<Button href="#">Edit metadata</Button>
+					</LinkContainer>
+
 					<LinkContainer to={abookEntriesDeletePath(abook.id)}>
 						<Button variant="danger" href="#">
 							Remove some entries
+						</Button>
+					</LinkContainer>
+					<LinkContainer to={abookDeletePath(abook.id)}>
+						<Button href="#" variant="danger">
+							Delete
 						</Button>
 					</LinkContainer>
 				</ActionsList>
