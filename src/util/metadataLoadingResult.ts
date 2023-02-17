@@ -1,4 +1,6 @@
+import { FilePlayerSourceResolver } from "@app/domain/managers/resolver"
 import {
+	DefaultMetadataLoader,
 	MetadataLoader,
 	MetadataLoadingResult,
 	MetadataLoadingResultType,
@@ -9,7 +11,7 @@ import {
 
 /**
  * Loads metadata from loader to MetadataLoadingResult.
- * 
+ *
  * It never throws.
  */
 export const loadMetadataToResultHack = async <T>(
@@ -28,4 +30,16 @@ export const loadMetadataToResultHack = async <T>(
 			error: String(e) || "Unknown error",
 		}
 	}
+}
+
+export const loadBlobMetadataUtil = async (
+	blob: Blob
+): Promise<MetadataLoadingResult> => {
+	const metadataLoader = new DefaultMetadataLoader(
+		new FilePlayerSourceResolver()
+	)
+	// Please note that this has to be done OUTSIDE addInternalFile callback, as it must be synchronous/await only
+	// db promises
+	const metadata = await loadMetadataToResultHack(metadataLoader, blob)
+	return metadata
 }

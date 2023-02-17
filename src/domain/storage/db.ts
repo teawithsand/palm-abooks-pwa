@@ -12,10 +12,7 @@ import {
 	InternalFile,
 	InternalFileOwnerDataType,
 } from "@app/domain/defines/externalFile"
-import { FilePlayerSourceResolver } from "@app/domain/managers/resolver"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
-import { loadMetadataToResultHack } from "@app/util/metadataLoadingResult"
-import { DefaultMetadataLoader } from "@teawithsand/tws-player"
 import {
 	GLOBAL_WEB_KEYED_LOCKS,
 	MiddlewareKeyedLocks,
@@ -181,20 +178,13 @@ export class AbookWriteAccess {
 			entry: FileEntryEntity
 		) => void
 	) => {
-		const metadataLoader = new DefaultMetadataLoader(
-			new FilePlayerSourceResolver()
-		)
-		// Please note that this has to be done OUTSIDE addInternalFile callback, as it must be synchronous/await only
-		// db promises
-		const metadata = await loadMetadataToResultHack(metadataLoader, blob)
-
-		this.addInternalFile(blob, (draft, newFileId) => {
+		await this.addInternalFile(blob, (draft, newFileId) => {
 			const entry = new FileEntryEntity(
 				{
 					id: generateUUID(),
 					disposition: null,
 					mime: blob.type,
-					musicMetadata: metadata,
+					musicMetadata: null,
 					name,
 					size: blob.size,
 				},
