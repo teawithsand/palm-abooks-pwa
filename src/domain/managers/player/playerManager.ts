@@ -367,7 +367,7 @@ export class PlayerManager {
 			this.onNewWhatToPlayDataSet(newWhatToPlayData)
 		} else {
 			if (
-				!this.isWhatToPlayDataSame(oldWhatToPlayData, newWhatToPlayData)
+				this.isWhatToPlayDataSame(oldWhatToPlayData, newWhatToPlayData)
 			) {
 				this.onWhatToPlayDataSameSourcesOverride(newWhatToPlayData)
 			} else {
