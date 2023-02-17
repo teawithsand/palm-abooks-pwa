@@ -2358,13 +2358,13 @@
     "@teawithsand/tws-stl" "^0.0.18"
     peerjs "^1.4.7"
 
-"@teawithsand/tws-player@^0.1.2":
-  version "0.1.2"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.1.2.tgz"
-  integrity sha512-DkPzkPXqsSUZbqsWociiVgWzXHYDXbqKAta4cstjkJ/nt2/Nt5pra/5pyIhYaRqe851GvkmCpAwxh2f2TnmfZg==
+"@teawithsand/tws-player@^0.1.4-np":
+  version "0.1.4-np"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.1.4-np.tgz#85c4c035f4b85711ecb19ee105c5af843d0cf675"
+  integrity sha512-7ZV76K09YDtNJZZB/TNXHo0hoKyHrYybeFHhTnTfT2MJauSE6pxNTO9EmXCDLEVJjPP1AqyJwJiWl0/8l+O3uQ==
   dependencies:
     "@teawithsand/jsmediatags" "^3.9.1008"
-    "@teawithsand/tws-stl" "^0.0.9"
+    "@teawithsand/tws-stl" "^0.0.23"
     immer "^9.0.15"
 
 "@teawithsand/tws-qr@^0.0.2":
@@ -2406,6 +2406,11 @@
   version "0.0.21"
   resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.21.tgz#4db76e54180894689acfd1221bc91655284a3204"
   integrity sha512-YKwavHCIAENHgm/2wV3FdPQ3wUO6ICVuUWr50MOvn3dJ+KDGqm4JtKfpCtbThPPAkwtq5TtTkJHMazINRW+RFg==
+
+"@teawithsand/tws-stl@^0.0.23":
+  version "0.0.23"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.23.tgz#38ac5409a4d598c23f70122e5272c3fb021b247a"
+  integrity sha512-RqnWTTlfS9yXGMlFAlbM0GteJKBWyfbQtfulJhvxh/3ddm2vw6pB1uLnmFsgCtqCkI085YZU4V1HehUufnFfTg==
 
 "@teawithsand/tws-stl@^0.0.9":
   version "0.0.9"
