@@ -4,6 +4,7 @@ import {
 	TrivialSeekData,
 } from "@app/domain/defines/seek"
 import { PlayerEntry } from "@app/domain/managers/newPlayer/source/entry"
+import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/source/source"
 import { MetadataBag } from "@teawithsand/tws-player"
 
 export class PlayerEntriesBag {
@@ -20,6 +21,20 @@ export class PlayerEntriesBag {
 
 	get isEmpty() {
 		return this.entries.length === 0
+	}
+
+	/**
+	 * Finds first source, which has is FileEntryEntityPlayerSource and has id equal to given one.
+	 */
+	findByFileEntryEntityId = (id: string): PlayerEntry | null => {
+		return (
+			this.entries.find((e) => {
+				if (e.source instanceof FileEntryEntityPlayerSource) {
+					return e.source.entry.id === id
+				}
+				return false
+			}) ?? null
+		)
 	}
 
 	findByIndex = (i: number): PlayerEntry | null => this.entries[i] ?? null

@@ -74,14 +74,19 @@ export class PlayerEntryListManager {
 	unsetList = () => {
 		this.setList(
 			new DefaultPlayerEntryList(),
+			null,
 			new PlayerEntryListMetadata({
 				type: PlayerEntryListMetadataType.UNKNOWN,
 			})
 		)
 	}
 
-	setList = (list: PlayerEntryList, metadata?: PlayerEntryListMetadata) => {
-		this.innerSetList(list, null, metadata)
+	setList = (
+		list: PlayerEntryList,
+		entryId: string | null = null,
+		metadata: PlayerEntryListMetadata | undefined = undefined
+	) => {
+		this.innerSetList(list, entryId, metadata)
 	}
 
 	goToNext = () => {

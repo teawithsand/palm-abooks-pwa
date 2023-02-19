@@ -31,6 +31,19 @@ export class PlayerEntry {
 		return null
 	}
 
+	/**
+	 * Returns file name of given PlayerEntry, if any.
+	 * 
+	 * Used for loading position by fileName.
+	 */
+	get fileName(): string | null {
+		if (this.source instanceof FileEntryEntityPlayerSource) {
+			return this.source.entry.name
+		}
+
+		return null
+	}
+
 	get displayName(): string {
 		if (this.source instanceof FileEntryEntityPlayerSource) {
 			return this.source.entry.name
