@@ -74,7 +74,7 @@ export class PlayerActionManager {
 		if (seekData.type === SeekType.ABSOLUTE_IN_FILE) {
 			this.localSeek(seekData.positionMs)
 		} else if (seekData.type === SeekType.ABSOLUTE_TO_FILE) {
-			this.jump(seekData.playableEntryId, seekData.positionMs)
+			this.jump(seekData.playerEntryId, seekData.positionMs)
 		} else if (seekData.type === SeekType.RELATIVE_GLOBAL) {
 			this.globalRelativeSeek(seekData.positionDeltaMs)
 		} else if (seekData.type === SeekType.RELATIVE_IN_FILE) {
