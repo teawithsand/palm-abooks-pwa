@@ -20,7 +20,7 @@
     "@tanstack/react-query": "^4.14.5",
     "@teawithsand/tws-gatsby-plugin": "^0.0.9",
     "@teawithsand/tws-peer": "^0.2.2-b1",
-    "@teawithsand/tws-player": "^0.1.4-np",
+    "@teawithsand/tws-player": "^0.1.4-np-b1",
     "@teawithsand/tws-qr": "^0.0.2",
     "@teawithsand/tws-stl": "^0.0.21",
     "@teawithsand/tws-stl-react": "^0.0.5",

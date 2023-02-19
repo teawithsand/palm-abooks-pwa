@@ -2358,10 +2358,10 @@
     "@teawithsand/tws-stl" "^0.0.18"
     peerjs "^1.4.7"
 
-"@teawithsand/tws-player@^0.1.4-np":
-  version "0.1.4-np"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.1.4-np.tgz#85c4c035f4b85711ecb19ee105c5af843d0cf675"
-  integrity sha512-7ZV76K09YDtNJZZB/TNXHo0hoKyHrYybeFHhTnTfT2MJauSE6pxNTO9EmXCDLEVJjPP1AqyJwJiWl0/8l+O3uQ==
+"@teawithsand/tws-player@^0.1.4-np-b1":
+  version "0.1.4-np-b1"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-player/-/tws-player-0.1.4-np-b1.tgz#ef0284ca99c42009a449829126ad7a2d61296a77"
+  integrity sha512-o8bgToUIzcPafyMM8LKGN5sAyv5dZT8V095gFtDdzx7Hme8+Yw0xKnmY6AvXNGj/QrIA59i0fw1MCce3zFXemA==
   dependencies:
     "@teawithsand/jsmediatags" "^3.9.1008"
     "@teawithsand/tws-stl" "^0.0.23"
