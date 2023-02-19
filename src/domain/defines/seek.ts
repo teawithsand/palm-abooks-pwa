@@ -7,8 +7,7 @@ export enum SeekType {
 	RELATIVE_GLOBAL = 4,
 	RELATIVE_IN_FILE = 5,
 }
-
-export type SeekData =
+export type AbsoluteSeekData =
 	| {
 			type: SeekType.ABSOLUTE_GLOBAL
 			positionMs: number
@@ -17,9 +16,13 @@ export type SeekData =
 			type: SeekType.ABSOLUTE_IN_FILE
 			positionMs: number
 	  }
-	| ({
+	| {
 			type: SeekType.ABSOLUTE_TO_FILE
-	  } & TrivialSeekData)
+			positionMs: number
+			playerEntryId: string
+	  }
+
+export type RelativeSeekData =
 	| {
 			type: SeekType.RELATIVE_GLOBAL
 			positionDeltaMs: number
@@ -29,12 +32,14 @@ export type SeekData =
 			positionDeltaMs: number
 	  }
 
+export type SeekData = RelativeSeekData | AbsoluteSeekData
+
 /**
  * SeekData, which can be directly supplied into player.
  */
 export type TrivialSeekData = {
 	positionMs: number
-	playableEntryId: string
+	playerEntryId: string | null // If null, then do not change whatever's set right now
 }
 
 /**
@@ -49,13 +54,13 @@ export enum SeekDiscardCondition {
 	/**
 	 * Discard this seek if can't seek right now(say, another seek is in queue), then just throw it away.
 	 */
-	INSTANT = 2, 
+	INSTANT = 2,
 
 	/**
 	 * Discard this seek if there is no metadata loaded, which for some reason is required to perform that seek.
 	 * Otherwise(say, another seek is in queue) wait until it's possible to execute it or until deadline.
 	 */
-	NO_METADATA = 3, 
+	NO_METADATA = 3,
 }
 
 export type ExtendedSeekData = {
