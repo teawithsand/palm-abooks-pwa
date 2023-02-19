@@ -2,6 +2,7 @@ import {
 	PlayerEntryList,
 	PlayerEntryListState,
 } from "@app/domain/managers/newPlayer/list/list"
+import { PlayerEntriesBag } from "@app/domain/managers/newPlayer/source/bag"
 import { MetadataBag } from "@teawithsand/tws-player"
 import {
 	DefaultStickyEventBus,
@@ -27,10 +28,8 @@ export class CompositePlayerEntryList implements PlayerEntryList {
 			new DefaultStickyEventBus<CompositePlayerEntryListState>({
 				id,
 				lists: [],
-				entries: [],
-				entriesById: {},
+				entriesBag: new PlayerEntriesBag([]),
 				isLoadingMetadata: false,
-				metadataBag: new MetadataBag([]),
 			})
 	}
 
@@ -77,23 +76,17 @@ export class CompositePlayerEntryList implements PlayerEntryList {
 	private computeStateUsingLists = (
 		lists: PlayerEntryList[]
 	): PlayerEntryListState => {
-		const entries = lists.flatMap((v) => v.stateBus.lastEvent.entries)
-		const results = lists.flatMap(
-			(v) => v.stateBus.lastEvent.metadataBag.results
+		const entries = lists.flatMap(
+			(v) => v.stateBus.lastEvent.entriesBag.entries
 		)
 
-		const metadataBag = new MetadataBag(results)
 		const isLoadingMetadata = lists.some(
 			(v) => v.stateBus.lastEvent.isLoadingMetadata
 		)
-
-		const entryIdTuples = entries.map((v) => [v.id, v])
-
+		
 		return {
-			entries,
-			metadataBag,
+			entriesBag: new PlayerEntriesBag(entries),
 			isLoadingMetadata,
-			entriesById: Object.fromEntries(entryIdTuples),
 			id: this.id,
 		}
 	}

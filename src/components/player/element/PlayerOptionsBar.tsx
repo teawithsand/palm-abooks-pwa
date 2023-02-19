@@ -8,15 +8,11 @@ import InnerPause from "@app/components/player/icons/pause.svg"
 import InnerPlay from "@app/components/player/icons/play.svg"
 import Skip from "@app/components/player/icons/skip.svg"
 
-import {
-	breakpointMediaDown,
-	BREAKPOINT_MD,
-	useStickySubscribable,
-} from "@teawithsand/tws-stl-react"
-import { Button } from "react-bootstrap"
-import { LinkContainer } from "@app/util/LinkContainer"
 import { useAppPaths } from "@app/paths"
-import { SleepManagerStateType } from "@app/domain/managers/sleep/sleepManager"
+import { LinkContainer } from "@app/util/LinkContainer"
+import { useStickySubscribable } from "@teawithsand/tws-stl-react"
+import { Button } from "react-bootstrap"
+import { SleepManagerStateType } from "@app/domain/managers/newPlayer/sleep/sleepManager"
 
 const Play = styled(InnerPlay)``
 

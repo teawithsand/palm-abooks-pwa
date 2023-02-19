@@ -1,3 +1,7 @@
+import {
+	LastPlayedSource,
+	LastPlayedSourceType,
+} from "@app/domain/defines/config/state"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import { PositionVariants } from "@app/domain/defines/position"
 import { TimestampMs, generateUUID } from "@teawithsand/tws-stl"
@@ -28,6 +32,17 @@ export class PlayerEntryListMetadata {
 		public readonly data: PlayerEntryListMetadataData,
 		public readonly id = generateUUID()
 	) {}
+
+	get lastPlayedSource(): LastPlayedSource | null {
+		if (this.data.type === PlayerEntryListMetadataType.ABOOK) {
+			return {
+				type: LastPlayedSourceType.ABOOK_ID,
+				id: this.data.abook.id,
+			}
+		}
+
+		return null
+	}
 
 	get positionToLoad(): PositionVariants | null {
 		if (this.data.type === PlayerEntryListMetadataType.ABOOK) {

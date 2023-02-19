@@ -2,14 +2,12 @@ import {
 	FileEntryType as FileEntryContentType,
 	FileEntryDisposition,
 } from "@app/domain/defines/abookFile"
-import { InternalFilePlayerSource } from "@app/domain/managers/player/source/internalFile"
 import { guessDisposition } from "@app/domain/storage/disposition"
 import { Serializer } from "@app/util/transform"
 import {
 	Metadata,
 	MetadataLoadingResult,
 	MetadataLoadingResultType,
-	PlayerSource,
 } from "@teawithsand/tws-player"
 
 export type FileEntryEntityData = {

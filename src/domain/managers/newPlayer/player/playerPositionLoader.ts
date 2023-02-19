@@ -10,10 +10,9 @@ import {
 	SeekType,
 } from "@app/domain/defines/seek"
 import { PlayerEntryListMetadata } from "@app/domain/managers/newPlayer/list/metadata"
-import { NewSeekQueue } from "@app/domain/managers/newPlayer/player/seekQueue"
+import { NewSeekQueue, SeekEvent, SeekEventType } from "@app/domain/managers/newPlayer/player/seekQueue"
 import { PlayerEntriesBag } from "@app/domain/managers/newPlayer/source/bag"
 import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/source/source"
-import { SeekEvent, SeekEventType } from "@app/domain/managers/player/seekQueue"
 import {
 	DefaultStickyEventBus,
 	PerformanceTimestampMs,

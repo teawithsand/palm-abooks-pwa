@@ -17,12 +17,12 @@ const rangeGrowFactor = 20
 export const PlayerSettingsSpeedSection = () => {
 	const app = useAppManager()
 	const speed = useStickySubscribableSelector(
-		app.playerManager.playerStateBus,
-		(state) => state.innerState.config.speed
+		app.playerManager.bus,
+		(state) => state.playerState.config.speed
 	)
 	const preservePitchForSpeed = useStickySubscribableSelector(
-		app.playerManager.playerStateBus,
-		(state) => state.innerState.config.preservePitchForSpeed
+		app.playerManager.bus,
+		(state) => state.playerState.config.preservePitchForSpeed
 	)
 	const actions = app.playerActionsManager
 	return (
