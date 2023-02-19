@@ -46,14 +46,14 @@ export class NewPlayerManager {
 			type: PlayerEntryListMetadataType.UNKNOWN,
 		})
 	private previousListId = generateUUID()
-	private currentLoaderShutdown: SubscriptionCanceler = () => {}
+	private currentPositionLoaderShutdown: SubscriptionCanceler = () => {}
 	private positionSaver: PlayerPositionSaver
 
 	private onNewMetadata = (
 		metadata: PlayerEntryListMetadata,
 		entries: PlayerEntriesBag
 	) => {
-		this.currentLoaderShutdown()
+		this.currentPositionLoaderShutdown()
 
 		const loader = new PlayerPositionLoader(
 			metadata,
@@ -70,7 +70,7 @@ export class NewPlayerManager {
 			)
 		})
 
-		this.currentLoaderShutdown = () => {
+		this.currentPositionLoaderShutdown = () => {
 			loader.close()
 			unsubscribe()
 		}
@@ -89,6 +89,8 @@ export class NewPlayerManager {
 			metadata,
 			this.abookDb
 		)
+
+		this.seekQueue.clear() // must be called AFTER PlayerPositionLoader.begin call
 	}
 
 	private onMaybeUpdatedEntries = (
