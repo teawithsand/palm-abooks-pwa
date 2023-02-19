@@ -56,6 +56,9 @@ export type PlayerManagerState = {
 	// TODO(teawithsand): add more entries here
 }
 
+/**
+ * @deprecated To be replaced with new player manager
+ */
 export class PlayerManager {
 	private readonly mediaSessionManager = MediaSessionApiHelper.instance
 	private readonly player: Player<PlayableEntry, string>

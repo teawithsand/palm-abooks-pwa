@@ -11,9 +11,7 @@ import {
 	DefaultStickyEventBus,
 	StickyEventBus,
 	StickySubscribable,
-	getNowPerformanceTimestamp,
 } from "@teawithsand/tws-stl"
-import produce from "immer"
 
 export type SleepConfig = {
 	baseDuration: number
@@ -188,7 +186,7 @@ export class SleepManager {
 				// for now we exclusively own volume here, in other cases it may be delegated to somewhere else
 				playerManager.mutateConfig((draft) => (draft.volume = volume))
 			}
-			
+
 			if (
 				event.type === SleepEventType.SLEEP_CANCEL ||
 				event.type === SleepEventType.SLEEP_FINISHED

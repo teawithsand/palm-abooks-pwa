@@ -1,4 +1,3 @@
-import list from "@app/pages/abook/list"
 import {
 	DefaultEventBus,
 	DefaultStickyEventBus,
