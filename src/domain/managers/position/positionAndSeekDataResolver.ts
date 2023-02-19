@@ -19,13 +19,13 @@ export class PositionAndSeekDataResolver {
 		data: AbsoluteSeekResolutionData,
 		position: Position
 	): SeekData | null => {
-		if (position.type === PositionType.FILE_ID_AND_LOCAL_OFFSET) {
-			const entry = data.entriesBag.findById(position.fileId)
+		if (position.type === PositionType.FILE_ENTITY_ID_AND_LOCAL_OFFSET) {
+			const entry = data.entriesBag.findById(position.fileEntityId)
 			if (!entry) return null
 
 			return {
 				type: SeekType.ABSOLUTE_TO_FILE,
-				playableEntryId: position.fileId,
+				playableEntryId: position.fileEntityId,
 				positionMs: position.positionMs,
 			}
 		} else if (position.type === PositionType.FILE_NAME_AND_LOCAL_OFFSET) {
@@ -56,7 +56,7 @@ export class PositionAndSeekDataResolver {
 		position: PositionVariants
 	): SeekData | null => {
 		const variants: PositionType[] = [
-			PositionType.FILE_ID_AND_LOCAL_OFFSET,
+			PositionType.FILE_ENTITY_ID_AND_LOCAL_OFFSET,
 			PositionType.FILE_NAME_AND_LOCAL_OFFSET,
 			PositionType.GLOBAL_OFFSET,
 		]

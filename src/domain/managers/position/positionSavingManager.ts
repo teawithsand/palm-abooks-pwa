@@ -202,9 +202,9 @@ export class PositionSavingManager {
 		const variants: PositionVariants = {}
 
 		if (currentEntry.type === PlayableEntryType.FILE_ENTRY) {
-			variants[PositionType.FILE_ID_AND_LOCAL_OFFSET] = {
-				type: PositionType.FILE_ID_AND_LOCAL_OFFSET,
-				fileId: currentEntry.entry.id,
+			variants[PositionType.FILE_ENTITY_ID_AND_LOCAL_OFFSET] = {
+				type: PositionType.FILE_ENTITY_ID_AND_LOCAL_OFFSET,
+				fileEntityId: currentEntry.entry.id,
 				positionMs: position,
 			}
 			variants[PositionType.FILE_NAME_AND_LOCAL_OFFSET] = {
