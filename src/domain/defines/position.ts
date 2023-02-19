@@ -1,7 +1,7 @@
 import { TimestampMs } from "@teawithsand/tws-stl"
 
 export enum PositionType {
-	FILE_ID_AND_LOCAL_OFFSET = 1,
+	FILE_ENTITY_ID_AND_LOCAL_OFFSET = 1,
 	FILE_NAME_AND_LOCAL_OFFSET = 2,
 	GLOBAL_OFFSET = 3,
 }
@@ -11,8 +11,8 @@ export enum PositionType {
  */
 export type Position =
 	| {
-			type: PositionType.FILE_ID_AND_LOCAL_OFFSET
-			fileId: string
+			type: PositionType.FILE_ENTITY_ID_AND_LOCAL_OFFSET
+			fileEntityId: string
 			positionMs: number
 	  }
 	| {
@@ -33,6 +33,6 @@ export type PositionVariants = {
 }
 
 export type SavedPositionVariants = {
-	variants: PositionVariants,
+	variants: PositionVariants
 	savedTimestamp: TimestampMs
 }
