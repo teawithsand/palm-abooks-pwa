@@ -1,11 +1,17 @@
 import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
 
+/**
+ * @deprecated to be replaced with new entity model
+ */
 export enum PlayableEntryType {
 	FILE_ENTRY = 1,
 	ARBITRARY_BLOB = 2,
 	ARBITRARY_URL = 3,
 }
 
+/**
+ * @deprecated to be replaced with new entity model
+ */
 export type PlayableEntry = {
 	id: string
 } & (

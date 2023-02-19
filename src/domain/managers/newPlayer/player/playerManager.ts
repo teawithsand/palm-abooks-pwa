@@ -12,7 +12,7 @@ import { PlayerPositionLoader } from "@app/domain/managers/newPlayer/player/play
 import { NewSeekQueue } from "@app/domain/managers/newPlayer/player/seekQueue"
 import { PlayerEntriesBag } from "@app/domain/managers/newPlayer/source/bag"
 import { PositionLoadingState } from "@app/domain/managers/player/playerManager"
-import { Player, PlayerState } from "@teawithsand/tws-player"
+import { Player, PlayerConfig, PlayerState } from "@teawithsand/tws-player"
 import {
 	DefaultStickyEventBus,
 	StickyEventBus,
@@ -20,7 +20,7 @@ import {
 	SubscriptionCanceler,
 	generateUUID,
 } from "@teawithsand/tws-stl"
-import produce from "immer"
+import produce, { Draft } from "immer"
 
 export type NewPlayerManagerState = {
 	playerState: PlayerState
@@ -30,6 +30,7 @@ export type NewPlayerManagerState = {
 }
 
 export class NewPlayerManager {
+	private readonly player: Player
 	private readonly innerBus: StickyEventBus<NewPlayerManagerState>
 
 	public get bus(): StickySubscribable<NewPlayerManagerState> {
@@ -84,6 +85,7 @@ export class NewPlayerManager {
 
 	constructor(playerEntryListManager: PlayerEntryListManager) {
 		const player = new Player()
+		this.player = player
 		this.innerBus = new DefaultStickyEventBus({
 			playerEntryListManagerState: playerEntryListManager.bus.lastEvent,
 			playerState: player.stateBus.lastEvent,
@@ -95,7 +97,9 @@ export class NewPlayerManager {
 		let handledIsEnded = false
 		player.stateBus.addSubscriber((state) => {
 			if (state.isEnded) {
-				playerEntryListManager.goToNext()
+				if (!handledIsEnded) {
+					playerEntryListManager.goToNext()
+				}
 				handledIsEnded = true
 			} else {
 				handledIsEnded = false
@@ -151,5 +155,9 @@ export class NewPlayerManager {
 				currentEntryPosition: state.playerState.position,
 			})
 		})
+	}
+
+	mutatePlayerConfig = (mutator: (draft: Draft<PlayerConfig>) => void) => {
+		this.player.mutateConfig(mutator)
 	}
 }
