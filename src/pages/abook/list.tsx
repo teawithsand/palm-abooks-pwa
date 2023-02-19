@@ -1,6 +1,5 @@
 import { AbookList } from "@app/components/abook/list/AbookList"
 import { PageContainer } from "@app/components/PageContainer"
-import { useAppManager } from "@app/domain/managers/app"
 import { useQueryAbookList } from "@app/domain/storage/queries/abook"
 import { wrapLocationProvider } from "@app/util/useLocation"
 import { wrapNoSSR } from "@teawithsand/tws-stl-react"

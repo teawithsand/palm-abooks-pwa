@@ -1,6 +1,6 @@
 import { ConfigManager } from "@app/domain/managers/config"
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
-import { ShakeManager } from "@app/domain/managers/sleep/shakeManager"
+import { ShakeManager } from "@app/domain/managers/shakeManager"
 import { Timestamps, getTimestamps } from "@app/util/timestamps"
 import {
 	SleepEventType,

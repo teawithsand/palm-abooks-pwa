@@ -1,6 +1,5 @@
 import { PageContainer, PageContainerType } from "@app/components/PageContainer"
 import { PlayLocalFilesForm } from "@app/components/player/form/localFilesToPlay"
-import { WhatToPlayLocatorType } from "@app/domain/defines/whatToPlay/locator"
 import { useAppManager } from "@app/domain/managers/app"
 import { useAppPaths } from "@app/paths"
 import { useNavigate } from "@app/util/navigate"
@@ -16,10 +15,7 @@ const PlayerPlayLocalFilesPage = () => {
 		<PageContainer type={PageContainerType.NORMAL} title="Play local files">
 			<PlayLocalFilesForm
 				onSubmit={async (data) => {
-					app.whatToPlayManager.setLocator({
-						type: WhatToPlayLocatorType.RAW_ENTRIES,
-						files: data.files,
-					})
+					app.playerActionsManager.playLocalFiles(data.files)
 					app.playerActionsManager.setIsPlaying(true)
 					navigate(playerUiPath)
 				}}
