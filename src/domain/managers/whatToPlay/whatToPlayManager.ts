@@ -14,6 +14,9 @@ import {
 } from "@teawithsand/tws-stl"
 import produce from "immer"
 
+/**
+ * @deprecated Instead NewPlayerManager should be used. Now there is no loading-entries-with-locator state.
+ */
 export class WhatToPlayManager {
 	private innerStateBus: DefaultStickyEventBus<WhatToPlayState> =
 		new DefaultStickyEventBus({

@@ -1,19 +1,15 @@
-import { lastPlayedSourceToWhatToPlaySourceLocator } from "@app/domain/defines/config/state"
 import { ConfigManager } from "@app/domain/managers/config"
 import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
-import { MetadataLoadHelper } from "@app/domain/managers/metadataHelper"
+import { InitializationManager } from "@app/domain/managers/initialization"
+import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/list/playerEntryListManager"
+import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
+import { SeekBackManager } from "@app/domain/managers/newPlayer/seekBack/seekBackManager"
+import { SleepManager } from "@app/domain/managers/newPlayer/sleep/sleepManager"
 import { PlayerActionManager } from "@app/domain/managers/player/playerActionsManager"
-import { PlayerManager } from "@app/domain/managers/player/playerManager"
-import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
-import { PositionSavingManager } from "@app/domain/managers/position/positionSavingManager"
-import { PlayableEntryPlayerSourceResolver } from "@app/domain/managers/resolver"
 import { ShakeManager } from "@app/domain/managers/sleep/shakeManager"
-import { SleepManager } from "@app/domain/managers/sleep/sleepManager"
 import { StorageSizeManager } from "@app/domain/managers/storageSizeManager"
-import { WhatToPlayLocatorResolverImpl } from "@app/domain/managers/whatToPlay/whatToPlayLocatorResolver"
-import { WhatToPlayLocatorWriterImpl } from "@app/domain/managers/whatToPlay/whatToPlayLocatorWriter"
-import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
 import { AbookDb } from "@app/domain/storage/db"
+import { latePromise } from "@teawithsand/tws-stl"
 import { isSsr } from "@teawithsand/tws-stl-react"
 
 export class AppManager {
@@ -27,46 +23,74 @@ export class AppManager {
 	public readonly globalEventsManager = new GlobalEventsManager()
 	public readonly storageSizeManager = new StorageSizeManager()
 	public readonly abookDb: AbookDb = new AbookDb(this.storageSizeManager)
-	public readonly whatToPlayManager = new WhatToPlayManager(
-		new MetadataLoadHelper(
-			new PlayableEntryPlayerSourceResolver(this.abookDb)
-		),
-		new WhatToPlayLocatorResolverImpl(this.abookDb)
-	)
 
 	public readonly configManager = new ConfigManager()
-	public readonly playerManager = new PlayerManager(
-		this.abookDb,
-		this.configManager,
-		this.whatToPlayManager
+	public readonly entryListManager = new PlayerEntryListManager()
+	public readonly playerManager = new NewPlayerManager(
+		this.entryListManager,
+		this.abookDb
 	)
+
 	public readonly sleepManager = new SleepManager(
 		this.playerManager,
 		this.configManager,
 		this.shakeManager
 	)
 
-	public readonly positionSavingManager = new PositionSavingManager(
-		this.playerManager,
-		new WhatToPlayLocatorWriterImpl(this.abookDb)
+	public readonly positionMoveAfterPauseManager = new SeekBackManager(
+		this.configManager,
+		this.playerManager
 	)
-
-	public readonly positionMoveAfterPauseManager =
-		new PositionMoveAfterPauseManager(this.playerManager)
 
 	public readonly playerActionsManager = new PlayerActionManager(
+		this.abookDb,
 		this.playerManager,
 		this.configManager,
-		this.whatToPlayManager,
-		this.sleepManager,
-		this.positionMoveAfterPauseManager
+		this.entryListManager,
+		this.sleepManager
 	)
 
-	public readonly initPromise = Promise.all([
-		this.configManager.loadedPromise,
-	])
+	public readonly initManager = new InitializationManager()
 
 	constructor() {
+		const [p1, resolveP1] = latePromise<void>()
+		this.configManager.globalPersistentPlayerState.bus.addSubscriber(
+			(config, canceler) => {
+				if (config) {
+					resolveP1()
+					canceler()
+
+					if (config.lastPlayed) {
+						// TODO(teawithsand): implement last played loading here
+					}
+				}
+			}
+		)
+
+		const [p2, resolveP2] = latePromise<void>()
+		this.configManager.globalPlayerConfig.bus.addSubscriber(
+			(config, canceler) => {
+				if (config) {
+					// HACK: canceller has to be called here in order to prevent infinite recursion
+					// as sleep manager updates config, we would trigger that update(even though it's no-op update)
+					// and go through another iteration of this listener
+					canceler()
+					resolveP2()
+
+					if (config.isSleepEnabled) {
+						this.sleepManager.setSleep(config.sleepConfig)
+					}
+				}
+			}
+		)
+
+		this.initManager.addPromise(
+			this.configManager.loadedPromise.then(() => {})
+		)
+		this.initManager.addPromise(p1)
+		this.initManager.addPromise(p2)
+		this.initManager.finalize()
+
 		// Enabling has to be done by user initiated event.
 		// Click is good enough to do so at some point, if it's required
 		document.addEventListener("click", () => {
@@ -76,37 +100,6 @@ export class AppManager {
 				this.shakeManager.enable()
 			}
 		})
-
-		this.configManager.globalPersistentPlayerState.bus.addSubscriber(
-			(config, canceler) => {
-				if (config) {
-					canceler()
-
-					if (config.lastPlayed) {
-						this.whatToPlayManager.setLocator(
-							lastPlayedSourceToWhatToPlaySourceLocator(
-								config.lastPlayed
-							)
-						)
-					}
-				}
-			}
-		)
-
-		this.configManager.globalPlayerConfig.bus.addSubscriber(
-			(config, canceler) => {
-				if (config) {
-					// HACK: canceller has to be called here in order to prevent infinite recursion
-					// as sleep manager updates config, we would trigger that update(even though it's no-op update)
-					// and go through another iteration of this listener
-					canceler()
-
-					if (config.isSleepEnabled) {
-						this.sleepManager.setSleep(config.sleepConfig)
-					}
-				}
-			}
-		)
 	}
 }
 
