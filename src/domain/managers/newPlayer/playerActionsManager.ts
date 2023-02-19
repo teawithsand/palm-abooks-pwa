@@ -1,4 +1,3 @@
-import { whatToPlaySourceLocatorToLastPlayedSource } from "@app/domain/defines/config/state"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import {
 	PlayerSeekAction,
@@ -9,7 +8,6 @@ import {
 	SeekDiscardCondition,
 	SeekType,
 } from "@app/domain/defines/seek"
-import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { ConfigManager } from "@app/domain/managers/config"
 import { DefaultPlayerEntryList } from "@app/domain/managers/newPlayer/list/entryList"
 import {
@@ -18,21 +16,19 @@ import {
 } from "@app/domain/managers/newPlayer/list/metadata"
 import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/list/playerEntryListManager"
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
-import { SleepManager } from "@app/domain/managers/newPlayer/sleep/sleepManager"
-import { PlayerEntry } from "@app/domain/managers/newPlayer/source/entry"
-import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/source/source"
-import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
 import {
 	SleepConfig,
+	SleepManager,
 	SleepManagerStateType,
-} from "@app/domain/managers/sleep/sleepManager"
+} from "@app/domain/managers/newPlayer/sleep/sleepManager"
+import { PlayerEntry } from "@app/domain/managers/newPlayer/source/entry"
+import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/source/source"
 import { AbookDb } from "@app/domain/storage/db"
-import { isTimeNumber } from "@teawithsand/tws-player"
+import { StaticPlayerSource, isTimeNumber } from "@teawithsand/tws-player"
 import {
 	MediaSessionApiHelper,
 	MediaSessionEventType,
 	generateUUID,
-	throwExpression,
 } from "@teawithsand/tws-stl"
 
 // TODO(teawithsand): hook jump back after pause manager to this class' play/pause method.
@@ -316,11 +312,6 @@ export class PlayerActionManager {
 		}
 	}
 
-	/**
-	 * @deprecated Just like What-To-Play stuff
-	 */
-	public setWhatToPlayLocator = (locator: WhatToPlayLocator | null) => {}
-
 	public unsetPlaylist = () => {
 		this.entryListManager.setList(
 			new DefaultPlayerEntryList(),
@@ -330,7 +321,23 @@ export class PlayerActionManager {
 			})
 		)
 	}
-	public setAbookToPlay = (abook: AbookEntity) => {
+
+	public playLocalFiles = (files: File[]) => {
+		const list = new DefaultPlayerEntryList()
+		const entries = files.map(
+			(f) => new PlayerEntry(new StaticPlayerSource(f))
+		)
+		list.setEntries(entries)
+		this.entryListManager.setList(
+			list,
+			entries.length ? entries[0].id : null,
+			new PlayerEntryListMetadata({
+				type: PlayerEntryListMetadataType.LOCAL_FILES,
+			})
+		)
+	}
+
+	public playAbook = (abook: AbookEntity) => {
 		const list = new DefaultPlayerEntryList()
 		const entries = abook.entries.map(
 			(v) =>

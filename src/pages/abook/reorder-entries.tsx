@@ -1,5 +1,4 @@
 import { AbookEntriesReorder } from "@app/components/abook/edit/AbookEntriesReorder"
-import { AbookMetadataEdit } from "@app/components/abook/edit/AbookMetadataEdit"
 import { PageContainer } from "@app/components/PageContainer"
 import { useAbookId } from "@app/components/util/useAbookId"
 import { useAppManager } from "@app/domain/managers/app"

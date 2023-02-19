@@ -2,14 +2,13 @@ import { AbookFileList } from "@app/components/abook/view/AbookFileList"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import { FileEntryEntity } from "@app/domain/defines/entity/fileEntry"
 import { useFileEntryEntityUrl } from "@app/domain/defines/entity/fileEntryHook"
-import { WhatToPlayLocatorType } from "@app/domain/defines/whatToPlay/locator"
 import { useAppManager } from "@app/domain/managers/app"
 import { DEFAULT_IMAGE_COVER_URL } from "@app/domain/ui/abook"
 import { useAppPaths } from "@app/paths"
 import { LinkContainer } from "@app/util/LinkContainer"
+import { useNavigate } from "@app/util/navigate"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import { BREAKPOINT_SM, breakpointMediaDown } from "@teawithsand/tws-stl-react"
-import { navigate } from "gatsby"
 import React from "react"
 import { Button } from "react-bootstrap"
 import styled from "styled-components"
@@ -140,6 +139,7 @@ export const AbookView = (props: {
 		abookEntriesDeletePath,
 		playerUiPath: playerPath,
 	} = useAppPaths()
+	const navigate = useNavigate()
 	const {
 		coverImageEntry,
 		musicEntries,
@@ -174,10 +174,8 @@ export const AbookView = (props: {
 					<Button
 						variant="success"
 						onClick={() => {
-							app.playerActionsManager.setWhatToPlayLocator({
-								type: WhatToPlayLocatorType.ABOOK,
-								abook,
-							})
+							app.playerActionsManager.playAbook(abook)
+
 							navigate(playerPath)
 						}}
 					>
