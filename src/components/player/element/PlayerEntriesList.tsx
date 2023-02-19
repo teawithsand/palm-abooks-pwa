@@ -1,13 +1,7 @@
-import {
-	PlayableEntry,
-	PlayableEntryType,
-} from "@app/domain/defines/player/playableEntry"
 import { useAppManager } from "@app/domain/managers/app"
+import { PlayerEntry } from "@app/domain/managers/newPlayer/source/entry"
 import { useUiPlayerData } from "@app/domain/ui/player"
-import {
-	MetadataLoadingResultType,
-	isTimeNumber,
-} from "@teawithsand/tws-player"
+import { isTimeNumber } from "@teawithsand/tws-player"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
 import React from "react"
 import styled from "styled-components"
@@ -89,7 +83,7 @@ const InvisibleInline = styled.span`
 
 // TODO(teawithsand): make this list base for reordering files stuff in abook view
 export const PlayerEntriesList = (props: {
-	onEntryClick?: (id: string, e: PlayableEntry) => void
+	onEntryClick?: (id: string, e: PlayerEntry) => void
 }) => {
 	const ui = useUiPlayerData()
 	const actions = useAppManager().playerActionsManager
@@ -104,54 +98,25 @@ export const PlayerEntriesList = (props: {
 	// TODO(teawithsand): make this more performant by adding intermediate level component for row
 	return (
 		<List>
-			{ui.entries.map((element, index) => {
-				let name = `Entry #${element.id}`
+			{ui.entriesBag.entries.map((element, index) => {
+				let name = element.displayName
 
-				const isPlaying =
-					element.id === ui.currentPosition.currentEntryId
+				const isPlaying = element.id === ui.currentPosition.entry?.id
 
-				let duration: number | null = null
-
-				const metadata = ui.metadataBag.getResult(index)
-				if (
-					metadata &&
-					metadata.type === MetadataLoadingResultType.OK &&
-					metadata.metadata.duration !== null &&
-					metadata.metadata.duration >= 0
-				) {
-					duration = metadata.metadata.duration
-				}
-
-				if (
-					metadata &&
-					metadata.type === MetadataLoadingResultType.OK &&
-					metadata.metadata.title
-				) {
-					name = `${metadata.metadata.artist || "No artist"} - ${
-						metadata.metadata.title
-					}`
-				} else if (element.type === PlayableEntryType.FILE_ENTRY) {
-					name = element.entry.name
-				} else if (element.type === PlayableEntryType.ARBITRARY_BLOB) {
-					name =
-						element.blob instanceof File
-							? element.blob.name
-							: `Sound blob #${element.id}`
-				} else if (element.type === PlayableEntryType.ARBITRARY_URL) {
-					name = element.url
-				}
+				let duration: number | null = element.duration
 
 				// Hack: calculate padding for these entries, so that we
 				// do not have to use grid or table to have numbers in list aligned
 				const padding = "0".repeat(
-					ui.entries.length.toString().length -
+					ui.entriesBag.length.toString().length -
 						(index + 1).toString().length
 				)
 
 				let bottomInfoProgress = ""
 
 				let startsAtNotice = ""
-				const startsAtTime = ui.metadataBag.getDurationToIndex(index)
+				const startsAtTime =
+					ui.entriesBag.metadataBag.getDurationToIndex(index)
 				if (
 					startsAtTime !== null &&
 					isTimeNumber(startsAtTime) &&

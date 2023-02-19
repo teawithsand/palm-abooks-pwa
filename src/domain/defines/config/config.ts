@@ -5,8 +5,7 @@ import {
 import { SeekBackStrategyDataType } from "@app/domain/defines/player/seekBack/defines"
 import { StoredSeekBackStrategy } from "@app/domain/defines/player/seekBack/stored"
 import { SeekBackStrategyEntity } from "@app/domain/defines/player/seekBack/strategy"
-import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
-import { SleepConfig } from "@app/domain/managers/sleep/sleepManager"
+import { SleepConfig } from "@app/domain/managers/newPlayer/sleep/sleepManager"
 
 export type GlobalPlayerConfig = {
 	speed: number

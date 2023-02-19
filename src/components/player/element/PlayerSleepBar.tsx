@@ -2,7 +2,6 @@ import { useAppManager } from "@app/domain/managers/app"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 
-import { SleepManagerStateType } from "@app/domain/managers/sleep/sleepManager"
 import { useAppPaths } from "@app/paths"
 import { useNavigate } from "@app/util/navigate"
 import {
@@ -10,6 +9,7 @@ import {
 	getNowPerformanceTimestamp,
 } from "@teawithsand/tws-stl"
 import { useStickySubscribable } from "@teawithsand/tws-stl-react"
+import { SleepManagerStateType } from "@app/domain/managers/newPlayer/sleep/sleepManager"
 
 const Bar = styled.div`
 	display: grid;

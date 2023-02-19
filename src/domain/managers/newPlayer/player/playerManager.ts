@@ -8,11 +8,13 @@ import {
 	PlayerEntryListManager,
 	PlayerEntryListManagerState,
 } from "@app/domain/managers/newPlayer/list/playerEntryListManager"
-import { PlayerPositionLoader } from "@app/domain/managers/newPlayer/player/playerPositionLoader"
+import {
+	PlayerPositionLoader,
+	PositionLoadingState,
+} from "@app/domain/managers/newPlayer/player/playerPositionLoader"
 import { PlayerPositionSaver } from "@app/domain/managers/newPlayer/player/playerPositionSaver"
 import { NewSeekQueue } from "@app/domain/managers/newPlayer/player/seekQueue"
 import { PlayerEntriesBag } from "@app/domain/managers/newPlayer/source/bag"
-import { PositionLoadingState } from "@app/domain/managers/player/playerManager"
 import { AbookDb } from "@app/domain/storage/db"
 import { Player, PlayerConfig, PlayerState } from "@teawithsand/tws-player"
 import {

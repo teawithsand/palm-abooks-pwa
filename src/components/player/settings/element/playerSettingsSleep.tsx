@@ -1,14 +1,10 @@
 import { INIT_GLOBAL_PLAYER_CONFIG } from "@app/domain/defines/config/config"
 import { useAppManager } from "@app/domain/managers/app"
-import { SleepManagerStateType } from "@app/domain/managers/sleep/sleepManager"
-import { useUiPlayerData } from "@app/domain/ui/player"
+import { SleepManagerStateType } from "@app/domain/managers/newPlayer/sleep/sleepManager"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
-import {
-	useStickySubscribable,
-	useStickySubscribableSelector,
-} from "@teawithsand/tws-stl-react"
+import { useStickySubscribable } from "@teawithsand/tws-stl-react"
 import React from "react"
-import { Button, Form } from "react-bootstrap"
+import { Form } from "react-bootstrap"
 import styled from "styled-components"
 
 const Container = styled.div`
@@ -88,20 +84,18 @@ export const PlayerSettingsSleepSection = () => {
 				onChange={(v) => {
 					if (v.target.checked) {
 						app.playerActionsManager.setSleepFromConfig()
-					}else{
+					} else {
 						app.playerActionsManager.unsetSleep()
 					}
 				}}
 			/>
 			<Form.Check
 				label="Shaking resets sleep"
-				checked={
-					sleepConfig.shakeResetsSleep
-				}
+				checked={sleepConfig.shakeResetsSleep}
 				disabled={!app.shakeManager.isSupported}
 				onChange={(v) => {
 					const checked = v.target.checked
-					
+
 					app.configManager.globalPlayerConfig.update((draft) => {
 						draft.sleepConfig.shakeResetsSleep = checked
 					})

@@ -1,6 +1,7 @@
 import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/source/source"
 import {
 	MetadataLoadingResult,
+	MetadataLoadingResultType,
 	PlayerSource,
 	StaticPlayerSource,
 	UrlPlayerSource,
@@ -18,6 +19,14 @@ export class PlayerEntry {
 		return new PlayerEntry(this.source, res, this.id)
 	}
 
+	get duration(): number | null {
+		const metadata = this.metadata
+		if (metadata && metadata.type === MetadataLoadingResultType.OK) {
+			return metadata.metadata.duration
+		}
+		return null
+	}
+
 	/**
 	 * Final metadata of PlayerEntry, no matter if it's loaded or cached already.
 	 */
@@ -33,7 +42,7 @@ export class PlayerEntry {
 
 	/**
 	 * Returns file name of given PlayerEntry, if any.
-	 * 
+	 *
 	 * Used for loading position by fileName.
 	 */
 	get fileName(): string | null {

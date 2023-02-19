@@ -1,5 +1,4 @@
-import { PlayableEntryType } from "@app/domain/defines/player/playableEntry"
-import { WhatToPlayDataType } from "@app/domain/defines/whatToPlay/data"
+import { PlayerEntryListMetadataType } from "@app/domain/managers/newPlayer/list/metadata"
 import { useUiPlayerData } from "@app/domain/ui/player"
 import { useAppPaths } from "@app/paths"
 import { useNavigate } from "@app/util/navigate"
@@ -24,33 +23,16 @@ export const PlayerFileInfoDisplay = () => {
 	const navigate = useNavigate()
 	const { playerPlaylistPath } = useAppPaths()
 
-	let name = ""
-	const entry = ui?.currentPosition.entry
-	if (entry) {
-		if (entry.type === PlayableEntryType.FILE_ENTRY) {
-			name = entry.entry.name
-		} else if (
-			entry.type === PlayableEntryType.ARBITRARY_BLOB &&
-			entry.blob instanceof File
-		) {
-			name = entry.blob.name
-		} else if (entry.type === PlayableEntryType.ARBITRARY_URL) {
-			name = entry.url
-		}
-	}
+	let name = ui?.lastValidPosition.entry?.displayName ?? ""
 
 	let content = ""
-	if (
-		!ui ||
-		!ui.whatToPlayData ||
-		ui.whatToPlayData.entriesBag.length === 0
-	) {
+	if (!ui || ui.entriesBag.length === 0) {
 		content = "Nothing to play"
 	} else {
-		if (ui.whatToPlayData.type === WhatToPlayDataType.ABOOK) {
-			content = `Now playing: ${ui.whatToPlayData.abook.displayName}/${name}`
+		if (ui.metadata.data.type === PlayerEntryListMetadataType.ABOOK) {
+			content = `Now playing: ${ui.metadata.data.abook.displayName}/${name}`
 		} else {
-			content = ""
+			content = "Playing audio"
 		}
 	}
 
