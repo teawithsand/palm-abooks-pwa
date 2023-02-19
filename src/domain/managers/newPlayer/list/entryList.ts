@@ -3,6 +3,7 @@ import {
 	PlayerEntryListState,
 } from "@app/domain/managers/newPlayer/list/list"
 import { PlayerEntry } from "@app/domain/managers/newPlayer/source/entry"
+import { PlayerEntriesBag } from "@app/domain/managers/newPlayer/source/bag"
 import { loadMetadataToResultHack } from "@app/util/metadataLoadingResult"
 import { zip } from "@app/util/zip"
 import {
@@ -32,10 +33,8 @@ export class DefaultPlayerEntryList implements PlayerEntryList {
 		this.innerStateBus =
 			new DefaultStickyEventBus<DefaultPlayerEntryListState>({
 				id,
-				entries: [],
-				entriesById: {},
+				entriesBag: new PlayerEntriesBag([]),
 				isLoadingMetadata: false,
-				metadataBag: new MetadataBag([]),
 			})
 	}
 
@@ -58,10 +57,8 @@ export class DefaultPlayerEntryList implements PlayerEntryList {
 
 			this.innerStateBus.emitEvent({
 				id: this.id,
-				entries: entries,
-				entriesById: Object.fromEntries(entries.map((v) => [v.id, v])),
+				entriesBag: new PlayerEntriesBag([...entries]),
 				isLoadingMetadata: isLoading,
-				metadataBag: new MetadataBag([...results]),
 			})
 		}
 

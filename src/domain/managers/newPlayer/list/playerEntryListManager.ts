@@ -28,9 +28,9 @@ export class PlayerEntryListManager {
 		new DefaultStickyEventBus<PlayerEntryListManagerState>({
 			currentEntryId: null,
 			listState: this.list.stateBus.lastEvent,
-			listMetadata: {
+			listMetadata: new PlayerEntryListMetadata({
 				type: PlayerEntryListMetadataType.UNKNOWN,
-			},
+			}),
 		})
 
 	get bus(): StickySubscribable<PlayerEntryListManagerState> {
@@ -56,7 +56,7 @@ export class PlayerEntryListManager {
 				produce(this.innerBus.lastEvent, (draft) => {
 					if (
 						draft.currentEntryId !== null &&
-						!(draft.currentEntryId in state.entriesById)
+						!state.entriesBag.findById(draft.currentEntryId)
 					) {
 						draft.currentEntryId = null
 					}
@@ -72,9 +72,12 @@ export class PlayerEntryListManager {
 	}
 
 	unsetList = () => {
-		this.setList(new DefaultPlayerEntryList(), {
-			type: PlayerEntryListMetadataType.UNKNOWN,
-		})
+		this.setList(
+			new DefaultPlayerEntryList(),
+			new PlayerEntryListMetadata({
+				type: PlayerEntryListMetadataType.UNKNOWN,
+			})
+		)
 	}
 
 	setList = (list: PlayerEntryList, metadata?: PlayerEntryListMetadata) => {
@@ -99,9 +102,10 @@ export class PlayerEntryListManager {
 
 	private getNextEntry = (): PlayerEntry | null => {
 		const {
-			listState: { entries },
+			listState: { entriesBag },
 			currentEntryId,
 		} = this.innerBus.lastEvent
+		const entries = entriesBag.entries
 		if (currentEntryId === null) {
 			if (entries.length > 0) {
 				return entries[0]
@@ -126,9 +130,10 @@ export class PlayerEntryListManager {
 
 	private getPrevEntry = (): PlayerEntry | null => {
 		const {
-			listState: { entries },
+			listState: { entriesBag },
 			currentEntryId,
 		} = this.innerBus.lastEvent
+		const entries = entriesBag.entries
 
 		if (currentEntryId === null) {
 			if (entries.length > 0) {

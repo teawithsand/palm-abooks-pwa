@@ -1,15 +1,9 @@
-import { PlayerEntry } from "@app/domain/managers/newPlayer/source/entry"
-import { MetadataBag } from "@teawithsand/tws-player"
+import { PlayerEntriesBag } from "@app/domain/managers/newPlayer/source/bag"
 import { StickySubscribable } from "@teawithsand/tws-stl"
 
 export type PlayerEntryListState = {
 	id: string
-	metadataBag: MetadataBag
-
-	entries: PlayerEntry[]
-	entriesById: {
-		[id: string]: PlayerEntry
-	}
+	entriesBag: PlayerEntriesBag
 
 	isLoadingMetadata: boolean
 }
