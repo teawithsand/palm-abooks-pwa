@@ -9,9 +9,11 @@ import {
 	PlayerEntryListManagerState,
 } from "@app/domain/managers/newPlayer/list/playerEntryListManager"
 import { PlayerPositionLoader } from "@app/domain/managers/newPlayer/player/playerPositionLoader"
+import { PlayerPositionSaver } from "@app/domain/managers/newPlayer/player/playerPositionSaver"
 import { NewSeekQueue } from "@app/domain/managers/newPlayer/player/seekQueue"
 import { PlayerEntriesBag } from "@app/domain/managers/newPlayer/source/bag"
 import { PositionLoadingState } from "@app/domain/managers/player/playerManager"
+import { AbookDb } from "@app/domain/storage/db"
 import { Player, PlayerConfig, PlayerState } from "@teawithsand/tws-player"
 import {
 	DefaultStickyEventBus,
@@ -44,7 +46,8 @@ export class NewPlayerManager {
 			type: PlayerEntryListMetadataType.UNKNOWN,
 		})
 	private previousListId = generateUUID()
-	private currentLoaderShutdown: SubscriptionCanceler
+	private currentLoaderShutdown: SubscriptionCanceler = () => {}
+	private positionSaver: PlayerPositionSaver
 
 	private onNewMetadata = (
 		metadata: PlayerEntryListMetadata,
@@ -75,15 +78,30 @@ export class NewPlayerManager {
 		loader.begin(this.seekQueue)
 	}
 
-	private onNewEntries = (entries: PlayerEntriesBag) => {
+	private onNewEntries = (
+		metadata: PlayerEntryListMetadata,
+		entries: PlayerEntriesBag
+	) => {
+		this.positionSaver.requestImmediateSave() // runs on previous metadata; request immediate saver
+		this.positionSaver.close()
+		this.positionSaver = new PlayerPositionSaver(
+			entries,
+			metadata,
+			this.abookDb
+		)
+	}
+
+	private onMaybeUpdatedEntries = (
+		metadata: PlayerEntryListMetadata,
+		entries: PlayerEntriesBag
+	) => {
 		// for now noop
 	}
 
-	private onMaybeUpdatedEntries = (entries: PlayerEntriesBag) => {
-		// for now noop
-	}
-
-	constructor(playerEntryListManager: PlayerEntryListManager) {
+	constructor(
+		playerEntryListManager: PlayerEntryListManager,
+		private readonly abookDb: AbookDb
+	) {
 		const player = new Player()
 		this.player = player
 		this.innerBus = new DefaultStickyEventBus({
@@ -91,8 +109,13 @@ export class NewPlayerManager {
 			playerState: player.stateBus.lastEvent,
 			positionLoadingState: PositionLoadingState.NOT_FOUND,
 		})
-
-		this.currentLoaderShutdown = () => {}
+		this.positionSaver = new PlayerPositionSaver(
+			new PlayerEntriesBag([]),
+			new PlayerEntryListMetadata({
+				type: PlayerEntryListMetadataType.UNKNOWN,
+			}),
+			abookDb
+		)
 
 		let handledIsEnded = false
 		player.stateBus.addSubscriber((state) => {
@@ -116,9 +139,15 @@ export class NewPlayerManager {
 			if (state.listState.id !== this.previousListId) {
 				this.previousListId = state.listState.id
 
-				this.onNewEntries(state.listState.entriesBag)
+				this.onNewEntries(
+					state.listMetadata,
+					state.listState.entriesBag
+				)
 			} else {
-				this.onMaybeUpdatedEntries(state.listState.entriesBag)
+				this.onMaybeUpdatedEntries(
+					state.listMetadata,
+					state.listState.entriesBag
+				)
 			}
 
 			if (this.previousMetadata.id !== state.listMetadata.id) {
@@ -147,6 +176,16 @@ export class NewPlayerManager {
 		this.seekQueue = new NewSeekQueue(player)
 
 		this.innerBus.addSubscriber((state) => {
+			this.positionSaver.setPosition(
+				state.playerEntryListManagerState.currentEntryId,
+				state.playerState.position
+			)
+
+			// Save position on pause
+			if (!state.playerState.isPlaying) {
+				this.positionSaver.requestImmediateSave()
+			}
+
 			this.seekQueue.setResolutionData({
 				currentEntryId:
 					state.playerEntryListManagerState.currentEntryId,

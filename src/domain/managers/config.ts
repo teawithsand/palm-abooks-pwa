@@ -20,7 +20,7 @@ const forage = localforage.createInstance({
 	driver: [LOCALSTORAGE],
 })
 
-function objectEquals(x: any, y: any): boolean {
+export function objectEquals(x: any, y: any): boolean {
 	"use strict"
 
 	if (x === null || x === undefined || y === null || y === undefined) {
