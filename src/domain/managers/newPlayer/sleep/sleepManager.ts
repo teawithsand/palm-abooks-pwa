@@ -1,5 +1,5 @@
 import { ConfigManager } from "@app/domain/managers/config"
-import { PlayerManager } from "@app/domain/managers/player/playerManager"
+import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
 import { ShakeManager } from "@app/domain/managers/sleep/shakeManager"
 import { Timestamps, getTimestamps } from "@app/util/timestamps"
 import {
@@ -43,9 +43,6 @@ export type SleepManagerState =
 			config: SleepConfig
 	  }
 
-/**
- * @deprecated Uses old player manager
- */
 export class SleepManager {
 	private readonly sleepHelper = new SleepHelper()
 
@@ -72,14 +69,13 @@ export class SleepManager {
 	}
 
 	constructor(
-		playerManager: PlayerManager,
+		playerManager: NewPlayerManager,
 		private readonly configManager: ConfigManager,
 		shakeManager: ShakeManager
 	) {
 		let currentSleepConfig: SleepConfig | null = null
 		let lastIsPlayingWhenReady =
-			playerManager.playerStateBus.lastEvent.innerState.config
-				.isPlayingWhenReady
+			playerManager.bus.lastEvent.playerState.config.isPlayingWhenReady
 
 		shakeManager.shakeBus.addSubscriber(() => {
 			const lastEvent = this.innerBus.lastEvent
@@ -123,7 +119,7 @@ export class SleepManager {
 			// always perform sync config if manually updated by external user
 			syncConfigToHelper(
 				config,
-				playerManager.playerStateBus.lastEvent.innerState.config
+				playerManager.bus.lastEvent.playerState.config
 					.isPlayingWhenReady
 			)
 
@@ -138,8 +134,8 @@ export class SleepManager {
 			}
 		})
 
-		playerManager.playerStateBus.addSubscriber((state) => {
-			const isPlaying = state.innerState.config.isPlayingWhenReady
+		playerManager.bus.addSubscriber((state) => {
+			const isPlaying = state.playerState.config.isPlayingWhenReady
 			if (isPlaying !== lastIsPlayingWhenReady) {
 				lastIsPlayingWhenReady = isPlaying
 
@@ -187,20 +183,22 @@ export class SleepManager {
 				const volume = startVolume - timeFractionPassed * delta
 
 				// for now we exclusively own volume here, in other cases it may be delegated to somewhere else
-				playerManager.mutateConfig((draft) => (draft.volume = volume))
+				playerManager.mutatePlayerConfig(
+					(draft) => (draft.volume = volume)
+				)
 			}
 
 			if (
 				event.type === SleepEventType.SLEEP_CANCEL ||
 				event.type === SleepEventType.SLEEP_FINISHED
 			) {
-				playerManager.mutateConfig((draft) => (draft.volume = 1))
+				playerManager.mutatePlayerConfig((draft) => (draft.volume = 1))
 			}
 
 			if (event.type === SleepEventType.SLEEP_FINISHED) {
 				// once this has happened, one should ALWAYS go to ENABLED_BUT_STOPPED state
 				// but right now pausing guarantees it so we're fine.
-				playerManager.mutateConfig(
+				playerManager.mutatePlayerConfig(
 					(draft) => (draft.isPlayingWhenReady = false)
 				)
 			}
