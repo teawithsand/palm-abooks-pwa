@@ -1,23 +1,37 @@
 import { whatToPlaySourceLocatorToLastPlayedSource } from "@app/domain/defines/config/state"
+import { AbookEntity } from "@app/domain/defines/entity/abook"
 import {
 	PlayerSeekAction,
 	PlayerSeekActionType,
 } from "@app/domain/defines/player/action"
-import { SeekData, SeekType } from "@app/domain/defines/seek"
+import {
+	SeekData,
+	SeekDiscardCondition,
+	SeekType,
+} from "@app/domain/defines/seek"
 import { WhatToPlayLocator } from "@app/domain/defines/whatToPlay/locator"
 import { ConfigManager } from "@app/domain/managers/config"
-import { PlayerManager } from "@app/domain/managers/player/playerManager"
+import { DefaultPlayerEntryList } from "@app/domain/managers/newPlayer/list/entryList"
+import {
+	PlayerEntryListMetadata,
+	PlayerEntryListMetadataType,
+} from "@app/domain/managers/newPlayer/list/metadata"
+import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/list/playerEntryListManager"
+import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
+import { SleepManager } from "@app/domain/managers/newPlayer/sleep/sleepManager"
+import { PlayerEntry } from "@app/domain/managers/newPlayer/source/entry"
+import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/source/source"
 import { PositionMoveAfterPauseManager } from "@app/domain/managers/position/positionMoveAfterPauseHelper"
 import {
 	SleepConfig,
-	SleepManager,
 	SleepManagerStateType,
 } from "@app/domain/managers/sleep/sleepManager"
-import { WhatToPlayManager } from "@app/domain/managers/whatToPlay/whatToPlayManager"
+import { AbookDb } from "@app/domain/storage/db"
 import { isTimeNumber } from "@teawithsand/tws-player"
 import {
 	MediaSessionApiHelper,
 	MediaSessionEventType,
+	generateUUID,
 	throwExpression,
 } from "@teawithsand/tws-stl"
 
@@ -30,11 +44,11 @@ import {
 
 export class PlayerActionManager {
 	constructor(
-		private readonly playerManager: PlayerManager,
+		private readonly abookDb: AbookDb,
+		private readonly playerManager: NewPlayerManager,
 		private readonly configManager: ConfigManager,
-		private readonly whatToPlayManager: WhatToPlayManager,
-		private readonly sleepManager: SleepManager,
-		private readonly positionMoveAfterPauseManager: PositionMoveAfterPauseManager
+		private readonly entryListManager: PlayerEntryListManager,
+		private readonly sleepManager: SleepManager
 	) {
 		this.initMediaSession()
 	}
@@ -104,90 +118,74 @@ export class PlayerActionManager {
 	public localSeek = (posMillis: number) => {
 		if (!isTimeNumber(posMillis)) return
 
-		this.playerManager.mutateConfig((draft) => {
-			draft.seekPosition = posMillis
+		this.playerManager.seekQueue.enqueueSeek({
+			id: generateUUID(),
+			discardCond: SeekDiscardCondition.INSTANT,
+			seekData: {
+				type: SeekType.ABSOLUTE_IN_FILE,
+				positionMs: posMillis,
+			},
+			deadlinePerfTimestamp: null,
 		})
 	}
 
 	public localRelativeSeek = (deltaMillis: number) => {
 		if (!isTimeNumber(Math.abs(deltaMillis))) return
 
-		const currentPosition =
-			this.playerManager.playerStateBus.lastEvent.innerState.position
-		if (currentPosition === null) return
-
-		this.localSeek(Math.max(0, currentPosition + deltaMillis))
+		this.playerManager.seekQueue.enqueueSeek({
+			id: generateUUID(),
+			discardCond: SeekDiscardCondition.INSTANT,
+			seekData: {
+				type: SeekType.RELATIVE_IN_FILE,
+				positionDeltaMs: deltaMillis,
+			},
+			deadlinePerfTimestamp: null,
+		})
 	}
 
 	public globalSeek = (posMillis: number) => {
 		if (!isTimeNumber(posMillis)) return
 
-		const { metadata, entriesBag } =
-			this.playerManager.playerStateBus.lastEvent.whatToPlayData ?? {}
-		if (!metadata || !entriesBag) return
-
-		const index = metadata.getIndexFromPosition(posMillis)
-		if (index === null) return
-
-		const subtractOffset =
-			metadata.getDurationToIndex(index) ??
-			throwExpression(
-				new Error(
-					`If index was found, then duration to index must be found as well`
-				)
-			)
-
-		const entryId = entriesBag.findByIndex(index)?.id ?? null
-
-		if (entryId === null) return null
-
-		this.playerManager.mutateConfig((draft) => {
-			draft.sourceKey = entryId
-			draft.seekPosition = posMillis - subtractOffset
+		this.playerManager.seekQueue.enqueueSeek({
+			id: generateUUID(),
+			discardCond: SeekDiscardCondition.INSTANT,
+			seekData: {
+				type: SeekType.ABSOLUTE_GLOBAL,
+				positionMs: posMillis,
+			},
+			deadlinePerfTimestamp: null,
 		})
 	}
 
 	public globalRelativeSeek = (deltaMillis: number) => {
 		if (!isTimeNumber(Math.abs(deltaMillis))) return
 
-		const sourceKey =
-			this.playerManager.playerStateBus.lastEvent.innerState.config
-				.sourceKey
-		const currentPosition =
-			this.playerManager.playerStateBus.lastEvent.innerState.position
-		if (sourceKey === null || currentPosition === null) return
-
-		const { metadata, entriesBag } =
-			this.playerManager.playerStateBus.lastEvent.whatToPlayData ?? {}
-		if (!metadata || !entriesBag) return
-
-		const entryIndex = entriesBag.findIndexById(sourceKey)
-		if (entryIndex === null) return
-
-		const durationToIndex = metadata.getDurationToIndex(entryIndex)
-		if (durationToIndex === null) return
-
-		this.globalSeek(
-			Math.max(0, currentPosition + durationToIndex + deltaMillis)
-		)
+		this.playerManager.seekQueue.enqueueSeek({
+			id: generateUUID(),
+			discardCond: SeekDiscardCondition.INSTANT,
+			seekData: {
+				type: SeekType.RELATIVE_GLOBAL,
+				positionDeltaMs: deltaMillis,
+			},
+			deadlinePerfTimestamp: null,
+		})
 	}
 
 	public jump = (entryId: string, posMillis = 0) => {
-		this.playerManager.mutateConfig((draft) => {
-			draft.sourceKey = entryId
-			draft.seekPosition = posMillis || null
+		this.playerManager.seekQueue.enqueueSeek({
+			id: generateUUID(),
+			discardCond: SeekDiscardCondition.INSTANT,
+			seekData: {
+				type: SeekType.ABSOLUTE_TO_FILE,
+				playerEntryId: entryId,
+				positionMs: posMillis,
+			},
+			deadlinePerfTimestamp: null,
 		})
 	}
 
 	public nextFile = () => {
-		const provider =
-			this.playerManager.playerStateBus.lastEvent.innerState.config
-				.sourceProvider
-
-		this.playerManager.mutateConfig((draft) => {
-			draft.sourceKey = provider.getNextSourceKey(draft.sourceKey)
-			draft.seekPosition = null
-		})
+		this.entryListManager.goToNext()
 	}
 
 	public jumpForward = () => {
@@ -229,33 +227,19 @@ export class PlayerActionManager {
 	}
 
 	public prevFile = () => {
-		const provider =
-			this.playerManager.playerStateBus.lastEvent.innerState.config
-				.sourceProvider
-
-		this.playerManager.mutateConfig((draft) => {
-			const prevFileKey = provider.getPrevSourceKey(draft.sourceKey)
-
-			// TODO(teawithsand): instead consider using behavior provided by sourceProvider.
-			// maybe seek to position zero if PSK is equal to CSK
-			if (prevFileKey) {
-				draft.sourceKey = prevFileKey
-				draft.seekPosition = null
-			} else {
-				draft.seekPosition = 0
-			}
-		})
+		this.entryListManager.goToPrev()
 	}
 
 	public togglePlay = () => {
 		this.setIsPlaying(
-			!this.playerManager.playerStateBus.lastEvent.innerState.config
+			!this.playerManager.bus.lastEvent.playerState.config
 				.isPlayingWhenReady
 		)
 	}
 
 	public setIsPlaying = (isPlaying: boolean) => {
 		if (isPlaying) {
+			/*
 			// HACK(teawithsand): there is a risk that in between executing seek and setting play
 			// somebody will trigger another seeking, which would double, or in general multiple PMAP effect
 			//
@@ -279,8 +263,12 @@ export class PlayerActionManager {
 					play()
 				})
 			}
+			*/
+			this.playerManager.mutatePlayerConfig((draft) => {
+				draft.isPlayingWhenReady = true
+			})
 		} else {
-			this.playerManager.mutateConfig((draft) => {
+			this.playerManager.mutatePlayerConfig((draft) => {
 				draft.isPlayingWhenReady = false
 			})
 		}
@@ -289,7 +277,7 @@ export class PlayerActionManager {
 	public setSpeed = (speed: number) => {
 		if (!isFinite(speed) || speed <= 0 || speed >= 10) return
 
-		this.playerManager.mutateConfig((draft) => {
+		this.playerManager.mutatePlayerConfig((draft) => {
 			draft.speed = speed
 		})
 		this.configManager.globalPlayerConfig.update((draft) => {
@@ -298,7 +286,7 @@ export class PlayerActionManager {
 	}
 
 	public setPreservePitchForSpeed = (preserve: boolean) => {
-		this.playerManager.mutateConfig((draft) => {
+		this.playerManager.mutatePlayerConfig((draft) => {
 			draft.preservePitchForSpeed = preserve
 		})
 		this.configManager.globalPlayerConfig.update((draft) => {
@@ -328,13 +316,36 @@ export class PlayerActionManager {
 		}
 	}
 
-	public setWhatToPlayLocator = (locator: WhatToPlayLocator | null) => {
-		this.whatToPlayManager.setLocator(locator)
-		this.configManager.globalPersistentPlayerState.update((draft) => {
-			draft.lastPlayed = locator
-				? whatToPlaySourceLocatorToLastPlayedSource(locator)
-				: null
-		})
-		this.configManager.globalPersistentPlayerState.save()
+	/**
+	 * @deprecated Just like What-To-Play stuff
+	 */
+	public setWhatToPlayLocator = (locator: WhatToPlayLocator | null) => {}
+
+	public unsetPlaylist = () => {
+		this.entryListManager.setList(
+			new DefaultPlayerEntryList(),
+			null,
+			new PlayerEntryListMetadata({
+				type: PlayerEntryListMetadataType.UNKNOWN,
+			})
+		)
+	}
+	public setAbookToPlay = (abook: AbookEntity) => {
+		const list = new DefaultPlayerEntryList()
+		const entries = abook.entries.map(
+			(v) =>
+				new PlayerEntry(
+					new FileEntryEntityPlayerSource(this.abookDb, v)
+				)
+		)
+		list.setEntries(entries)
+		this.entryListManager.setList(
+			list,
+			entries.length ? entries[0].id : null,
+			new PlayerEntryListMetadata({
+				type: PlayerEntryListMetadataType.ABOOK,
+				abook,
+			})
+		)
 	}
 }
