@@ -28,7 +28,9 @@ import { StaticPlayerSource, isTimeNumber } from "@teawithsand/tws-player"
 import {
 	MediaSessionApiHelper,
 	MediaSessionEventType,
+	PerformanceTimestampMs,
 	generateUUID,
+	getNowPerformanceTimestamp,
 } from "@teawithsand/tws-stl"
 
 // TODO(teawithsand): hook jump back after pause manager to this class' play/pause method.
@@ -81,17 +83,18 @@ export class PlayerActionManager {
 	}
 
 	public seek = (seekData: SeekData) => {
-		if (seekData.type === SeekType.ABSOLUTE_IN_FILE) {
-			this.localSeek(seekData.positionMs)
-		} else if (seekData.type === SeekType.ABSOLUTE_TO_FILE) {
-			this.jump(seekData.playerEntryId, seekData.positionMs)
-		} else if (seekData.type === SeekType.RELATIVE_GLOBAL) {
-			this.globalRelativeSeek(seekData.positionDeltaMs)
-		} else if (seekData.type === SeekType.RELATIVE_IN_FILE) {
-			this.localRelativeSeek(seekData.positionDeltaMs)
-		} else if (seekData.type === SeekType.ABSOLUTE_GLOBAL) {
-			this.globalSeek(seekData.positionMs)
-		}
+		if (this.playerManager.seekQueue.queueLength > 10) return // silently ignore call in that case
+
+		this.playerManager.seekQueue.enqueueSeek(
+			{
+				id: generateUUID(),
+				discardCond: SeekDiscardCondition.NO_METADATA,
+				seekData: seekData,
+				deadlinePerfTimestamp: (getNowPerformanceTimestamp() +
+					100) as PerformanceTimestampMs,
+			},
+			true
+		)
 	}
 
 	public executeSeekAction = (
@@ -114,69 +117,44 @@ export class PlayerActionManager {
 	public localSeek = (posMillis: number) => {
 		if (!isTimeNumber(posMillis)) return
 
-		this.playerManager.seekQueue.enqueueSeek({
-			id: generateUUID(),
-			discardCond: SeekDiscardCondition.INSTANT,
-			seekData: {
-				type: SeekType.ABSOLUTE_IN_FILE,
-				positionMs: posMillis,
-			},
-			deadlinePerfTimestamp: null,
+		this.seek({
+			type: SeekType.ABSOLUTE_IN_FILE,
+			positionMs: posMillis,
 		})
 	}
 
 	public localRelativeSeek = (deltaMillis: number) => {
 		if (!isTimeNumber(Math.abs(deltaMillis))) return
 
-		this.playerManager.seekQueue.enqueueSeek({
-			id: generateUUID(),
-			discardCond: SeekDiscardCondition.INSTANT,
-			seekData: {
-				type: SeekType.RELATIVE_IN_FILE,
-				positionDeltaMs: deltaMillis,
-			},
-			deadlinePerfTimestamp: null,
+		this.seek({
+			type: SeekType.RELATIVE_IN_FILE,
+			positionDeltaMs: deltaMillis,
 		})
 	}
 
 	public globalSeek = (posMillis: number) => {
 		if (!isTimeNumber(posMillis)) return
 
-		this.playerManager.seekQueue.enqueueSeek({
-			id: generateUUID(),
-			discardCond: SeekDiscardCondition.INSTANT,
-			seekData: {
-				type: SeekType.ABSOLUTE_GLOBAL,
-				positionMs: posMillis,
-			},
-			deadlinePerfTimestamp: null,
+		this.seek({
+			type: SeekType.ABSOLUTE_GLOBAL,
+			positionMs: posMillis,
 		})
 	}
 
 	public globalRelativeSeek = (deltaMillis: number) => {
 		if (!isTimeNumber(Math.abs(deltaMillis))) return
 
-		this.playerManager.seekQueue.enqueueSeek({
-			id: generateUUID(),
-			discardCond: SeekDiscardCondition.INSTANT,
-			seekData: {
-				type: SeekType.RELATIVE_GLOBAL,
-				positionDeltaMs: deltaMillis,
-			},
-			deadlinePerfTimestamp: null,
+		this.seek({
+			type: SeekType.RELATIVE_GLOBAL,
+			positionDeltaMs: deltaMillis,
 		})
 	}
 
 	public jump = (entryId: string, posMillis = 0) => {
-		this.playerManager.seekQueue.enqueueSeek({
-			id: generateUUID(),
-			discardCond: SeekDiscardCondition.INSTANT,
-			seekData: {
-				type: SeekType.ABSOLUTE_TO_FILE,
-				playerEntryId: entryId,
-				positionMs: posMillis,
-			},
-			deadlinePerfTimestamp: null,
+		this.seek({
+			type: SeekType.ABSOLUTE_TO_FILE,
+			playerEntryId: entryId,
+			positionMs: posMillis,
 		})
 	}
 
