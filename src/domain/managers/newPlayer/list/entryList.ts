@@ -62,6 +62,8 @@ export class DefaultPlayerEntryList implements PlayerEntryList {
 			})
 		}
 
+		emitUpdate()
+
 		const runLoading = async () => {
 			let i = 0
 			for (const [entry, preloadedResult] of zip(entries, [...results])) {
