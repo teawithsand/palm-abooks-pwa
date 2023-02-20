@@ -89,6 +89,16 @@ export class PlayerEntryListManager {
 		this.innerSetList(list, entryId, metadata)
 	}
 
+	goToEntry = (id: string) => {
+		if (this.innerBus.lastEvent.currentEntryId !== id) {
+			this.innerBus.emitEvent(
+				produce(this.innerBus.lastEvent, (draft) => {
+					draft.currentEntryId = id
+				})
+			)
+		}
+	}
+
 	goToNext = () => {
 		this.innerBus.emitEvent(
 			produce(this.innerBus.lastEvent, (draft) => {

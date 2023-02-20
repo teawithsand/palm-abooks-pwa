@@ -107,6 +107,9 @@ export class NewPlayerManager {
 		private readonly abookDb: AbookDb
 	) {
 		const player = new Player()
+		this.seekQueue = new NewSeekQueue(player, (id) => {
+			playerEntryListManager.goToEntry(id)
+		})
 		this.player = player
 		this.innerBus = new DefaultStickyEventBus({
 			playerEntryListManagerState: playerEntryListManager.bus.lastEvent,
@@ -125,9 +128,9 @@ export class NewPlayerManager {
 		player.stateBus.addSubscriber((state) => {
 			if (state.isEnded) {
 				if (!handledIsEnded) {
+					handledIsEnded = true
 					playerEntryListManager.goToNext()
 				}
-				handledIsEnded = true
 			} else {
 				handledIsEnded = false
 			}
@@ -176,8 +179,6 @@ export class NewPlayerManager {
 				draft.source = entry?.source ?? null
 			})
 		})
-
-		this.seekQueue = new NewSeekQueue(player)
 
 		this.innerBus.addSubscriber((state) => {
 			this.positionSaver.setPosition(

@@ -20,6 +20,8 @@ import {
 	throwExpression,
 } from "@teawithsand/tws-stl"
 
+const DELAY = 10
+
 export enum SeekEventType {
 	PERFORMED = 1,
 	DISCARDED_TIMEOUT = 2,
@@ -70,7 +72,10 @@ export class NewSeekQueue {
 		this.resolutionDataBus.emitEvent(rd)
 	}
 
-	constructor(private readonly player: Player) {
+	constructor(
+		private readonly player: Player,
+		private readonly onFileChangingSeek: (sourceId: string) => void
+	) {
 		this.intervalHelper.disable()
 
 		this.intervalHelper.bus.addSubscriber(() => {
@@ -224,7 +229,6 @@ export class NewSeekQueue {
 					!bag.isEmpty && // There are some entries that we can operate on
 					!!resolved && // Succeeded to resolve seek
 					!filedToLoad && // Didn't fail to load entry by it's id
-					playerState.config.seekPosition === null && // Done previous seek
 					playerState.positionUpdatedAfterSeek && // Update current position after previous seek
 					(!!entry || !!playerState.config.source) // Either: current entry is set or we will set one
 
@@ -235,11 +239,13 @@ export class NewSeekQueue {
 					// this pop has to be there because updating config causes state to recompute, which would enter infinite recursion in that case
 					this.queue.pop()
 
+					// TODO(teawithsand): find better way of notifying playerEntryListManager about change of entry, so seek can be performed
+					if (entry) {
+						this.onFileChangingSeek(entry.id)
+					}
+
 					// not the most elegant thing to do(as we get triggered by this state's updates), but will work
 					this.player.mutateConfig((draft) => {
-						if (entry) {
-							draft.source = entry.source
-						}
 						draft.seekPosition = resolved.positionMs
 					})
 
@@ -265,7 +271,7 @@ export class NewSeekQueue {
 		} finally {
 			if (!this.queue.isEmpty) {
 				// generate some events that may trigger new seek TBD
-				this.intervalHelper.setDelay(10, false)
+				this.intervalHelper.setDelay(DELAY, false)
 			} else {
 				this.intervalHelper.disable()
 			}
