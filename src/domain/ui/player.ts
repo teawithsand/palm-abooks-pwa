@@ -48,12 +48,13 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 
 	const currentEntryDuration = playerManagerState.playerState.duration
 
-	const globalPositionUpToCurrentEntry = currentEntryIndex
-		? entriesBag.metadataBag.getDurationToIndex(currentEntryIndex)
-		: null
+	const globalPositionUpToCurrentEntry =
+		currentEntryIndex !== null
+			? entriesBag.metadataBag.getDurationToIndex(currentEntryIndex)
+			: null
 
 	const currentGlobalPosition =
-		globalPositionUpToCurrentEntry && currentEntryPosition
+		globalPositionUpToCurrentEntry !== null && currentEntryPosition !== null
 			? currentEntryPosition + globalPositionUpToCurrentEntry
 			: null
 
@@ -70,7 +71,7 @@ export const useUiPlayerData = (): UiPlayerData | null => {
 	const isPositionCorrupted =
 		playerManagerState.playerState.isSeeking ||
 		playerManagerState.playerState.config.seekPosition !== null ||
-		playerManagerState.playerState.positionUpdatedAfterSeek
+		!playerManagerState.playerState.positionUpdatedAfterSeek
 
 	const lastValidPosition = isPositionCorrupted
 		? lastValidPositionRef.current ?? currentPosition
