@@ -1,6 +1,6 @@
 import { useAppManager } from "@app/domain/managers/app"
 import { useUiPlayerData } from "@app/domain/ui/player"
-import React from "react"
+import React, { ChangeEvent, useCallback, useRef } from "react"
 import styled from "styled-components"
 
 import { Form } from "react-bootstrap"
@@ -15,6 +15,38 @@ export const PlayerLocalProgressBar = () => {
 	const duration = lastValidPosition?.currentEntryDuration ?? 0
 	const position = lastValidPosition?.currentEntryPosition ?? 0
 
+	const lastEventTimestampRef = useRef<number | null>(null)
+	const wasPlayingRef = useRef<boolean | null>(null)
+
+	const onChange = useCallback(
+		(e: ChangeEvent) => {
+			if (!e.isTrusted) return
+
+			const lastTimestamp = lastEventTimestampRef.current
+			if (lastTimestamp !== null) {
+				if (e.timeStamp < lastTimestamp) return
+			}
+			lastEventTimestampRef.current = e.timeStamp
+
+			const value = parseInt((e.target as any).value)
+			if (!isFinite(value) || value < 0) return
+			actions.localSeek(value)
+		},
+		[actions, lastEventTimestampRef]
+	)
+
+	const onDown = useCallback(() => {
+		wasPlayingRef.current = uiData?.isPlaying ?? null
+		if (wasPlayingRef.current === true) {
+			actions.setIsPlaying(false)
+		}
+	}, [wasPlayingRef, uiData?.isPlaying, actions])
+
+	const onUp = useCallback(() => {
+		const { current } = wasPlayingRef
+		if (current !== null) actions.setIsPlaying(current)
+	}, [actions, wasPlayingRef])
+
 	return (
 		<Bar>
 			<Form.Range
@@ -27,13 +59,9 @@ export const PlayerLocalProgressBar = () => {
 						null ||
 					(lastValidPosition?.currentEntryPosition ?? null) === null
 				}
-				onInput={(v) => {
-					if (v.isTrusted) {
-						const value = parseInt((v.target as any).value)
-						if (!isFinite(value) || value < 0) return
-						actions.localSeek(value)
-					}
-				}}
+				onPointerDown={onDown}
+				onPointerUp={onUp}
+				onChange={onChange}
 			/>
 		</Bar>
 	)
