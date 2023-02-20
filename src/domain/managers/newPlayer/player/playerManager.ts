@@ -126,7 +126,7 @@ export class NewPlayerManager {
 
 		let handledIsEnded = false
 		player.stateBus.addSubscriber((state) => {
-			if (state.isEnded) {
+			if (state.isEnded && state.config.isPlayingWhenReady) {
 				if (!handledIsEnded) {
 					handledIsEnded = true
 					playerEntryListManager.goToNext()
