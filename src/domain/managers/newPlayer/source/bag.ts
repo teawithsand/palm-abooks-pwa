@@ -5,7 +5,7 @@ import {
 } from "@app/domain/defines/seek"
 import { PlayerEntry } from "@app/domain/managers/newPlayer/source/entry"
 import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/source/source"
-import { MetadataBag } from "@teawithsand/tws-player"
+import { MetadataBag, MetadataLoadingResultType } from "@teawithsand/tws-player"
 
 export class PlayerEntriesBag {
 	public readonly metadataBag: MetadataBag
@@ -50,14 +50,33 @@ export class PlayerEntriesBag {
 		seekData: AbsoluteSeekData
 	): TrivialSeekData | null => {
 		if (seekData.type === SeekType.ABSOLUTE_GLOBAL) {
-			const index = this.metadataBag.getIndexFromPosition(
+			let index = this.metadataBag.getIndexFromPosition(
 				seekData.positionMs
 			)
 			if (index === null) return null
+			let position = seekData.positionMs
+			const duration = this.metadataBag.getDurationToIndex(index)
+			if (duration === null) return null
+
+			// cap result if position is after the end 
+			if (index >= this.metadataBag.length) {
+				index = this.metadataBag.length - 1
+
+				const res = this.metadataBag.results[index]
+				if (
+					res &&
+					res.type === MetadataLoadingResultType.OK &&
+					res.metadata.duration !== null
+				) {
+					position = res.metadata.duration
+				} else {
+					return null
+				}
+			}
 
 			return {
 				playerEntryId: this.entries[index].id,
-				positionMs: seekData.positionMs,
+				positionMs: seekData.positionMs - duration,
 			}
 		} else if (seekData.type === SeekType.ABSOLUTE_IN_FILE) {
 			return {
