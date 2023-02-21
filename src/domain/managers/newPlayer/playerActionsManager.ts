@@ -16,6 +16,7 @@ import {
 } from "@app/domain/managers/newPlayer/list/metadata"
 import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/list/playerEntryListManager"
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
+import { SeekBackManager } from "@app/domain/managers/newPlayer/seekBack/seekBackManager"
 import {
 	SleepConfig,
 	SleepManager,
@@ -33,20 +34,14 @@ import {
 	getNowPerformanceTimestamp,
 } from "@teawithsand/tws-stl"
 
-// TODO(teawithsand): hook jump back after pause manager to this class' play/pause method.
-// TODO(teawithsand): hook this manager everywhere player's needed
-
-// TODO(teawithsand): put position loading somewhere, so that player UI is disabled BEFORE position load happens
-
-// TODO(teawithsand): implement seek data here
-
 export class PlayerActionManager {
 	constructor(
 		private readonly abookDb: AbookDb,
 		private readonly playerManager: NewPlayerManager,
 		private readonly configManager: ConfigManager,
 		private readonly entryListManager: PlayerEntryListManager,
-		private readonly sleepManager: SleepManager
+		private readonly sleepManager: SleepManager,
+		private readonly seekBackManager: SeekBackManager
 	) {
 		this.initMediaSession()
 	}
@@ -85,16 +80,13 @@ export class PlayerActionManager {
 	public seek = (seekData: SeekData) => {
 		if (this.playerManager.seekQueue.queueLength > 10) return // silently ignore call in that case
 
-		this.playerManager.seekQueue.enqueueSeek(
-			{
-				id: generateUUID(),
-				discardCond: SeekDiscardCondition.NO_METADATA,
-				seekData: seekData,
-				deadlinePerfTimestamp: (getNowPerformanceTimestamp() +
-					100) as PerformanceTimestampMs,
-			},
-			true
-		)
+		this.playerManager.seekQueue.enqueueSeek({
+			id: generateUUID(),
+			discardCond: SeekDiscardCondition.NO_METADATA,
+			seekData: seekData,
+			deadlinePerfTimestamp: (getNowPerformanceTimestamp() +
+				100) as PerformanceTimestampMs,
+		})
 	}
 
 	public executeSeekAction = (
@@ -204,43 +196,44 @@ export class PlayerActionManager {
 		this.entryListManager.goToPrev()
 	}
 
-	public togglePlay = () => {
+	public togglePlay = (jumpBack = true) => {
 		this.setIsPlaying(
 			!this.playerManager.bus.lastEvent.playerState.config
-				.isPlayingWhenReady
+				.isPlayingWhenReady,
+				jumpBack
 		)
 	}
 
-	public setIsPlaying = (isPlaying: boolean) => {
+	public setIsPlaying = (isPlaying: boolean, jumpBack = true) => {
 		if (isPlaying) {
-			/*
 			// HACK(teawithsand): there is a risk that in between executing seek and setting play
 			// somebody will trigger another seeking, which would double, or in general multiple PMAP effect
 			//
 			// This is now handled by hack in PMAPManager, which resets timer when enqueueJumpBackAfterSeek occurs.
-			const res = this.positionMoveAfterPauseManager.enqueueJumpBackSeek()
 
 			const play = () => {
-				this.playerManager.mutateConfig((draft) => {
+				this.playerManager.mutatePlayerConfig((draft) => {
 					draft.isPlayingWhenReady = true
 				})
 			}
 
-			if (!res) {
-				play()
-			} else {
-				// TODO(teawithsand): skip call to play if PMAP seeking was started already
-				res.addSubscriber((ev, unsubscribe) => {
-					if (!ev) return
-					unsubscribe()
+			if (jumpBack) {
+				const res = this.seekBackManager.onBeforeToggledToPlay()
 
+				if (!res) {
 					play()
-				})
+				} else {
+					// TODO(teawithsand): skip call to play if PMAP seeking was started already
+					res.addSubscriber((ev, unsubscribe) => {
+						if (!ev) return
+						unsubscribe()
+
+						play()
+					})
+				}
+			} else {
+				play()
 			}
-			*/
-			this.playerManager.mutatePlayerConfig((draft) => {
-				draft.isPlayingWhenReady = true
-			})
 		} else {
 			this.playerManager.mutatePlayerConfig((draft) => {
 				draft.isPlayingWhenReady = false

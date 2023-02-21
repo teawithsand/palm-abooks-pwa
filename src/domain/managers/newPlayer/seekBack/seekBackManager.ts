@@ -13,9 +13,45 @@ export class SeekBackManager {
 
 	private currentMetadataId: string | null = null
 	private lastPauseTimestamp: PerformanceTimestampMs | null = null
-	private waitUntilPlay = false
-    
-	constructor(configManger: ConfigManager, playerManager: NewPlayerManager) {
+	private currentIsPlaying = false
+
+	private onPause = () => {
+		this.lastPauseTimestamp = getNowPerformanceTimestamp()
+	}
+
+	private onPlay = () => {
+		this.lastPauseTimestamp = null
+	}
+
+	onBeforeToggledToPlay = () => {
+		if (this.lastPauseTimestamp === null) return
+
+		const pauseDuration = Math.max(
+			0,
+			getNowPerformanceTimestamp() - this.lastPauseTimestamp
+		)
+		if (this.seekBackStrategy) {
+			const time =
+				this.seekBackStrategy.computeJumpBackTime(pauseDuration)
+			return this.playerManager.seekQueue.enqueueSeek({
+				id: generateUUID(),
+				discardCond: SeekDiscardCondition.NEVER,
+				seekData: {
+					type: SeekType.RELATIVE_GLOBAL,
+					positionDeltaMs: -time,
+				},
+				deadlinePerfTimestamp: (getNowPerformanceTimestamp() +
+					300) as PerformanceTimestampMs,
+			})
+		}
+
+		return null
+	}
+
+	constructor(
+		configManger: ConfigManager,
+		private readonly playerManager: NewPlayerManager
+	) {
 		configManger.globalPlayerConfig.bus.addSubscriber((config) => {
 			const data = config?.seekBackStrategy ?? null
 			this.seekBackStrategy = data
@@ -24,43 +60,21 @@ export class SeekBackManager {
 		})
 		playerManager.bus.addSubscriber((state) => {
 			const metadataId = state.playerEntryListManagerState.listMetadata.id
+			const isPlaying = state.playerState.config.isPlayingWhenReady
 			if (metadataId !== this.currentMetadataId) {
 				this.currentMetadataId = metadataId
 
 				this.lastPauseTimestamp = null
-				this.waitUntilPlay = true
+				this.currentIsPlaying = isPlaying
 			}
 
-			const isPlaying = state.playerState.config.isPlayingWhenReady
-			if (this.waitUntilPlay && isPlaying) {
-				this.waitUntilPlay = false
-			}
-
-			if (!this.waitUntilPlay && !isPlaying) {
-				if (this.lastPauseTimestamp !== null) {
-					const pauseDuration = Math.max(
-						0,
-						getNowPerformanceTimestamp() - this.lastPauseTimestamp
-					)
-					if (this.seekBackStrategy) {
-						const time =
-							this.seekBackStrategy.computeJumpBackTime(
-								pauseDuration
-							)
-						playerManager.seekQueue.enqueueSeek({
-							id: generateUUID(),
-							discardCond: SeekDiscardCondition.NEVER,
-							seekData: {
-								type: SeekType.RELATIVE_GLOBAL,
-								positionDeltaMs: -time,
-							},
-							deadlinePerfTimestamp:
-								(getNowPerformanceTimestamp() +
-									300) as PerformanceTimestampMs,
-						})
-					}
+			if (isPlaying !== this.currentIsPlaying) {
+				this.currentIsPlaying = isPlaying
+				if (isPlaying) {
+					this.onPlay()
+				} else {
+					this.onPause()
 				}
-				this.lastPauseTimestamp = getNowPerformanceTimestamp()
 			}
 		})
 	}

@@ -37,7 +37,7 @@ export class AppManager {
 		this.shakeManager
 	)
 
-	public readonly positionMoveAfterPauseManager = new SeekBackManager(
+	public readonly seekBackManager = new SeekBackManager(
 		this.configManager,
 		this.playerManager
 	)
@@ -47,7 +47,8 @@ export class AppManager {
 		this.playerManager,
 		this.configManager,
 		this.entryListManager,
-		this.sleepManager
+		this.sleepManager,
+		this.seekBackManager,
 	)
 
 	public readonly initManager = new InitializationManager()
