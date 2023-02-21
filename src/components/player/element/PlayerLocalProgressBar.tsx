@@ -44,14 +44,14 @@ export const PlayerLocalProgressBar = () => {
 		isClickedRef.current = true
 		wasPlayingRef.current = uiData?.isPlaying ?? null
 		if (wasPlayingRef.current === true) {
-			actions.setIsPlaying(false)
+			actions.setIsPlaying(false, false)
 		}
 	}, [wasPlayingRef, isClickedRef, uiData?.isPlaying, actions])
 
 	const onUp = useCallback(() => {
 		isClickedRef.current = false
 		const { current } = wasPlayingRef
-		if (current !== null) actions.setIsPlaying(current)
+		if (current !== null) actions.setIsPlaying(current, false)
 		const value = seekToRef.current
 		if (value !== null) {
 			actions.localSeek(value)
