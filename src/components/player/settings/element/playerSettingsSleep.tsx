@@ -1,8 +1,8 @@
-import { INIT_GLOBAL_PLAYER_CONFIG } from "@app/domain/defines/config/config"
+import { SleepConfig } from "@app/domain/defines/config/sleep"
 import { useAppManager } from "@app/domain/managers/app"
 import { SleepManagerStateType } from "@app/domain/managers/newPlayer/sleep/sleepManager"
+import { useConfig, useConfigUpdater } from "@teawithsand/tws-config"
 import { formatDurationSeconds } from "@teawithsand/tws-stl"
-import { useStickySubscribable } from "@teawithsand/tws-stl-react"
 import React from "react"
 import { Form } from "react-bootstrap"
 import styled from "styled-components"
@@ -13,11 +13,29 @@ const Container = styled.div`
 
 export const PlayerSettingsSleepSection = () => {
 	const app = useAppManager()
-	const sleepConfig =
-		useStickySubscribable(app.configManager.globalPlayerConfig.bus)
-			?.sleepConfig || INIT_GLOBAL_PLAYER_CONFIG.sleepConfig
+	const sleepConfig = useConfig(
+		app.configManager.globalPlayerConfig
+	).sleepConfig
+	const updater = useConfigUpdater(app.configManager.globalPlayerConfig)
 	const actions = app.playerActionsManager
-	const resetSleepIfNeeded = () => actions.resetSleep()
+
+	const updateSleepConfig = (newSleepConfig: SleepConfig) => {
+		updater.updateConfig((draft) => {
+			draft.sleepConfig = newSleepConfig
+		})
+		updater.save()
+
+		actions.setSleepFromConfig()
+	}
+
+	const setSleepEnabled = (enabled: boolean) => {
+		updater.updateConfig((draft) => {
+			draft.isSleepEnabled = enabled
+		})
+		updater.save()
+
+		actions.setSleepFromConfig()
+	}
 
 	return (
 		<Container>
@@ -37,17 +55,14 @@ export const PlayerSettingsSleepSection = () => {
 				value={sleepConfig.baseDuration}
 				onInput={(v) => {
 					if (v.isTrusted) {
-						app.configManager.globalPlayerConfig.update((draft) => {
-							const value = parseInt((v.target as any).value)
-							if (!isFinite(value) || value < 0) return
+						const value = parseInt((v.target as any).value)
+						if (!isFinite(value) || value < 0) return
 
-							draft.sleepConfig = {
-								...sleepConfig,
-								baseDuration:
-									value - sleepConfig.turnVolumeDownDuration,
-							}
+						updateSleepConfig({
+							...sleepConfig,
+							baseDuration:
+								value - sleepConfig.turnVolumeDownDuration,
 						})
-						resetSleepIfNeeded()
 					}
 				}}
 			/>
@@ -59,18 +74,14 @@ export const PlayerSettingsSleepSection = () => {
 						? 10 * 1000
 						: 0
 
-					app.configManager.globalPlayerConfig.update((draft) => {
-						draft.sleepConfig = {
-							...sleepConfig,
-							baseDuration:
-								sleepConfig.baseDuration -
-								(newTurnVolumeDownDuration -
-									sleepConfig.turnVolumeDownDuration),
-							turnVolumeDownDuration: newTurnVolumeDownDuration,
-						}
+					updateSleepConfig({
+						...sleepConfig,
+						baseDuration:
+							sleepConfig.baseDuration -
+							(newTurnVolumeDownDuration -
+								sleepConfig.turnVolumeDownDuration),
+						turnVolumeDownDuration: newTurnVolumeDownDuration,
 					})
-
-					resetSleepIfNeeded()
 				}}
 			/>
 			<Form.Check
@@ -82,11 +93,7 @@ export const PlayerSettingsSleepSection = () => {
 						SleepManagerStateType.ENABLED_BUT_STOPPED
 				}
 				onChange={(v) => {
-					if (v.target.checked) {
-						app.playerActionsManager.setSleepFromConfig()
-					} else {
-						app.playerActionsManager.unsetSleep()
-					}
+					setSleepEnabled(v.target.checked)
 				}}
 			/>
 			<Form.Check
@@ -95,12 +102,10 @@ export const PlayerSettingsSleepSection = () => {
 				disabled={!app.shakeManager.isSupported}
 				onChange={(v) => {
 					const checked = v.target.checked
-
-					app.configManager.globalPlayerConfig.update((draft) => {
-						draft.sleepConfig.shakeResetsSleep = checked
+					updateSleepConfig({
+						...sleepConfig,
+						shakeResetsSleep: checked,
 					})
-
-					resetSleepIfNeeded()
 				}}
 			/>
 		</Container>

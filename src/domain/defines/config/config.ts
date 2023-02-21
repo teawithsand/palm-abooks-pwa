@@ -1,4 +1,5 @@
 import {
+	DEFAULT_SLEEP_CONFIG,
 	SleepConfig,
 	SleepConfigSerializer,
 	StoredSleepConfig,
@@ -18,8 +19,9 @@ export type StoredGlobalPlayerConfig = {
 	version: 0
 
 	speed: number
-	sleepConfig: StoredSleepConfig | null
 	preservePitchForSpeed: boolean
+
+	sleepConfig: StoredSleepConfig
 	isSleepEnabled: boolean
 
 	lastFileTransferName: string
@@ -35,8 +37,9 @@ export type StoredGlobalPlayerConfig = {
 
 export type GlobalPlayerConfig = {
 	speed: number
-	sleepConfig: SleepConfig | null
 	preservePitchForSpeed: boolean
+
+	sleepConfig: SleepConfig
 	isSleepEnabled: boolean
 
 	lastFileTransferName: string
@@ -59,14 +62,8 @@ export const INIT_GLOBAL_PLAYER_CONFIG: GlobalPlayerConfig = {
 		coefficient: 1 / 3,
 		limit: 60 * 1000,
 	}),
+	sleepConfig: DEFAULT_SLEEP_CONFIG,
 	isSleepEnabled: false,
-	sleepConfig: {
-		baseDuration: 30 * 60 * 1000,
-		shakeResetsSleep: false,
-		turnVolumeDownDuration: 10 * 1000,
-		turnVolumeDownEndLevel: 0,
-		turnVolumeDownStartLevel: 1,
-	},
 
 	lastFileTransferName: "",
 
@@ -96,10 +93,9 @@ export const GlobalPlayerConfigSerializer = new VersioningSerializer<
 		version: 0,
 
 		speed: value.speed,
-		sleepConfig: value.sleepConfig
-			? SleepConfigSerializer.serialize(value.sleepConfig)
-			: null,
 		preservePitchForSpeed: value.preservePitchForSpeed,
+
+		sleepConfig: SleepConfigSerializer.serialize(value.sleepConfig),
 		isSleepEnabled: value.isSleepEnabled,
 
 		lastFileTransferName: value.lastFileTransferName,
@@ -119,11 +115,9 @@ export const GlobalPlayerConfigSerializer = new VersioningSerializer<
 	{
 		0: (value) => ({
 			speed: value.speed,
-			sleepConfig: value.sleepConfig
-				? SleepConfigSerializer.deserialize(value.sleepConfig)
-				: null,
-			preservePitchForSpeed: value.preservePitchForSpeed,
+			sleepConfig: SleepConfigSerializer.deserialize(value.sleepConfig),
 			isSleepEnabled: value.isSleepEnabled,
+			preservePitchForSpeed: value.preservePitchForSpeed,
 			lastFileTransferName: value.lastFileTransferName,
 			seekBackStrategy: SeekBackStrategyEntity.Serializer.deserialize(
 				value.seekBackStrategy

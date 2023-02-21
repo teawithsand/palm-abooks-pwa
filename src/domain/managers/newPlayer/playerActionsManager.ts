@@ -240,35 +240,37 @@ export class PlayerActionManager {
 	public setSpeed = (speed: number) => {
 		if (!isFinite(speed) || speed <= 0 || speed >= 10) return
 
-		this.playerManager.mutatePlayerConfig((draft) => {
-			draft.speed = speed
-		})
 		this.configManager.globalPlayerConfig.updateConfig((draft) => {
 			draft.speed = speed
 		})
+		this.configManager.globalPlayerConfig.save()
 	}
 
 	public setPreservePitchForSpeed = (preserve: boolean) => {
-		this.playerManager.mutatePlayerConfig((draft) => {
-			draft.preservePitchForSpeed = preserve
-		})
 		this.configManager.globalPlayerConfig.updateConfig((draft) => {
 			draft.preservePitchForSpeed = preserve
 		})
+		this.configManager.globalPlayerConfig.save()
 	}
 
 	public setSleepFromConfig = () => {
 		const config = this.configManager.globalPlayerConfig.configBus.lastEvent
 		if (!config) return
 
-		this.sleepManager.setSleep(config.sleepConfig)
+		if (config.isSleepEnabled) {
+			this.sleepManager.setSleep(config.sleepConfig)
+		} else {
+			this.sleepManager.setSleep(null)
+		}
 	}
 
 	public setSleepConfigManual = (sleepConfig: SleepConfig | null) => {
-		this.configManager.globalPlayerConfig.updateConfig(draft => {
-			draft.sleepConfig = sleepConfig
-		})
-		this.configManager.globalPlayerConfig.save()
+		if (sleepConfig) {
+			this.configManager.globalPlayerConfig.updateConfig((draft) => {
+				draft.sleepConfig = sleepConfig
+			})
+			this.configManager.globalPlayerConfig.save()
+		}
 		this.sleepManager.setSleep(sleepConfig)
 	}
 

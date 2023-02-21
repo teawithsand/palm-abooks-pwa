@@ -26,7 +26,7 @@ export class FileTransferStateManager {
 	) {
 		let loaded = false
 
-		configManager.globalPlayerConfig.bus.addSubscriber(
+		configManager.globalPlayerConfig.configBus.addSubscriber(
 			(config, canceler) => {
 				if (!config) return
 				canceler()
@@ -44,7 +44,7 @@ export class FileTransferStateManager {
 
 		this.innerStateBus.addSubscriber((state) => {
 			if (loaded) {
-				configManager.globalPlayerConfig.update((draft) => {
+				configManager.globalPlayerConfig.updateConfig((draft) => {
 					draft.lastFileTransferName = state.name
 				})
 				// configManager.globalPlayerConfig.save()

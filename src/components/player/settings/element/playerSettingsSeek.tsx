@@ -1,7 +1,6 @@
 import { PlayerSeekActionPicker } from "@app/components/player/settings/playerSeekActionPicker"
-import { INIT_GLOBAL_PLAYER_CONFIG } from "@app/domain/defines/config/config"
 import { useAppManager } from "@app/domain/managers/app"
-import { useStickySubscribable } from "@teawithsand/tws-stl-react"
+import { useConfigOrDefault, useConfigUpdater } from "@teawithsand/tws-config"
 import React from "react"
 import styled from "styled-components"
 
@@ -14,9 +13,10 @@ const Section = styled.div``
 
 export const PlayerSettingsSeekAction = () => {
 	const app = useAppManager()
-	const seekActions =
-		useStickySubscribable(app.configManager.globalPlayerConfig.bus)
-			?.seekActions || INIT_GLOBAL_PLAYER_CONFIG.seekActions
+	const seekActions = useConfigOrDefault(
+		app.configManager.globalPlayerConfig
+	).seekActions
+	const updater = useConfigUpdater(app.configManager.globalPlayerConfig)
 	return (
 		<Container>
 			<h3>Seek</h3>
@@ -27,7 +27,7 @@ export const PlayerSettingsSeekAction = () => {
 					value={seekActions.short}
 					defaultSeekTimeMillis={10000}
 					onChange={(v) => {
-						app.configManager.globalPlayerConfig.update((draft) => {
+						updater.updateConfig((draft) => {
 							draft.seekActions.short = v
 						})
 					}}
@@ -39,7 +39,7 @@ export const PlayerSettingsSeekAction = () => {
 					value={seekActions.long}
 					defaultSeekTimeMillis={60000}
 					onChange={(v) => {
-						app.configManager.globalPlayerConfig.update((draft) => {
+						updater.updateConfig((draft) => {
 							draft.seekActions.long = v
 						})
 					}}
@@ -51,7 +51,7 @@ export const PlayerSettingsSeekAction = () => {
 					value={seekActions.mediaSession}
 					defaultSeekTimeMillis={10000}
 					onChange={(v) => {
-						app.configManager.globalPlayerConfig.update((draft) => {
+						updater.updateConfig((draft) => {
 							draft.seekActions.mediaSession = v
 						})
 					}}
