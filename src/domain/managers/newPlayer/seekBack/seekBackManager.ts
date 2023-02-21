@@ -1,6 +1,5 @@
 import { SeekBackStrategyEntity } from "@app/domain/defines/player/seekBack/strategy"
 import { SeekDiscardCondition, SeekType } from "@app/domain/defines/seek"
-import { ConfigManager } from "@app/domain/managers/config"
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
 import {
 	PerformanceTimestampMs,
@@ -30,34 +29,28 @@ export class SeekBackManager {
 			0,
 			getNowPerformanceTimestamp() - this.lastPauseTimestamp
 		)
-		if (this.seekBackStrategy) {
-			const time =
-				this.seekBackStrategy.computeJumpBackTime(pauseDuration)
-			return this.playerManager.seekQueue.enqueueSeek({
-				id: generateUUID(),
-				discardCond: SeekDiscardCondition.NEVER,
-				seekData: {
-					type: SeekType.RELATIVE_GLOBAL,
-					positionDeltaMs: -time,
-				},
-				deadlinePerfTimestamp: (getNowPerformanceTimestamp() +
-					300) as PerformanceTimestampMs,
-			})
+		if (!this.seekBackStrategy) {
+			return null
 		}
 
-		return null
+		const time = this.seekBackStrategy.computeJumpBackTime(pauseDuration)
+		return this.playerManager.seekQueue.enqueueSeek({
+			id: generateUUID(),
+			discardCond: SeekDiscardCondition.NEVER,
+			seekData: {
+				type: SeekType.RELATIVE_GLOBAL,
+				positionDeltaMs: -time,
+			},
+			deadlinePerfTimestamp: (getNowPerformanceTimestamp() +
+				300) as PerformanceTimestampMs,
+		})
 	}
 
-	constructor(
-		configManger: ConfigManager,
-		private readonly playerManager: NewPlayerManager
-	) {
-		configManger.globalPlayerConfig.bus.addSubscriber((config) => {
-			const data = config?.seekBackStrategy ?? null
-			this.seekBackStrategy = data
-				? SeekBackStrategyEntity.Serializer.deserialize(data)
-				: null
-		})
+	setStrategy = (strategy: SeekBackStrategyEntity) => {
+		this.seekBackStrategy = strategy
+	}
+
+	constructor(private readonly playerManager: NewPlayerManager) {
 		playerManager.bus.addSubscriber((state) => {
 			const metadataId = state.playerEntryListManagerState.listMetadata.id
 			const isPlaying = state.playerState.config.isPlayingWhenReady

@@ -1,5 +1,5 @@
 import { PositionType, PositionVariants } from "@app/domain/defines/position"
-import { objectEquals } from "@app/domain/managers/config"
+import { objectEquals } from "@app/domain/managers/config/config"
 import {
 	PlayerEntryListMetadata,
 	PlayerEntryListMetadataType,

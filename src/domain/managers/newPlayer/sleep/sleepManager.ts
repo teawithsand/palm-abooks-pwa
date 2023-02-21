@@ -1,4 +1,4 @@
-import { ConfigManager } from "@app/domain/managers/config"
+import { SleepConfig } from "@app/domain/defines/config/sleep"
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
 import { ShakeManager } from "@app/domain/managers/shakeManager"
 import { Timestamps, getTimestamps } from "@app/util/timestamps"
@@ -12,16 +12,6 @@ import {
 	StickyEventBus,
 	StickySubscribable,
 } from "@teawithsand/tws-stl"
-
-export type SleepConfig = {
-	baseDuration: number
-
-	turnVolumeDownDuration: number // ignored when not duration number or zero
-	turnVolumeDownStartLevel: number
-	turnVolumeDownEndLevel: number
-
-	shakeResetsSleep: boolean
-}
 
 export enum SleepManagerStateType {
 	DISABLED = 1,
@@ -62,17 +52,7 @@ export class SleepManager {
 		this.configBus.emitEvent(sleepConfig)
 	}
 
-	setSleepConfigFromStoredConfig = () => {
-		this.setSleep(
-			this.configManager.globalPlayerConfig.getOrThrow().sleepConfig
-		)
-	}
-
-	constructor(
-		playerManager: NewPlayerManager,
-		private readonly configManager: ConfigManager,
-		shakeManager: ShakeManager
-	) {
+	constructor(playerManager: NewPlayerManager, shakeManager: ShakeManager) {
 		let currentSleepConfig: SleepConfig | null = null
 		let lastIsPlayingWhenReady =
 			playerManager.bus.lastEvent.playerState.config.isPlayingWhenReady
@@ -122,16 +102,6 @@ export class SleepManager {
 				playerManager.bus.lastEvent.playerState.config
 					.isPlayingWhenReady
 			)
-
-			// HACK(teawithsand): config should be already loaded, but this will work as well
-			if (configManager.globalPlayerConfig.loaded) {
-				configManager.globalPlayerConfig.update((draft) => {
-					if (config) {
-						draft.sleepConfig = config
-					}
-					draft.isSleepEnabled = config !== null
-				})
-			}
 		})
 
 		playerManager.bus.addSubscriber((state) => {

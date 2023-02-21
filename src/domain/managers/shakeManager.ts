@@ -41,9 +41,11 @@ export class ShakeManager {
 	}
 
 	enable = () => {
-		this.innerBus.emitEvent({
-			enabled: true,
-		})
+		if (!this.innerBus.lastEvent.enabled) {
+			this.innerBus.emitEvent({
+				enabled: true,
+			})
+		}
 	}
 
 	constructor() {

@@ -1,3 +1,4 @@
+import { SleepConfig } from "@app/domain/defines/config/sleep"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import {
 	PlayerSeekAction,
@@ -8,7 +9,7 @@ import {
 	SeekDiscardCondition,
 	SeekType,
 } from "@app/domain/defines/seek"
-import { ConfigManager } from "@app/domain/managers/config"
+import { ConfigManager } from "@app/domain/managers/config/config"
 import { DefaultPlayerEntryList } from "@app/domain/managers/newPlayer/list/entryList"
 import {
 	PlayerEntryListMetadata,
@@ -18,7 +19,6 @@ import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/list/play
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
 import { SeekBackManager } from "@app/domain/managers/newPlayer/seekBack/seekBackManager"
 import {
-	SleepConfig,
 	SleepManager,
 	SleepManagerStateType,
 } from "@app/domain/managers/newPlayer/sleep/sleepManager"
@@ -60,17 +60,16 @@ export class PlayerActionManager {
 			} else if (event.type === MediaSessionEventType.PLAY) {
 				this.setIsPlaying(true)
 			} else if (event.type === MediaSessionEventType.PREVIOUS_TRACK) {
-				this.executeSeekAction(
-					this.configManager.globalPlayerConfig.getOrThrow()
-						.seekActions.mediaSession,
-					true
-				)
+				const config =
+					this.configManager.globalPlayerConfig.configBus.lastEvent
+				if (!config) return
+				this.executeSeekAction(config.seekActions.mediaSession, true)
 			} else if (event.type === MediaSessionEventType.NEXT_TRACK) {
-				this.executeSeekAction(
-					this.configManager.globalPlayerConfig.getOrThrow()
-						.seekActions.mediaSession,
-					false
-				)
+				const config =
+					this.configManager.globalPlayerConfig.configBus.lastEvent
+				if (!config) return
+
+				this.executeSeekAction(config.seekActions.mediaSession, false)
 			}
 
 			// TODO(teawithsand): here support for the rest of events
@@ -163,33 +162,30 @@ export class PlayerActionManager {
 	}
 
 	public shortForwardButtonAction = () => {
-		this.executeSeekAction(
-			this.configManager.globalPlayerConfig.getOrThrow().seekActions
-				.short,
-			false
-		)
+		const config = this.configManager.globalPlayerConfig.configBus.lastEvent
+		if (!config) return
+		this.executeSeekAction(config.seekActions.short, false)
 	}
 
 	public longForwardButtonAction = () => {
-		this.executeSeekAction(
-			this.configManager.globalPlayerConfig.getOrThrow().seekActions.long,
-			false
-		)
+		const config = this.configManager.globalPlayerConfig.configBus.lastEvent
+		if (!config) return
+
+		this.executeSeekAction(config.seekActions.long, false)
 	}
 
 	public shortBackwardButtonAction = () => {
-		this.executeSeekAction(
-			this.configManager.globalPlayerConfig.getOrThrow().seekActions
-				.short,
-			true
-		)
+		const config = this.configManager.globalPlayerConfig.configBus.lastEvent
+		if (!config) return
+
+		this.executeSeekAction(config.seekActions.short, true)
 	}
 
 	public longBackwardButtonAction = () => {
-		this.executeSeekAction(
-			this.configManager.globalPlayerConfig.getOrThrow().seekActions.long,
-			true
-		)
+		const config = this.configManager.globalPlayerConfig.configBus.lastEvent
+		if (!config) return
+
+		this.executeSeekAction(config.seekActions.long, true)
 	}
 
 	public prevFile = () => {
@@ -200,7 +196,7 @@ export class PlayerActionManager {
 		this.setIsPlaying(
 			!this.playerManager.bus.lastEvent.playerState.config
 				.isPlayingWhenReady,
-				jumpBack
+			jumpBack
 		)
 	}
 
@@ -247,7 +243,7 @@ export class PlayerActionManager {
 		this.playerManager.mutatePlayerConfig((draft) => {
 			draft.speed = speed
 		})
-		this.configManager.globalPlayerConfig.update((draft) => {
+		this.configManager.globalPlayerConfig.updateConfig((draft) => {
 			draft.speed = speed
 		})
 	}
@@ -256,17 +252,24 @@ export class PlayerActionManager {
 		this.playerManager.mutatePlayerConfig((draft) => {
 			draft.preservePitchForSpeed = preserve
 		})
-		this.configManager.globalPlayerConfig.update((draft) => {
+		this.configManager.globalPlayerConfig.updateConfig((draft) => {
 			draft.preservePitchForSpeed = preserve
 		})
 	}
 
 	public setSleepFromConfig = () => {
-		this.sleepManager.setSleepConfigFromStoredConfig()
+		const config = this.configManager.globalPlayerConfig.configBus.lastEvent
+		if (!config) return
+
+		this.sleepManager.setSleep(config.sleepConfig)
 	}
 
-	public setSleepConfigManual = (sleepData: SleepConfig | null) => {
-		this.sleepManager.setSleep(sleepData)
+	public setSleepConfigManual = (sleepConfig: SleepConfig | null) => {
+		this.configManager.globalPlayerConfig.updateConfig(draft => {
+			draft.sleepConfig = sleepConfig
+		})
+		this.configManager.globalPlayerConfig.save()
+		this.sleepManager.setSleep(sleepConfig)
 	}
 
 	/**

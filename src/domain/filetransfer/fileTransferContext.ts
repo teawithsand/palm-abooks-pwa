@@ -1,5 +1,5 @@
 import { isFileTransferAuthNameValid } from "@app/domain/filetransfer/defines"
-import { ConfigManager } from "@app/domain/managers/config"
+import { ConfigManager } from "@app/domain/managers/config/config"
 import { PeerJSIPeer, generateSecureClientId } from "@teawithsand/tws-peer"
 import {
 	DefaultStickyEventBus,

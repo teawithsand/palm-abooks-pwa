@@ -1,4 +1,5 @@
-import { ConfigManager } from "@app/domain/managers/config"
+import { ConfigManager } from "@app/domain/managers/config/config"
+import { ConfigSyncManager } from "@app/domain/managers/config/sync"
 import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
 import { InitializationManager } from "@app/domain/managers/initialization"
 import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/list/playerEntryListManager"
@@ -33,14 +34,10 @@ export class AppManager {
 
 	public readonly sleepManager = new SleepManager(
 		this.playerManager,
-		this.configManager,
 		this.shakeManager
 	)
 
-	public readonly seekBackManager = new SeekBackManager(
-		this.configManager,
-		this.playerManager
-	)
+	public readonly seekBackManager = new SeekBackManager(this.playerManager)
 
 	public readonly playerActionsManager = new PlayerActionManager(
 		this.abookDb,
@@ -48,14 +45,22 @@ export class AppManager {
 		this.configManager,
 		this.entryListManager,
 		this.sleepManager,
-		this.seekBackManager,
+		this.seekBackManager
+	)
+
+	public readonly configSyncManager = new ConfigSyncManager(
+		this.configManager,
+		this.playerManager,
+		this.seekBackManager
 	)
 
 	public readonly initManager = new InitializationManager()
 
 	constructor() {
+		this.configManager.initialize()
+
 		const [p1, resolveP1] = latePromise<void>()
-		this.configManager.globalPersistentPlayerState.bus.addSubscriber(
+		this.configManager.globalPersistentPlayerState.configBus.addSubscriber(
 			(config, canceler) => {
 				if (config) {
 					resolveP1()
@@ -69,7 +74,7 @@ export class AppManager {
 		)
 
 		const [p2, resolveP2] = latePromise<void>()
-		this.configManager.globalPlayerConfig.bus.addSubscriber(
+		this.configManager.globalPlayerConfig.configBus.addSubscriber(
 			(config, canceler) => {
 				if (config) {
 					// HACK: canceller has to be called here in order to prevent infinite recursion
@@ -95,11 +100,7 @@ export class AppManager {
 		// Enabling has to be done by user initiated event.
 		// Click is good enough to do so at some point, if it's required
 		document.addEventListener("click", () => {
-			if (this.configManager.globalPlayerConfig.loaded) {
-				// enable this if it's needed or not just because it may become needed at some point
-				// and why not
-				this.shakeManager.enable()
-			}
+			this.shakeManager.enable()
 		})
 	}
 }
