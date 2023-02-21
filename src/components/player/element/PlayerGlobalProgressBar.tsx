@@ -1,6 +1,6 @@
 import { useAppManager } from "@app/domain/managers/app"
-import { useUiPlayerData } from "@app/domain/ui/player"
-import React, { ChangeEvent, useCallback, useRef } from "react"
+import { useUiPlayerDataInterval } from "@app/domain/ui/player"
+import React, { useCallback, useRef, useState } from "react"
 import styled from "styled-components"
 
 import { Form } from "react-bootstrap"
@@ -8,19 +8,23 @@ import { Form } from "react-bootstrap"
 const Bar = styled.div``
 
 export const PlayerGlobalProgressBar = () => {
-	const uiData = useUiPlayerData()
+	const [uiData, refresh] = useUiPlayerDataInterval(500)
 	const lastValidPosition = uiData?.lastValidPosition
 	const actions = useAppManager().playerActionsManager
 
-	const duration = lastValidPosition?.currentGlobalDuration ?? 0
-	const position = lastValidPosition?.currentGlobalPosition ?? 0
+	const duration = lastValidPosition?.currentEntryDuration ?? 0
+	const position = lastValidPosition?.currentEntryPosition ?? 0
 
 	const lastEventTimestampRef = useRef<number | null>(null)
 	const wasPlayingRef = useRef<boolean | null>(null)
+	const isClickedRef = useRef<boolean>(false)
+
+	const [valueOverride, setValueOverride] = useState<number | null>(null)
+	const seekToRef = useRef<number | null>(null)
 
 	const onChange = useCallback(
-		(e: ChangeEvent) => {
-			if (!e.isTrusted) return
+		(e: any) => {
+			if (!e.isTrusted || !isClickedRef.current) return
 
 			const lastTimestamp = lastEventTimestampRef.current
 			if (lastTimestamp !== null) {
@@ -30,29 +34,38 @@ export const PlayerGlobalProgressBar = () => {
 
 			const value = parseInt((e.target as any).value)
 			if (!isFinite(value) || value < 0) return
-			actions.globalSeek(value)
+			seekToRef.current = value
+			setValueOverride(value)
 		},
-		[actions, lastEventTimestampRef]
+		[isClickedRef, lastEventTimestampRef, actions]
 	)
 
 	const onDown = useCallback(() => {
+		isClickedRef.current = true
 		wasPlayingRef.current = uiData?.isPlaying ?? null
 		if (wasPlayingRef.current === true) {
 			actions.setIsPlaying(false)
 		}
-	}, [wasPlayingRef, uiData?.isPlaying, actions])
+	}, [wasPlayingRef, isClickedRef, uiData?.isPlaying, actions])
 
 	const onUp = useCallback(() => {
+		isClickedRef.current = false
 		const { current } = wasPlayingRef
 		if (current !== null) actions.setIsPlaying(current)
-	}, [actions, wasPlayingRef])
+		const value = seekToRef.current
+		if (value !== null) {
+			actions.localSeek(value)
+		}
+		setValueOverride(null)
+		refresh()
+	}, [wasPlayingRef, isClickedRef, refresh])
 
 	return (
 		<Bar>
 			<Form.Range
 				min={0}
 				max={duration}
-				value={position}
+				value={valueOverride ?? position}
 				disabled={
 					uiData?.isPositionCorrupted ||
 					(lastValidPosition?.currentEntryDuration ?? null) ===
@@ -61,7 +74,8 @@ export const PlayerGlobalProgressBar = () => {
 				}
 				onPointerDown={onDown}
 				onPointerUp={onUp}
-				onChange={onChange}
+				onPointerCancel={onUp}
+				onInput={onChange}
 			/>
 		</Bar>
 	)
