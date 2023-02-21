@@ -181,6 +181,14 @@ export class NewPlayerManager {
 		})
 
 		this.innerBus.addSubscriber((state) => {
+			this.seekQueue.setResolutionData({
+				currentEntryId:
+					state.playerEntryListManagerState.currentEntryId,
+				entriesBag:
+					state.playerEntryListManagerState.listState.entriesBag,
+				currentEntryPosition: state.playerState.position,
+			})
+			
 			this.positionSaver.setPosition(
 				state.playerEntryListManagerState.currentEntryId,
 				state.playerState.position
@@ -190,14 +198,6 @@ export class NewPlayerManager {
 			if (!state.playerState.isPlaying) {
 				this.positionSaver.requestImmediateSave()
 			}
-
-			this.seekQueue.setResolutionData({
-				currentEntryId:
-					state.playerEntryListManagerState.currentEntryId,
-				entriesBag:
-					state.playerEntryListManagerState.listState.entriesBag,
-				currentEntryPosition: state.playerState.position,
-			})
 		})
 	}
 
