@@ -2341,13 +2341,13 @@
   dependencies:
     xhr2 "^0.1.4"
 
-"@teawithsand/tws-config@^0.0.2":
-  version "0.0.2"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-config/-/tws-config-0.0.2.tgz#64747689613c4363e1ce0d74b1ca4b56c3757d0c"
-  integrity sha512-rNJZbijBGYEIuzWC7yJUsca8s3xRNQg0ohGupbfk96tfQQfYrFP2mRQmHEOQs2BMJlR2It0bKe5OP5WJiy1/Zw==
+"@teawithsand/tws-config@^0.0.5":
+  version "0.0.5"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-config/-/tws-config-0.0.5.tgz#4741fd8a20a9b357b4f52295b2446e675a993f82"
+  integrity sha512-ufBNxAMobiy+6LH9TvQvxAKGzl4WsrCWUDzqGBFXU5SsHakYwgtSTkawEYuC7Ek+px0eKjdmQ6vbrm4Y6Z15zg==
   dependencies:
     "@teawithsand/tws-stl" "^0.0.23"
-    "@teawithsand/tws-stl-react" "^0.0.6"
+    "@teawithsand/tws-stl-react" "^0.0.8"
     immer "^9"
     localforage "^1"
 
@@ -2402,10 +2402,10 @@
     "@teawithsand/tws-stl" "^0.0.14"
     react-error-boundary "^3.1.4"
 
-"@teawithsand/tws-stl-react@^0.0.6":
-  version "0.0.6"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl-react/-/tws-stl-react-0.0.6.tgz#c16f62c0a7ba592fc856d6f1d45a144859049fce"
-  integrity sha512-veja2a/ip+c4jxJsk0KNamqn+2P51m7BWfW1iQMBr735QsAq/8nOr+SurNeeyw75HDDHGv3gKYv+wnLeo7aUyw==
+"@teawithsand/tws-stl-react@^0.0.8":
+  version "0.0.8"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl-react/-/tws-stl-react-0.0.8.tgz#7a3bd26dfbf541aa00820cf93c566b298d0950bc"
+  integrity sha512-crHj/BCiK1owVRFxfCOtZo58Ii4IPPM/SWoESvLoD017kFWlGmlJasm8Bw9ehI6qxpUVUUoAexciuIpSR1xwSQ==
   dependencies:
     "@teawithsand/tws-stl" "^0.0.14"
     react-error-boundary "^3.1.4"
