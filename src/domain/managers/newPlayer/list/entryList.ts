@@ -22,6 +22,37 @@ import {
 
 export interface DefaultPlayerEntryListState extends PlayerEntryListState {}
 
+/**
+ * Simplest possible entry list. It does nothing, just represents entries that it stores.
+ */
+export class SimplePlayerEntryList implements PlayerEntryList {
+	private readonly innerStateBus: StickyEventBus<DefaultPlayerEntryListState>
+
+	constructor(public readonly id: string = generateUUID()) {
+		this.innerStateBus =
+			new DefaultStickyEventBus<DefaultPlayerEntryListState>({
+				id,
+				entriesBag: new PlayerEntriesBag([]),
+				isLoadingMetadata: false,
+			})
+	}
+
+	get stateBus(): StickySubscribable<DefaultPlayerEntryListState> {
+		return this.innerStateBus
+	}
+
+	setEntries = (entries: PlayerEntry[]) => {
+		this.innerStateBus.emitEvent({
+			id: this.id,
+			entriesBag: new PlayerEntriesBag([...entries]),
+			isLoadingMetadata: false,
+		})
+	}
+}
+
+/**
+ * PlayerEntryList, which loads music metadata for each entry it owns.
+ */
 export class DefaultPlayerEntryList implements PlayerEntryList {
 	private readonly innerStateBus: StickyEventBus<DefaultPlayerEntryListState>
 	private readonly taskAtom = new DefaultTaskAtom()
