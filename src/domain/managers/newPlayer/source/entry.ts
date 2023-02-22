@@ -1,4 +1,6 @@
+import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/source/source"
+import { guessDisposition } from "@app/domain/storage/disposition"
 import {
 	MetadataLoadingResult,
 	MetadataLoadingResultType,
@@ -8,15 +10,71 @@ import {
 } from "@teawithsand/tws-player"
 import { generateUUID } from "@teawithsand/tws-stl"
 
+export type PlayerEntryOverrides = {
+	loadedMetadata?: MetadataLoadingResult | null
+	disposition?: FileEntryDisposition | null
+}
+
 export class PlayerEntry {
 	constructor(
 		public readonly source: PlayerSource,
-		public readonly loadedMetadata: MetadataLoadingResult | null = null,
-		public readonly id = generateUUID()
+		public readonly id = generateUUID(),
+		public readonly overrides: PlayerEntryOverrides = {}
 	) {}
 
-	withLoadedMetadata = (res: MetadataLoadingResult | null): PlayerEntry => {
-		return new PlayerEntry(this.source, res, this.id)
+	withOverrides = (overrides: PlayerEntryOverrides): PlayerEntry => {
+		return new PlayerEntry(this.source, this.id, overrides)
+	}
+
+	withLoadedMetadata = (
+		loadedMetadata: MetadataLoadingResult | null
+	): PlayerEntry =>
+		this.withOverrides({
+			...this.overrides,
+			loadedMetadata,
+		})
+
+	withDisposition = (disposition: FileEntryDisposition) =>
+		this.withOverrides({
+			...this.overrides,
+			disposition,
+		})
+
+	get disposition(): FileEntryDisposition {
+		if (this.overrides.disposition) return this.overrides.disposition
+
+		if (this.source instanceof FileEntryEntityPlayerSource) {
+			return this.source.entry.dispositionOrGuess
+		}
+
+		if (this.source instanceof UrlPlayerSource) {
+			return guessDisposition({
+				url: this.source.url,
+			})
+		}
+
+		if (this.source instanceof StaticPlayerSource) {
+			const { asset } = this.source
+			if (typeof asset === "string") {
+				return guessDisposition({
+					url: asset,
+				})
+			} else {
+				return guessDisposition({
+					mime: asset.type,
+					name: asset instanceof File ? asset.name : "",
+				})
+			}
+		}
+
+		return FileEntryDisposition.UNKNOWN
+	}
+
+	/**
+	 * Metadata that was loaded. To allow cached versions use metadata instead.
+	 */
+	get loadedMetadata(): MetadataLoadingResult | null {
+		return this.overrides.loadedMetadata ?? null
 	}
 
 	get duration(): number | null {
