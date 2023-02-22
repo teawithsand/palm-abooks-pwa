@@ -12,8 +12,8 @@ export const PlayerGlobalProgressBar = () => {
 	const lastValidPosition = uiData?.lastValidPosition
 	const actions = useAppManager().playerActionsManager
 
-	const duration = lastValidPosition?.currentEntryDuration ?? 0
-	const position = lastValidPosition?.currentEntryPosition ?? 0
+	const duration = lastValidPosition?.currentGlobalDuration ?? 0
+	const position = lastValidPosition?.currentGlobalPosition ?? 0
 
 	const lastEventTimestampRef = useRef<number | null>(null)
 	const wasPlayingRef = useRef<boolean | null>(null)
@@ -54,7 +54,7 @@ export const PlayerGlobalProgressBar = () => {
 		if (current !== null) actions.setIsPlaying(current, false)
 		const value = seekToRef.current
 		if (value !== null) {
-			actions.localSeek(value)
+			actions.globalSeek(value)
 		}
 		setValueOverride(null)
 		refresh()
@@ -68,9 +68,9 @@ export const PlayerGlobalProgressBar = () => {
 				value={valueOverride ?? position}
 				disabled={
 					uiData?.isPositionCorrupted ||
-					(lastValidPosition?.currentEntryDuration ?? null) ===
+					(lastValidPosition?.currentGlobalDuration ?? null) ===
 						null ||
-					(lastValidPosition?.currentEntryPosition ?? null) === null
+					(lastValidPosition?.currentGlobalPosition ?? null) === null
 				}
 				onPointerDown={onDown}
 				onPointerUp={onUp}
