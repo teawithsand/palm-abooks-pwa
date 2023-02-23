@@ -66,12 +66,4 @@ export class ViewPlayerEntryList implements PlayerEntryList {
 			this.recomputeState(state)
 		})
 	}
-
-	private setEntries = (entries: PlayerEntry[]) => {
-		this.innerStateBus.emitEvent({
-			id: this.id,
-			entriesBag: new PlayerEntriesBag([...entries]),
-			isLoadingMetadata: false,
-		})
-	}
 }
