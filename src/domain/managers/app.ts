@@ -3,6 +3,7 @@ import { ConfigSyncManager } from "@app/domain/managers/config/sync"
 import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
 import { InitializationManager } from "@app/domain/managers/initialization"
 import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/listManager/playerEntryListManager"
+import { MediaSessionManager } from "@app/domain/managers/newPlayer/mediaSession/mediaSessionManager"
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
 import { PlayerActionManager } from "@app/domain/managers/newPlayer/playerActionsManager"
 import { SeekBackManager } from "@app/domain/managers/newPlayer/seekBack/seekBackManager"
@@ -52,6 +53,9 @@ export class AppManager {
 		this.configManager,
 		this.playerManager,
 		this.seekBackManager
+	)
+	public readonly mediaSessionManager = new MediaSessionManager(
+		this.playerManager
 	)
 
 	public readonly initManager = new InitializationManager()
