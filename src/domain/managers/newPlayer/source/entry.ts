@@ -2,6 +2,7 @@ import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/source/source"
 import { guessDisposition } from "@app/domain/storage/disposition"
 import {
+	Metadata,
 	MetadataLoadingResult,
 	MetadataLoadingResultType,
 	PlayerSource,
@@ -26,7 +27,8 @@ export class PlayerEntry {
 	 * Makes copy of this PlayerEntry with same source, but different id,
 	 * so it can be stored on playable entry list twice.
 	 */
-	makeCopy = () => new PlayerEntry(this.source, generateUUID(), this.overrides)
+	makeCopy = () =>
+		new PlayerEntry(this.source, generateUUID(), this.overrides)
 
 	withOverrides = (overrides: PlayerEntryOverrides): PlayerEntry => {
 		return new PlayerEntry(this.source, this.id, overrides)
@@ -81,6 +83,13 @@ export class PlayerEntry {
 	 */
 	get loadedMetadata(): MetadataLoadingResult | null {
 		return this.overrides.loadedMetadata ?? null
+	}
+
+	get successMetadata(): Metadata | null {
+		const metadata = this.metadata
+		if (metadata?.type !== MetadataLoadingResultType.OK) return null
+
+		return metadata.metadata
 	}
 
 	get duration(): number | null {
