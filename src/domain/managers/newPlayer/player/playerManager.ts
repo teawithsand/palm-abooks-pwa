@@ -99,7 +99,7 @@ export class NewPlayerManager {
 		metadata: PlayerEntryListMetadata,
 		entries: PlayerEntriesBag
 	) => {
-		// for now noop
+		this.positionSaver.setEntriesBagAndMetadata(entries, metadata)
 	}
 
 	constructor(
@@ -188,7 +188,7 @@ export class NewPlayerManager {
 					state.playerEntryListManagerState.listState.entriesBag,
 				currentEntryPosition: state.playerState.position,
 			})
-			
+
 			this.positionSaver.setPosition(
 				state.playerEntryListManagerState.currentEntryId,
 				state.playerState.position

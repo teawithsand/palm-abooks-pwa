@@ -63,6 +63,8 @@ export function objectEquals(x: any, y: any): boolean {
 	)
 }
 
+// TODO(teawithsand): refactor it, so it does not requires recreating each time metadata/entries bag are swapped
+//  changes of these should be opaque to this component
 export class PlayerPositionSaver {
 	private readonly intervalHelper = new IntervalHelper(0)
 	private isClosed = false
@@ -71,12 +73,20 @@ export class PlayerPositionSaver {
 	private currentPosition: PositionVariants = {}
 
 	constructor(
-		private readonly entriesBag: PlayerEntriesBag,
-		private readonly metadata: PlayerEntryListMetadata,
+		private entriesBag: PlayerEntriesBag,
+		private metadata: PlayerEntryListMetadata,
 		private readonly abookDb: AbookDb
 	) {
 		this.intervalHelper.setDelay(10 * 1000)
 		this.intervalHelper.bus.addSubscriber(() => this.maybeWritePosition())
+	}
+
+	setEntriesBagAndMetadata = (
+		bag: PlayerEntriesBag,
+		metadata: PlayerEntryListMetadata
+	) => {
+		this.entriesBag = bag
+		this.metadata = metadata
 	}
 
 	setPosition = (entryId: string | null, positionMs: number | null) => {
