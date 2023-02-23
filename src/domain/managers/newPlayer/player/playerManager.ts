@@ -7,7 +7,7 @@ import {
 import {
 	PlayerEntryListManager,
 	PlayerEntryListManagerState,
-} from "@app/domain/managers/newPlayer/list/playerEntryListManager"
+} from "@app/domain/managers/newPlayer/listManager/playerEntryListManager"
 import {
 	PlayerPositionLoader,
 	PositionLoadingState,

@@ -15,7 +15,7 @@ import {
 	PlayerEntryListMetadata,
 	PlayerEntryListMetadataType,
 } from "@app/domain/managers/newPlayer/list/metadata"
-import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/list/playerEntryListManager"
+import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/listManager/playerEntryListManager"
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
 import { SeekBackManager } from "@app/domain/managers/newPlayer/seekBack/seekBackManager"
 import {
