@@ -10,7 +10,11 @@ import {
 	SeekType,
 } from "@app/domain/defines/seek"
 import { PlayerEntryListMetadata } from "@app/domain/managers/newPlayer/list/metadata"
-import { NewSeekQueue, SeekEvent, SeekEventType } from "@app/domain/managers/newPlayer/player/seekQueue"
+import {
+	NewSeekQueue,
+	SeekEvent,
+	SeekEventType,
+} from "@app/domain/managers/newPlayer/player/seekQueue"
 import { PlayerEntriesBag } from "@app/domain/managers/newPlayer/source/bag"
 import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/source/source"
 import {
@@ -67,7 +71,7 @@ export class PlayerPositionLoader {
 
 			return {
 				type: SeekType.ABSOLUTE_TO_FILE,
-				playerEntryId: position.fileEntityId,
+				playerEntryId: entry.id,
 				positionMs: position.positionMs,
 			}
 		} else if (position.type === PositionType.FILE_NAME_AND_LOCAL_OFFSET) {

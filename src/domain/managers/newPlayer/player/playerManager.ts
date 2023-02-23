@@ -53,7 +53,6 @@ export class NewPlayerManager {
 		metadata: PlayerEntryListMetadata,
 		entries: PlayerEntriesBag
 	) => {
-		console.warn("Got new metadata!!!")
 		this.currentPositionLoaderShutdown()
 		this.seekQueue.clear() // remove any enqueued seeks, since we will load position now
 
@@ -67,7 +66,6 @@ export class NewPlayerManager {
 		const unsubscribe = loader.bus.addSubscriber((state) => {
 			this.innerBus.emitEvent(
 				produce(this.innerBus.lastEvent, (draft) => {
-					console.log("Loading position: ", state.state)
 					draft.positionLoadingState = state.state
 				})
 			)
@@ -86,7 +84,6 @@ export class NewPlayerManager {
 			unsubscribe()
 		}
 
-		console.log("Loading position began")
 		loader.begin(this.seekQueue)
 	}
 
