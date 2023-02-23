@@ -1,3 +1,4 @@
+import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 import {
 	AbsoluteSeekData,
 	SeekType,
@@ -46,6 +47,11 @@ export class PlayerEntriesBag {
 		return i
 	}
 
+	findFirstEntryWithDisposition = (
+		disposition: FileEntryDisposition
+	): PlayerEntry | null =>
+		this.entries.find((e) => e.disposition === disposition) ?? null
+
 	resolveAbsoluteSeek = (
 		seekData: AbsoluteSeekData
 	): TrivialSeekData | null => {
@@ -58,7 +64,7 @@ export class PlayerEntriesBag {
 			const duration = this.metadataBag.getDurationToIndex(index)
 			if (duration === null) return null
 
-			// cap result if position is after the end 
+			// cap result if position is after the end
 			if (index >= this.metadataBag.length) {
 				index = this.metadataBag.length - 1
 
