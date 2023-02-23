@@ -53,23 +53,40 @@ export class PlayerActionManager {
 			"pause",
 			"nexttrack",
 			"previoustrack",
+			"seekbackward",
+			"seekforward",
 		])
 		this.mediaSessionManager.eventBus.addSubscriber((event) => {
 			if (event.type === MediaSessionEventType.PAUSE) {
 				this.setIsPlaying(false)
 			} else if (event.type === MediaSessionEventType.PLAY) {
 				this.setIsPlaying(true)
-			} else if (event.type === MediaSessionEventType.PREVIOUS_TRACK) {
-				const config =
-					this.configManager.globalPlayerConfig.configBus.lastEvent
-				if (!config) return
-				this.executeSeekAction(config.seekActions.mediaSession, true)
-			} else if (event.type === MediaSessionEventType.NEXT_TRACK) {
+			} else {
 				const config =
 					this.configManager.globalPlayerConfig.configBus.lastEvent
 				if (!config) return
 
-				this.executeSeekAction(config.seekActions.mediaSession, false)
+				if (event.type === MediaSessionEventType.PREVIOUS_TRACK) {
+					this.executeSeekAction(
+						config.seekActions.mediaSession,
+						true
+					)
+				} else if (event.type === MediaSessionEventType.NEXT_TRACK) {
+					this.executeSeekAction(
+						config.seekActions.mediaSession,
+						false
+					)
+				} else if (event.type === MediaSessionEventType.SEEK_FORWARD) {
+					this.executeSeekAction(
+						config.seekActions.mediaSession,
+						false
+					)
+				} else if (event.type === MediaSessionEventType.SEEK_BACKWARD) {
+					this.executeSeekAction(
+						config.seekActions.mediaSession,
+						true
+					)
+				}
 			}
 
 			// TODO(teawithsand): here support for the rest of events
