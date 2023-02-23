@@ -122,6 +122,8 @@ export class PlayerPositionLoader {
 	}
 
 	begin = (seekQueue: NewSeekQueue) => {
+		if(this.isClosed) return
+		
 		const position = this.metadata.positionToLoad
 		const lastPlayedTimestamp = this.metadata.lastPlayedTimestamp
 		if (!position) {
