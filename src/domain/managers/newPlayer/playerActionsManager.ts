@@ -289,13 +289,7 @@ export class PlayerActionManager {
 	}
 
 	public unsetPlaylist = () => {
-		this.entryListManager.setList(
-			new DefaultPlayerEntryList(),
-			null,
-			new PlayerEntryListMetadata({
-				type: PlayerEntryListMetadataType.UNKNOWN,
-			})
-		)
+		this.entryListManager.unsetLists()
 	}
 
 	public playLocalFiles = (files: File[]) => {
@@ -304,8 +298,12 @@ export class PlayerActionManager {
 			(f) => new PlayerEntry(new StaticPlayerSource(f))
 		)
 		list.setEntries(entries)
-		this.entryListManager.setList(
-			list,
+		this.entryListManager.setLists(
+			{
+				full: list,
+				player: list,
+				presentation: list,
+			},
 			entries.length ? entries[0].id : null,
 			new PlayerEntryListMetadata({
 				type: PlayerEntryListMetadataType.LOCAL_FILES,
@@ -322,8 +320,12 @@ export class PlayerActionManager {
 				)
 		)
 		list.setEntries(entries)
-		this.entryListManager.setList(
-			list,
+		this.entryListManager.setLists(
+			{
+				full: list,
+				player: list,
+				presentation: list,
+			},
 			entries.length ? entries[0].id : null,
 			new PlayerEntryListMetadata({
 				type: PlayerEntryListMetadataType.ABOOK,
