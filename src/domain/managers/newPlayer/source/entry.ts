@@ -22,6 +22,12 @@ export class PlayerEntry {
 		public readonly overrides: PlayerEntryOverrides = {}
 	) {}
 
+	/**
+	 * Makes copy of this PlayerEntry with same source, but different id,
+	 * so it can be stored on playable entry list twice.
+	 */
+	makeCopy = () => new PlayerEntry(this.source, generateUUID(), this.overrides)
+
 	withOverrides = (overrides: PlayerEntryOverrides): PlayerEntry => {
 		return new PlayerEntry(this.source, this.id, overrides)
 	}
