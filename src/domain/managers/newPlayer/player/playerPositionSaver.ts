@@ -164,33 +164,39 @@ export class PlayerPositionSaver {
 
 	private maybeWritePosition = async () => {
 		await GLOBAL_SAVE_LOCK.withLock(async () => {
-			if (!this.loadedPosition) return
-			if (this.isPositionWritten) return
+			try {
+				if (!this.loadedPosition) return
+				if (this.isPositionWritten) return
 
-			const anyPositionNotLoaded =
-				!this.currentPosition[
-					PositionType.FILE_ENTITY_ID_AND_LOCAL_OFFSET
-				] ||
-				!this.currentPosition[
-					PositionType.FILE_NAME_AND_LOCAL_OFFSET
-				] ||
-				!this.currentPosition[PositionType.GLOBAL_OFFSET]
+				const anyPositionNotLoaded =
+					!this.currentPosition[
+						PositionType.FILE_ENTITY_ID_AND_LOCAL_OFFSET
+					] ||
+					!this.currentPosition[
+						PositionType.FILE_NAME_AND_LOCAL_OFFSET
+					] ||
+					!this.currentPosition[PositionType.GLOBAL_OFFSET]
 
-			if (anyPositionNotLoaded) {
-				return
-			}
+				if (anyPositionNotLoaded) {
+					return
+				}
 
-			// Do not save position, if it didn't change
-			if (objectEquals(this.lastSavedPosition, this.currentPosition)) {
+				// Do not save position, if it didn't change
+				if (
+					objectEquals(this.lastSavedPosition, this.currentPosition)
+				) {
+					this.isPositionWritten = true
+					return
+				}
+
+				this.lastSavedPosition = { ...this.currentPosition }
+				await this.innerWritePositionNoLock({
+					...this.currentPosition,
+				})
 				this.isPositionWritten = true
-				return
+			} catch (e) {
+				console.error("Filed to save position", e)
 			}
-
-			this.lastSavedPosition = { ...this.currentPosition }
-			await this.innerWritePositionNoLock({
-				...this.currentPosition,
-			})
-			this.isPositionWritten = true
 		})
 	}
 
