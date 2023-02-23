@@ -19,6 +19,7 @@ import {
 	StickySubscribable,
 	generateUUID,
 } from "@teawithsand/tws-stl"
+import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 
 export interface DefaultPlayerEntryListState extends PlayerEntryListState {}
 
@@ -99,7 +100,10 @@ export class DefaultPlayerEntryList implements PlayerEntryList {
 			let i = 0
 			for (const [entry, preloadedResult] of zip(entries, [...results])) {
 				if (!claim.isValid) return
-				if (!preloadedResult) {
+				if (
+					!preloadedResult &&
+					entry.disposition === FileEntryDisposition.MUSIC
+				) {
 					results[i] = await loadMetadataToResultHack(
 						this.loader,
 						entry.source
