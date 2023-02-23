@@ -1,3 +1,4 @@
+import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 import { SleepConfig } from "@app/domain/defines/config/sleep"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import {
@@ -15,6 +16,7 @@ import {
 	PlayerEntryListMetadata,
 	PlayerEntryListMetadataType,
 } from "@app/domain/managers/newPlayer/list/metadata"
+import { ViewPlayerEntryList } from "@app/domain/managers/newPlayer/list/viewEntryList"
 import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/listManager/playerEntryListManager"
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
 import { SeekBackManager } from "@app/domain/managers/newPlayer/seekBack/seekBackManager"
@@ -315,11 +317,17 @@ export class PlayerActionManager {
 			(f) => new PlayerEntry(new StaticPlayerSource(f))
 		)
 		list.setEntries(entries)
+
+		const playableList = new ViewPlayerEntryList()
+		playableList.setBaseList(list)
+		playableList.setPredicate(
+			(e) => e.disposition === FileEntryDisposition.MUSIC
+		)
 		this.entryListManager.setLists(
 			{
 				full: list,
-				player: list,
-				presentation: list,
+				player: playableList,
+				presentation: playableList,
 			},
 			entries.length ? entries[0].id : null,
 			new PlayerEntryListMetadata({
@@ -337,11 +345,18 @@ export class PlayerActionManager {
 				)
 		)
 		list.setEntries(entries)
+
+		const playableList = new ViewPlayerEntryList()
+		playableList.setBaseList(list)
+		playableList.setPredicate(
+			(e) => e.disposition === FileEntryDisposition.MUSIC
+		)
+
 		this.entryListManager.setLists(
 			{
 				full: list,
-				player: list,
-				presentation: list,
+				player: playableList,
+				presentation: playableList,
 			},
 			entries.length ? entries[0].id : null,
 			new PlayerEntryListMetadata({
