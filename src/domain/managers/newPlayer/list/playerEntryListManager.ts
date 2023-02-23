@@ -203,13 +203,13 @@ export class PlayerEntryListManager {
 	goToEntry = (id: string) => {
 		if (this.innerBus.lastEvent.currentEntryId === id) return // ignore noop
 
-		if (!this.lists.player.stateBus.lastEvent.entriesBag.findById(id)) {
-			throw new Error(`id ${id} not found on player list`)
-		}
-
 		this.innerBus.emitEvent(
 			produce(this.innerBus.lastEvent, (draft) => {
-				draft.currentEntryId = id
+				if (!draft.states.player.entriesBag.findById(id)) {
+					draft.currentEntryId = null
+				} else {
+					draft.currentEntryId = id
+				}
 			})
 		)
 	}
