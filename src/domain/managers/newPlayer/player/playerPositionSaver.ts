@@ -9,8 +9,6 @@ import { AbookDb } from "@app/domain/storage/db"
 import { IntervalHelper } from "@app/util/IntervalHelper"
 import { Lock, MutexLockAdapter, getNowTimestamp } from "@teawithsand/tws-stl"
 
-// HACK(teawithsand): this should be removed, in fact even now it's here just in case
-
 const GLOBAL_SAVE_LOCK = new Lock(new MutexLockAdapter())
 
 export function objectEquals(x: any, y: any): boolean {
@@ -63,34 +61,64 @@ export function objectEquals(x: any, y: any): boolean {
 	)
 }
 
-// TODO(teawithsand): refactor it, so it does not requires recreating each time metadata/entries bag are swapped
-//  changes of these should be opaque to this component
 export class PlayerPositionSaver {
 	private readonly intervalHelper = new IntervalHelper(0)
-	private isClosed = false
+
 	private isPositionWritten = false
 	private lastSavedPosition: PositionVariants = {}
 	private currentPosition: PositionVariants = {}
 
-	constructor(
-		private entriesBag: PlayerEntriesBag,
-		private metadata: PlayerEntryListMetadata,
-		private readonly abookDb: AbookDb
-	) {
-		this.intervalHelper.setDelay(10 * 1000)
+	private loadedPosition: boolean = false
+
+	private entriesBag: PlayerEntriesBag = new PlayerEntriesBag([])
+	private metadata: PlayerEntryListMetadata = new PlayerEntryListMetadata({
+		type: PlayerEntryListMetadataType.UNKNOWN,
+	})
+
+	constructor(private readonly abookDb: AbookDb) {
 		this.intervalHelper.bus.addSubscriber(() => this.maybeWritePosition())
 	}
 
-	setEntriesBagAndMetadata = (
-		bag: PlayerEntriesBag,
-		metadata: PlayerEntryListMetadata
+	setState = (
+		entryId: string | null,
+		positionMs: number | null,
+		entriesBag: PlayerEntriesBag,
+		metadata: PlayerEntryListMetadata,
+		loadedPosition: boolean
 	) => {
-		this.entriesBag = bag
-		this.metadata = metadata
+		let enableInterval = false
+		if (!loadedPosition) {
+			this.intervalHelper.disable()
+		} else {
+			if (!this.loadedPosition) {
+				enableInterval = true
+			}
+		}
+
+		this.loadedPosition = loadedPosition
+
+		this.entriesBag = entriesBag
+		if (this.metadata.id !== metadata.id) {
+			// metadata id change
+			// invalidate any previous position state
+			// 'cause we are writing to new location
+			this.currentPosition = {}
+			this.lastSavedPosition = {}
+			this.isPositionWritten = false
+			this.metadata = metadata
+		}
+
+		this.setPosition(entryId, positionMs)
+
+		if (enableInterval) {
+			this.intervalHelper.setDelay(10 * 1000)
+		}
 	}
 
-	setPosition = (entryId: string | null, positionMs: number | null) => {
-		if (this.isClosed) return
+	private setPosition = (
+		entryId: string | null,
+		positionMs: number | null
+	) => {
 		if (entryId === null || positionMs === null) return
 
 		const entry = this.entriesBag.findById(entryId)
@@ -130,16 +158,16 @@ export class PlayerPositionSaver {
 	}
 
 	requestImmediateSave = () => {
-		if (this.isClosed) return
-		this.intervalHelper.trigger()
+		if (!this.loadedPosition) return
+		this.maybeWritePosition()
 	}
 
 	private maybeWritePosition = async () => {
-		if (this.isClosed) return
 		await GLOBAL_SAVE_LOCK.withLock(async () => {
+			if (!this.loadedPosition) return
 			if (this.isPositionWritten) return
 
-			if (
+			const anyPositionNotLoaded =
 				!this.currentPosition[
 					PositionType.FILE_ENTITY_ID_AND_LOCAL_OFFSET
 				] ||
@@ -147,7 +175,8 @@ export class PlayerPositionSaver {
 					PositionType.FILE_NAME_AND_LOCAL_OFFSET
 				] ||
 				!this.currentPosition[PositionType.GLOBAL_OFFSET]
-			) {
+
+			if (anyPositionNotLoaded) {
 				return
 			}
 
@@ -157,8 +186,10 @@ export class PlayerPositionSaver {
 				return
 			}
 
-			this.lastSavedPosition = this.currentPosition
-			await this.innerWritePositionNoLock(this.currentPosition)
+			this.lastSavedPosition = { ...this.currentPosition }
+			await this.innerWritePositionNoLock({
+				...this.currentPosition,
+			})
 			this.isPositionWritten = true
 		})
 	}
@@ -177,12 +208,5 @@ export class PlayerPositionSaver {
 				}
 			)
 		}
-	}
-
-	close = () => {
-		if (this.isClosed) return
-		this.isClosed = true
-
-		this.intervalHelper.disable()
 	}
 }

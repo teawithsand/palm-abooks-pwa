@@ -22,7 +22,6 @@ import {
 	StickyEventBus,
 	StickySubscribable,
 	SubscriptionCanceler,
-	generateUUID,
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
 
@@ -47,7 +46,6 @@ export class NewPlayerManager {
 		new PlayerEntryListMetadata({
 			type: PlayerEntryListMetadataType.UNKNOWN,
 		})
-	private previousListId = generateUUID()
 	private currentPositionLoaderShutdown: SubscriptionCanceler = () => {}
 	private positionSaver: PlayerPositionSaver
 
@@ -55,7 +53,9 @@ export class NewPlayerManager {
 		metadata: PlayerEntryListMetadata,
 		entries: PlayerEntriesBag
 	) => {
+		console.warn("Got new metadata!!!")
 		this.currentPositionLoaderShutdown()
+		this.seekQueue.clear() // remove any enqueued seeks, since we will load position now
 
 		const loader = new PlayerPositionLoader(
 			metadata,
@@ -67,44 +67,32 @@ export class NewPlayerManager {
 		const unsubscribe = loader.bus.addSubscriber((state) => {
 			this.innerBus.emitEvent(
 				produce(this.innerBus.lastEvent, (draft) => {
+					console.log("Loading position: ", state.state)
 					draft.positionLoadingState = state.state
 				})
 			)
 		})
+
+		// initialize position as being loaded
+		// even though for small bit of time, old metadata is set
+		this.innerBus.emitEvent(
+			produce(this.innerBus.lastEvent, (draft) => {
+				draft.positionLoadingState = loader.bus.lastEvent.state
+			})
+		)
 
 		this.currentPositionLoaderShutdown = () => {
 			loader.close()
 			unsubscribe()
 		}
 
+		console.log("Loading position began")
 		loader.begin(this.seekQueue)
-	}
-
-	private onNewEntries = (
-		metadata: PlayerEntryListMetadata,
-		entries: PlayerEntriesBag
-	) => {
-		this.positionSaver.requestImmediateSave() // runs on previous metadata; request immediate saver
-		this.positionSaver.close()
-		this.positionSaver = new PlayerPositionSaver(
-			entries,
-			metadata,
-			this.abookDb
-		)
-
-		this.seekQueue.clear() // must be called AFTER PlayerPositionLoader.begin call
-	}
-
-	private onMaybeUpdatedEntries = (
-		metadata: PlayerEntryListMetadata,
-		entries: PlayerEntriesBag
-	) => {
-		this.positionSaver.setEntriesBagAndMetadata(entries, metadata)
 	}
 
 	constructor(
 		playerEntryListManager: PlayerEntryListManager,
-		private readonly abookDb: AbookDb
+		abookDb: AbookDb
 	) {
 		const player = new Player()
 		this.seekQueue = new NewSeekQueue(player, (id) => {
@@ -116,13 +104,7 @@ export class NewPlayerManager {
 			playerState: player.stateBus.lastEvent,
 			positionLoadingState: PositionLoadingState.NOT_FOUND,
 		})
-		this.positionSaver = new PlayerPositionSaver(
-			new PlayerEntriesBag([]),
-			new PlayerEntryListMetadata({
-				type: PlayerEntryListMetadataType.UNKNOWN,
-			}),
-			abookDb
-		)
+		this.positionSaver = new PlayerPositionSaver(abookDb)
 
 		let handledIsEnded = false
 		player.stateBus.addSubscriber((state) => {
@@ -143,26 +125,13 @@ export class NewPlayerManager {
 		})
 
 		playerEntryListManager.bus.addSubscriber((state) => {
-			if (state.listState.id !== this.previousListId) {
-				this.previousListId = state.listState.id
-
-				this.onNewEntries(
-					state.listMetadata,
-					state.listState.entriesBag
-				)
-			} else {
-				this.onMaybeUpdatedEntries(
-					state.listMetadata,
-					state.listState.entriesBag
-				)
-			}
-
 			if (this.previousMetadata.id !== state.listMetadata.id) {
 				this.onNewMetadata(
 					state.listMetadata,
 					state.listState.entriesBag
 				)
 			}
+			this.previousMetadata = state.listMetadata
 
 			this.innerBus.emitEvent(
 				produce(this.innerBus.lastEvent, (draft) => {
@@ -189,12 +158,20 @@ export class NewPlayerManager {
 				currentEntryPosition: state.playerState.position,
 			})
 
-			this.positionSaver.setPosition(
+			this.positionSaver.setState(
 				state.playerEntryListManagerState.currentEntryId,
-				state.playerState.position
+				state.playerState.position,
+				state.playerEntryListManagerState.listState.entriesBag,
+				state.playerEntryListManagerState.listMetadata,
+				[
+					PositionLoadingState.LOADED,
+					PositionLoadingState.NOT_FOUND,
+					PositionLoadingState.ERROR,
+				].includes(state.positionLoadingState)
 			)
 
-			// Save position on pause
+			// Save position on real pause pause
+			// only do so after state is updated
 			if (!state.playerState.isPlaying) {
 				this.positionSaver.requestImmediateSave()
 			}
