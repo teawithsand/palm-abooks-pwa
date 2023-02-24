@@ -8,8 +8,10 @@ import { FileEntryEntityPlayerSource } from "@app/domain/managers/newPlayer/sour
 import { AbookDb } from "@app/domain/storage/db"
 import { IntervalHelper } from "@app/util/IntervalHelper"
 import { Lock, MutexLockAdapter, getNowTimestamp } from "@teawithsand/tws-stl"
+import { isSsr } from "@teawithsand/tws-stl-react"
 
-const GLOBAL_SAVE_LOCK = new Lock(new MutexLockAdapter())
+// TODO(teawithsand): make some better initialization trick
+const GLOBAL_SAVE_LOCK: Lock = isSsr() ? null as any as Lock : new Lock(new MutexLockAdapter())
 
 export function objectEquals(x: any, y: any): boolean {
 	"use strict"

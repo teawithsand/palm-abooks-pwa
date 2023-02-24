@@ -6,20 +6,33 @@ import {
 } from "@app/domain/filetransfer"
 import { useAppManager } from "@app/domain/managers/app"
 import { PeerJSIPeer } from "@teawithsand/tws-peer"
-import React, { ReactNode, useEffect, useMemo } from "react"
+import React, { ReactNode, useEffect, useState } from "react"
 
 export const ReceiverContextProvider = (props: { children?: ReactNode }) => {
 	const configManager = useAppManager().configManager
-	const fileTransferStateManager = useMemo(
-		() => new FileTransferStateManager(new PeerJSIPeer(), configManager),
-		[configManager]
-	)
-	const receiverStateManager = useMemo(
-		() => new ReceiverStateManager(fileTransferStateManager),
-		[fileTransferStateManager]
-	)
+
+	// Hack to bypass SSR
+	const [fileTransferStateManager, setFileTransferStateManager] =
+		useState<FileTransferStateManager | null>(null)
+	const [receiverStateManager, setReceiverStateManager] =
+		useState<ReceiverStateManager | null>(null)
 
 	useEffect(() => {
+		setFileTransferStateManager(
+			new FileTransferStateManager(new PeerJSIPeer(), configManager)
+		)
+	}, [configManager])
+
+	useEffect(() => {
+		if (!fileTransferStateManager) return
+
+		setReceiverStateManager(
+			new ReceiverStateManager(fileTransferStateManager)
+		)
+	}, [fileTransferStateManager])
+
+	useEffect(() => {
+		if (!fileTransferStateManager) return
 		fileTransferStateManager.peer.setConfig({
 			acceptDataConnections: true,
 			acceptMediaConnections: false,
@@ -27,16 +40,20 @@ export const ReceiverContextProvider = (props: { children?: ReactNode }) => {
 	}, [fileTransferStateManager])
 
 	useEffect(() => {
+		if (!receiverStateManager) return
 		return () => {
 			receiverStateManager.close()
 		}
 	}, [receiverStateManager])
 
 	useEffect(() => {
+		if (!fileTransferStateManager) return
 		return () => {
 			fileTransferStateManager.close()
 		}
 	}, [fileTransferStateManager])
+
+	if (!receiverStateManager || !fileTransferStateManager) return <></>
 
 	return (
 		<ReceiverStateManagerContext.Provider value={receiverStateManager}>

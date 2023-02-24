@@ -2,6 +2,7 @@ import {
 	FileTransferTokenData,
 	encodeFileTransferTokenData,
 } from "@app/domain/filetransfer"
+import { isSsr } from "@teawithsand/tws-stl-react"
 import React, { useMemo, useState } from "react"
 import { Alert, Button } from "react-bootstrap"
 import styled from "styled-components"
@@ -27,6 +28,8 @@ const CopiedText = styled.div`
 	font-weight: bold;
 `
 
+const isClipboardSupported = !isSsr() && "clipboard" in window.navigator
+
 export const TextAuthCodeSender = (props: { token: FileTransferTokenData }) => {
 	const { token } = props
 	const encodedToken = useMemo(
@@ -40,7 +43,7 @@ export const TextAuthCodeSender = (props: { token: FileTransferTokenData }) => {
 		<Alert variant="info">
 			<h4>Copy the following token onto receiving device:</h4>
 			<TokenField>{encodedToken}</TokenField>
-			{"clipboard" in navigator ? (
+			{isClipboardSupported ? (
 				<CopyButton
 					onClick={() => {
 						navigator.clipboard

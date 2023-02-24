@@ -21,11 +21,6 @@ import {
 } from "@teawithsand/tws-stl"
 import produce, { Draft } from "immer"
 
-export const AbookDbLock = new MiddlewareKeyedLocks(
-	GLOBAL_WEB_KEYED_LOCKS,
-	(key) => "tws-abook-player/" + key
-)
-
 const eqSet = <T>(xs: Set<T>, ys: Set<T>) =>
 	xs.size === ys.size && [...xs].every((x) => ys.has(x))
 const extractAbookInternalFileIds = (abook: AbookEntity): Set<string> =>
@@ -265,7 +260,10 @@ export class AbookDb extends Dexie {
 	abooks!: Table<StoredAbookEntity, string>
 	internalFiles!: Table<InternalFile, string>
 
-	public readonly locks = AbookDbLock
+	public readonly locks = new MiddlewareKeyedLocks(
+		GLOBAL_WEB_KEYED_LOCKS,
+		(key) => "tws-abook-player/" + key
+	)
 
 	constructor(private readonly storageSizeManager: StorageSizeManager) {
 		super("tws-abook/abook-db")

@@ -1,11 +1,10 @@
 import { useAppManager } from "@app/domain/managers/app"
-import { useStickySubscribable } from "@teawithsand/tws-stl-react"
-import { useEffect, useState } from "react"
-import styled from "styled-components"
-import React from "react"
-import { formatFileSize } from "@teawithsand/tws-stl"
-import { Alert, Button } from "react-bootstrap"
 import { useMutation } from "@tanstack/react-query"
+import { formatFileSize } from "@teawithsand/tws-stl"
+import { useIsSsr, useStickySubscribable } from "@teawithsand/tws-stl-react"
+import React, { useEffect } from "react"
+import { Alert, Button } from "react-bootstrap"
+import styled from "styled-components"
 
 const Container = styled.div`
 	display: grid;
@@ -22,8 +21,18 @@ const StorageStatsContainer = styled.div`
 	}
 `
 
+export const useUserAgent = () => {
+	const isSsr = useIsSsr()
+	if (isSsr) {
+		return ""
+	} else {
+		return window.navigator.userAgent
+	}
+}
+
 export const StoragePanel = () => {
 	const app = useAppManager()
+	const ua = useUserAgent()
 	const storageUsageData = useStickySubscribable(
 		app.storageSizeManager.storageStatsBus
 	)
@@ -55,10 +64,9 @@ export const StoragePanel = () => {
 				Android app installed via Google Play.
 				<div></div>
 				<hr />
-				{navigator.userAgent ? (
+				{ua ? (
 					<>
-						The browser you are using right now is:{" "}
-						<b>{navigator.userAgent}</b>
+						The browser you are using right now is: <b>{ua}</b>
 						<div></div>
 						Knowing this is important if you installed app from some
 						store like Google Play.
@@ -124,8 +132,8 @@ export const StoragePanel = () => {
 						Your storage is <b>not</b> persistent. Browser can{" "}
 						<b>automatically</b> remove your data.
 						<hr />
-						Aside from that, granting persistent storage permission often increases
-						available storage size.
+						Aside from that, granting persistent storage permission
+						often increases available storage size.
 					</div>
 					<Button
 						onClick={() => {
