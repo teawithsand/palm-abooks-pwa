@@ -33,7 +33,7 @@
 		"dexie": "^3.2.2",
 		"final-form": "^4.20.7",
 		"final-form-arrays": "^3.0.2",
-		"gatsby": "^5.3.3",
+		"gatsby": "^5.7.0",
 		"gatsby-plugin-image": "^3.3.2",
 		"gatsby-plugin-layout": "^4.3.0",
 		"gatsby-plugin-manifest": "^5.3.1",
