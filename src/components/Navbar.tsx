@@ -1,7 +1,12 @@
+import { useAppManager } from "@app/domain/managers/app"
 import { useAppPaths } from "@app/paths"
 import { useAppTranslationSelector } from "@app/trans/AppTranslation"
 import { LinkContainer } from "@app/util/LinkContainer"
 import { useNavigate } from "@app/util/navigate"
+import {
+	useStickySubscribable,
+	useStickySubscribableSelector,
+} from "@teawithsand/tws-stl-react"
 import React from "react"
 import { Navbar as Bar, Container, NavDropdown, Nav } from "react-bootstrap"
 import styled from "styled-components"
@@ -16,7 +21,13 @@ export const Navbar = (props: {
 }) => {
 	const translations = useAppTranslationSelector((s) => s.navbar)
 
-	const navigate = useNavigate()
+	const app = useAppManager()
+	const isPlayerSet = useStickySubscribableSelector(
+		app.playerManager.bus,
+		(state) =>
+			state.playerEntryListManagerState.listState.entriesBag.length > 0
+	)
+
 	const {
 		homePath,
 		abookListPath: listABookPath,
@@ -42,7 +53,7 @@ export const Navbar = (props: {
 			className={props.className}
 		>
 			<Container fluid={true}>
-				<LinkContainer to={"/"}>
+				<LinkContainer to={isPlayerSet ? playerPath : homePath}>
 					<Bar.Brand href="#">{translations.pageTitle}</Bar.Brand>
 				</LinkContainer>
 
