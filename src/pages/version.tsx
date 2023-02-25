@@ -55,8 +55,8 @@ const AppInfoPage = () => {
 					</a>
 				</p>
 				<p>
-					Right now this app is free and ad free, so please enjoy
-					using it.
+					This app is free and ad free, so enjoy using
+					it.
 				</p>
 			</div>
 		</PageContainer>
