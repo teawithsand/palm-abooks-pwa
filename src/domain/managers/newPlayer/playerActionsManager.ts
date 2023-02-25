@@ -1,5 +1,6 @@
 import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 import { SleepConfig } from "@app/domain/defines/config/sleep"
+import { LastPlayedSourceType } from "@app/domain/defines/config/state"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import {
 	PlayerSeekAction,
@@ -367,6 +368,19 @@ export class PlayerActionManager {
 				)
 		)
 		list.setEntries(entries)
+
+		if (
+			this.configManager.globalPersistentPlayerState.configBus.lastEvent
+		) {
+			this.configManager.globalPersistentPlayerState.updateConfig(
+				(config) => {
+					config.lastPlayed = {
+						type: LastPlayedSourceType.ABOOK_ID,
+						id: abook.id,
+					}
+				}
+			)
+		}
 
 		const playableList = new ViewPlayerEntryList()
 		playableList.setBaseList(list)

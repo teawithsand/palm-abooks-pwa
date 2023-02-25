@@ -5,12 +5,8 @@ import { useQuery } from "@tanstack/react-query"
 export const useQueryAbookById = (id: string): AbookEntity | null => {
 	const app = useAppManager()
 	const result = useQuery(["abook", "get", id], async () => {
-		const access = await app.abookDb.abookWriteAccess(id)
-		try {
-			return access.getAbook()
-		} finally {
-			access.release()
-		}
+		const abooks = await app.abookDb.listAbooks()
+		return abooks.find((abook) => abook.id === id) ?? null
 	})
 
 	return result.data ?? null
