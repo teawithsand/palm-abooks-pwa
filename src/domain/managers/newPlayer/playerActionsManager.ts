@@ -54,10 +54,8 @@ export class PlayerActionManager {
 		this.mediaSessionManager.setSupportedActions([
 			"play",
 			"pause",
-			"nexttrack",
 			"previoustrack",
-			"seekbackward",
-			"seekforward",
+			"nexttrack",
 		])
 		this.mediaSessionManager.eventBus.addSubscriber((event) => {
 			if (event.type === MediaSessionEventType.PAUSE) {

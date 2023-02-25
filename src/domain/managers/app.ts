@@ -2,6 +2,7 @@ import { ConfigManager } from "@app/domain/managers/config/config"
 import { ConfigSyncManager } from "@app/domain/managers/config/sync"
 import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
 import { InitializationManager } from "@app/domain/managers/initialization"
+import { InstallPromptManager } from "@app/domain/managers/installPromptManager"
 import { PlayerEntryListManager } from "@app/domain/managers/newPlayer/listManager/playerEntryListManager"
 import { MediaSessionManager } from "@app/domain/managers/newPlayer/mediaSession/mediaSessionManager"
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
@@ -21,6 +22,7 @@ export class AppManager {
 	 */
 	// public static readonly instance: AppManager = new AppManager()
 
+	public readonly installPromptManager = new InstallPromptManager()
 	public readonly shakeManager = new ShakeManager()
 	public readonly globalEventsManager = new GlobalEventsManager()
 	public readonly storageSizeManager = new StorageSizeManager()
@@ -62,6 +64,7 @@ export class AppManager {
 
 	constructor() {
 		this.configManager.initialize()
+		this.installPromptManager.initialize()
 
 		const [p1, resolveP1] = latePromise<void>()
 		this.configManager.globalPersistentPlayerState.configBus.addSubscriber(

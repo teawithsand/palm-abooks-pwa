@@ -1,3 +1,4 @@
+import { PwaInstallBanner } from "@app/components/misc/pwaInstallBanner"
 import { LastPlayedSourceType } from "@app/domain/defines/config/state"
 import { useAppManager } from "@app/domain/managers/app"
 import { useQueryAbookById } from "@app/domain/storage/queries/abook"
@@ -60,6 +61,7 @@ export const Home = () => {
 
 	return (
 		<Container>
+			<PwaInstallBanner />
 			{!isStoragePersistent ? (
 				<Alert
 					variant="warning"
@@ -116,7 +118,9 @@ export const Home = () => {
 				Complete guide how to use this app is NIY, especially that it's
 				in it's public alpha phase.
 			</p>
-			<p>Here are some most common things that you may be interested in:</p>
+			<p>
+				Here are some most common things that you may be interested in:
+			</p>
 			<ButtonsGrid>
 				<LinkContainer to={abookListPath}>
 					<Button href="#">ABook list</Button>
