@@ -2604,10 +2604,10 @@
     immer "^9"
     localforage "^1"
 
-"@teawithsand/tws-gatsby-plugin@^0.0.9-b2":
-  version "0.0.9-b2"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-gatsby-plugin/-/tws-gatsby-plugin-0.0.9-b2.tgz#4783be5507e9efc19d3971907fd50d6aabd5a641"
-  integrity sha512-W2wGMUpz+D+LtkOwAcemH1D1lLcKzisycFneEiu9uDrSW/sCWPnAuD7nYPnLc5SL0VaDvW0zg10CjsyIYc5oTQ==
+"@teawithsand/tws-gatsby-plugin@^0.0.11":
+  version "0.0.11"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-gatsby-plugin/-/tws-gatsby-plugin-0.0.11.tgz#5a362edf8714e1c4d47864f709e49b0c53acbe33"
+  integrity sha512-dNhuogBn2fOuK3NHifrt3v1baWlV3lI1WpUuebL0jwrtOTTfXCFmXtqbeKwjU69odzqRfU4o/IquwI6Tz0271A==
   dependencies:
     "@svgr/webpack" "^6.5.1"
     dotenv "^16.0.3"
