@@ -62,10 +62,6 @@ export const Navbar = (props: {
 				<Bar.Collapse>
 					<ToEndPaginator></ToEndPaginator>
 					<Nav>
-						<LinkContainer to={homePath}>
-							<Nav.Link>{translations.homePage}</Nav.Link>
-						</LinkContainer>
-
 						<NavDropdown
 							title={translations.abookLibraryDropdown.title}
 							align={"end"}
@@ -113,7 +109,6 @@ export const Navbar = (props: {
 								</NavDropdown.Item>
 							</LinkContainer>
 						</NavDropdown>
-
 						<NavDropdown
 							title={translations.playerDropdown.title}
 							align={"end"}
@@ -140,7 +135,6 @@ export const Navbar = (props: {
 								</NavDropdown.Item>
 							</LinkContainer>
 						</NavDropdown>
-
 						<NavDropdown
 							title={translations.miscHelpDropdown.title}
 							align={"end"}
