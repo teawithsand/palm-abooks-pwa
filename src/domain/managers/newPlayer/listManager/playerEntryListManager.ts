@@ -22,6 +22,7 @@ export type PlayerEntryListManagerLists = {
 	 * It contains all entries of playerListState.
 	 */
 	full: PlayerEntryList
+	
 	/**
 	 * List of entries that are available to player. This one is queried when requesting playable entry by id.
 	 *
@@ -214,23 +215,25 @@ export class PlayerEntryListManager {
 		)
 	}
 
-	goToNext = () => {
+	/**
+	 * @deprecated to be called only from playerManager as a hack. It should be refactored.
+	 */
+	onEnded = () => {
+		const nextEntry = this.getNextEntry()?.id ?? null
+		// only jump to next entry, if one is there
+		// kinda makes sense imho
+		// TODO(teawithsand): here emit some on ended event that would notify that we reached the end
+		// of current playlist playback
+		if (!nextEntry) return
+
 		this.innerBus.emitEvent(
 			produce(this.innerBus.lastEvent, (draft) => {
-				draft.currentEntryId = this.getNextEntry()?.id ?? null
+				draft.currentEntryId = nextEntry
 			})
 		)
 	}
 
-	goToPrev = () => {
-		this.innerBus.emitEvent(
-			produce(this.innerBus.lastEvent, (draft) => {
-				draft.currentEntryId = this.getPrevEntry()?.id ?? null
-			})
-		)
-	}
-
-	private getNextEntry = (): PlayerEntry | null => {
+	getNextEntry = (): PlayerEntry | null => {
 		const {
 			states: {
 				player: { entriesBag },
@@ -260,7 +263,7 @@ export class PlayerEntryListManager {
 		}
 	}
 
-	private getPrevEntry = (): PlayerEntry | null => {
+	getPrevEntry = (): PlayerEntry | null => {
 		const {
 			states: {
 				player: { entriesBag },

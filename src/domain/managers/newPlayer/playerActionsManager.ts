@@ -169,7 +169,21 @@ export class PlayerActionManager {
 	}
 
 	public nextFile = () => {
-		this.entryListManager.goToNext()
+		const nextEntry = this.entryListManager.getNextEntry()
+		if (!nextEntry) return
+		this.jump(nextEntry.id)
+	}
+
+	public prevFile = () => {
+		const prevEntry = this.entryListManager.getPrevEntry()
+		if (!prevEntry) {
+			this.seek({
+				type: SeekType.ABSOLUTE_IN_FILE,
+				positionMs: 0,
+			})
+		} else {
+			this.jump(prevEntry.id)
+		}
 	}
 
 	public jumpForward = () => {
@@ -205,10 +219,6 @@ export class PlayerActionManager {
 		if (!config) return
 
 		this.executeSeekAction(config.seekActions.long, true)
-	}
-
-	public prevFile = () => {
-		this.entryListManager.goToPrev()
 	}
 
 	public togglePlay = (jumpBack = true) => {

@@ -108,7 +108,7 @@ export class NewPlayerManager {
 			if (state.isEnded && state.config.isPlayingWhenReady) {
 				if (!handledIsEnded) {
 					handledIsEnded = true
-					playerEntryListManager.goToNext()
+					playerEntryListManager.onEnded()
 				}
 			} else {
 				handledIsEnded = false
