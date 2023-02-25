@@ -25,7 +25,7 @@ export const PlayerSettingsSleepSection = () => {
 		})
 		updater.save()
 
-		actions.setSleepFromConfig()
+		actions.setSleepFromConfigIfWasEnabled()
 	}
 
 	const setSleepEnabled = (enabled: boolean) => {
@@ -34,7 +34,7 @@ export const PlayerSettingsSleepSection = () => {
 		})
 		updater.save()
 
-		actions.setSleepFromConfig()
+		actions.setSleepFromConfigIfWasEnabled()
 	}
 
 	return (

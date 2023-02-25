@@ -11,20 +11,8 @@ import Skip from "@app/components/player/icons/skip.svg"
 import { useAppPaths } from "@app/paths"
 import { LinkContainer } from "@app/util/LinkContainer"
 import { useStickySubscribable } from "@teawithsand/tws-stl-react"
-import { Button } from "react-bootstrap"
+import { Button, ButtonGroup } from "react-bootstrap"
 import { SleepManagerStateType } from "@app/domain/managers/newPlayer/sleep/sleepManager"
-
-const Play = styled(InnerPlay)``
-
-const Pause = styled(InnerPause)``
-
-const Prev = styled(Skip)`
-	rotate: 180deg;
-`
-
-const Rewind = styled(FastForward)`
-	rotate: 180deg;
-`
 
 const Bar = styled.div`
 	display: grid;
@@ -32,11 +20,8 @@ const Bar = styled.div`
 	grid-auto-columns: 1fr;
 
 	gap: 1em;
-
-	overflow: hidden;
+	padding: 0.3em;
 	width: 100%;
-
-	justify-items: stretch;
 `
 
 export const PlayerOptionsBar = () => {
@@ -49,26 +34,30 @@ export const PlayerOptionsBar = () => {
 
 	return (
 		<Bar>
-			<LinkContainer to={playerOptionsPath}>
-				<Button href="#" variant="success">
-					Player options
+			<ButtonGroup>
+				<LinkContainer to={playerOptionsPath}>
+					<Button href="#" variant="success">
+						Player options
+					</Button>
+				</LinkContainer>
+				<LinkContainer to={playerPlaylistPath}>
+					<Button href="#">Playlist</Button>
+				</LinkContainer>
+				<Button
+					variant="secondary"
+					onClick={() => {
+						if (
+							sleepState.type === SleepManagerStateType.DISABLED
+						) {
+							actions.setSleepFromConfig()
+						} else {
+							actions.setSleepConfigManual(null)
+						}
+					}}
+				>
+					Toggle sleep
 				</Button>
-			</LinkContainer>
-			<LinkContainer to={playerPlaylistPath}>
-				<Button href="#">Playlist</Button>
-			</LinkContainer>
-			<Button
-				variant="secondary"
-				onClick={() => {
-					if (sleepState.type === SleepManagerStateType.DISABLED) {
-						actions.setSleepFromConfig()
-					} else {
-						actions.unsetSleep()
-					}
-				}}
-			>
-				Toggle sleep
-			</Button>
+			</ButtonGroup>
 		</Bar>
 	)
 }

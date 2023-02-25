@@ -282,7 +282,7 @@ export class PlayerActionManager {
 		this.configManager.globalPlayerConfig.save()
 	}
 
-	public setSleepFromConfig = () => {
+	public setSleepFromConfigIfWasEnabled = () => {
 		const config = this.configManager.globalPlayerConfig.configBus.lastEvent
 		if (!config) return
 
@@ -293,12 +293,24 @@ export class PlayerActionManager {
 		}
 	}
 
+	public setSleepFromConfig = () => {
+		const config = this.configManager.globalPlayerConfig.configBus.lastEvent
+		if (!config) return
+
+		this.setSleepConfigManual(config.sleepConfig)
+	}
+
 	public setSleepConfigManual = (sleepConfig: SleepConfig | null) => {
 		if (sleepConfig) {
 			this.configManager.globalPlayerConfig.updateConfig((draft) => {
 				draft.sleepConfig = sleepConfig
+				draft.isSleepEnabled = true
 			})
 			this.configManager.globalPlayerConfig.save()
+		} else {
+			this.configManager.globalPlayerConfig.updateConfig((draft) => {
+				draft.isSleepEnabled = false
+			})
 		}
 		this.sleepManager.setSleep(sleepConfig)
 	}
