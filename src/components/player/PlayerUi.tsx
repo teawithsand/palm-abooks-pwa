@@ -3,6 +3,7 @@ import { PlayerCoverDisplay } from "@app/components/player/element/PlayerCoverDi
 import { PlayerFileInfoDisplay } from "@app/components/player/element/PlayerFileInfoDisplay"
 import { PlayerGlobalProgressBar } from "@app/components/player/element/PlayerGlobalProgressBar"
 import { PlayerGlobalProgressDisplay } from "@app/components/player/element/PlayerGlobalProgressDisplay"
+import { PlayerKeyboardShortcut } from "@app/components/player/element/PlayerKeyboardShortcut"
 import { PlayerLocalProgressBar } from "@app/components/player/element/PlayerLocalProgressBar"
 import { PlayerLocalProgressDisplay } from "@app/components/player/element/PlayerLocalProgressDisplay"
 import { PlayerOptionsBar } from "@app/components/player/element/PlayerOptionsBar"
@@ -29,6 +30,7 @@ export const PlayerMusicUi = () => {
 			<PlayerGlobalProgressBar />
 			<PlayerGlobalProgressDisplay />
 			<PlayerControlsBar />
+			<PlayerKeyboardShortcut />
 		</Container>
 	)
 }
