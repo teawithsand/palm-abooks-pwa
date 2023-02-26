@@ -291,7 +291,14 @@ export class AbookDb extends Dexie {
 		this.onStorageModified()
 	}
 
+	/**
+	 * @deprecated use getAbookById instead
+	 */
 	readAbook = async (id: AbookId): Promise<AbookEntity | null> => {
+		return await this.getAbookById(id)
+	}
+
+	getAbookById = async (id: AbookId): Promise<AbookEntity | null> => {
 		const raw = (await this.abooks.where("id").equals(id).first()) ?? null
 		if (!raw) return null
 		return AbookEntity.serializer.deserialize(raw)

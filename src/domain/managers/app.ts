@@ -1,3 +1,4 @@
+import { LastPlayedSourceType } from "@app/domain/defines/config/state"
 import { ConfigManager } from "@app/domain/managers/config/config"
 import { ConfigSyncManager } from "@app/domain/managers/config/sync"
 import { GlobalEventsManager } from "@app/domain/managers/globalEventsManager"
@@ -73,9 +74,20 @@ export class AppManager {
 					resolveP1()
 					canceler()
 
-					if (config.lastPlayed) {
-						// TODO(teawithsand): implement last played loading here
+					// TODO(teawithsand): refactor me and put somewhere else
+					const p = async () => {
+						try {
+							if (!config.lastPlayed) return
+
+							await this.playerActionsManager.loadLastPlayed(
+								config.lastPlayed
+							)
+						} finally {
+							resolveP1()
+						}
 					}
+
+					p()
 				}
 			}
 		)
@@ -89,7 +101,6 @@ export class AppManager {
 					// and go through another iteration of this listener
 					canceler()
 					resolveP2()
-
 					if (config.isSleepEnabled) {
 						this.sleepManager.setSleep(config.sleepConfig)
 					}

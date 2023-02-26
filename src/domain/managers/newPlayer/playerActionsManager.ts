@@ -1,6 +1,9 @@
 import { FileEntryDisposition } from "@app/domain/defines/abookFile"
 import { SleepConfig } from "@app/domain/defines/config/sleep"
-import { LastPlayedSourceType } from "@app/domain/defines/config/state"
+import {
+	LastPlayedSource,
+	LastPlayedSourceType,
+} from "@app/domain/defines/config/state"
 import { AbookEntity } from "@app/domain/defines/entity/abook"
 import {
 	PlayerSeekAction,
@@ -355,6 +358,18 @@ export class PlayerActionManager {
 				type: PlayerEntryListMetadataType.LOCAL_FILES,
 			})
 		)
+	}
+
+	// TODO(teawithsand): put contents of this function somewhere else, as this function
+	// does not really fit nature(???) of this class
+	public loadLastPlayed = async (lastPlayed: LastPlayedSource) => {
+		if (lastPlayed.type === LastPlayedSourceType.ABOOK_ID) {
+			const abookId = lastPlayed.id
+			const abook = await this.abookDb.getAbookById(abookId)
+			if (!abook) return
+
+			this.playAbook(abook)
+		}
 	}
 
 	public playAbook = (abook: AbookEntity) => {
