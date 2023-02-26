@@ -2663,6 +2663,14 @@
     "@teawithsand/tws-stl" "^0.0.14"
     react-error-boundary "^3.1.4"
 
+"@teawithsand/tws-stl-react@^0.0.9":
+  version "0.0.9"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-stl-react/-/tws-stl-react-0.0.9.tgz#dabf4c6bdc4b4f9180b6113493fe98f648285ece"
+  integrity sha512-h3LvlTxbO+xTzOtqTDZOJAvUlF4vDbZ24ThGKJgMdnWCkIn3rQYfuVrrO2MqU32t+wZcUv2zr+jy8PWJQcxDqw==
+  dependencies:
+    "@teawithsand/tws-stl" "^0.0.14"
+    react-error-boundary "^3.1.4"
+
 "@teawithsand/tws-stl@^0.0.14":
   version "0.0.14"
   resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.14.tgz"
