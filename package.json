@@ -19,7 +19,7 @@
 	"dependencies": {
 		"@tanstack/react-query": "^4.14.5",
 		"@teawithsand/tws-config": "^0.0.5",
-		"@teawithsand/tws-gatsby-plugin": "^0.0.11",
+		"@teawithsand/tws-gatsby-plugin": "^0.0.13",
 		"@teawithsand/tws-peer": "^0.2.2-b1",
 		"@teawithsand/tws-player": "^0.2.0",
 		"@teawithsand/tws-qr": "^0.0.2",
