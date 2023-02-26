@@ -2,7 +2,8 @@ import { Footer } from "@app/components/Footer"
 import { Navbar } from "@app/components/Navbar"
 import { AppErrorBoundary } from "@app/components/boundary/error"
 import { AppLoadingBoundary } from "@app/components/boundary/loading"
-import { DialogBoundary } from "@teawithsand/tws-stl-react"
+import { useAppManager } from "@app/domain/managers/app"
+import { DialogBoundary, usePromiseSuspense } from "@teawithsand/tws-stl-react"
 import React, { ReactNode } from "react"
 import { Container } from "react-bootstrap"
 import styled, { createGlobalStyle, css } from "styled-components"
@@ -119,6 +120,14 @@ export type PageContainerProps = {
 	  }
 )
 
+const DelayTillAppLoadedBoundary = (props: { children?: ReactNode }) => {
+	const app = useAppManager()
+	const promise = app.initManager.getDonePromise()
+	usePromiseSuspense(promise)
+
+	return <>{props.children}</>
+}
+
 export const PageContainer = (
 	props: PageContainerProps & {
 		children?: ReactNode
@@ -147,7 +156,9 @@ export const PageContainer = (
 
 	inner = (
 		<AppErrorBoundary>
-			<AppLoadingBoundary>{inner}</AppLoadingBoundary>
+			<AppLoadingBoundary>
+				<DelayTillAppLoadedBoundary>{inner}</DelayTillAppLoadedBoundary>
+			</AppLoadingBoundary>
 		</AppErrorBoundary>
 	)
 
