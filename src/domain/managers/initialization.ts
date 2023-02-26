@@ -1,24 +1,29 @@
-import { latePromise } from "@teawithsand/tws-stl"
+import { throwExpression } from "@teawithsand/tws-stl"
 
 export class InitializationManager {
 	private readonly promises: Promise<void>[] = []
-	private innerFinalize: () => void
+	private donePromise: Promise<void> | null = null
 
-	constructor() {
-		const [promise, resolve] = latePromise<void>()
-		this.innerFinalize = resolve
-		this.promises.push(promise)
-	}
+	constructor() {}
 
 	addPromise = (p: Promise<void>) => {
+		if (this.donePromise) throw new Error(`Already finalized`)
 		this.promises.push(p)
 	}
 
-	getDonePromise = async (): Promise<void> => {
-		await Promise.all(this.promises)
+	getDonePromise = (): Promise<void> => {
+		return (
+			this.donePromise ??
+			throwExpression(
+				new Error(`InitializationManager not finalized yet`)
+			)
+		)
 	}
 
 	finalize = () => {
-		this.innerFinalize()
+		if (this.donePromise) throw new Error(`Already finalized`)
+		this.donePromise = this.promises.length
+			? Promise.all(this.promises).then(() => undefined)
+			: Promise.resolve()
 	}
 }
