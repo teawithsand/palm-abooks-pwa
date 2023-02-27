@@ -18,6 +18,7 @@ const swOptions: Config = {
 			template.globPatterns.push(...p.dependencies)
 		}
 		template.globPatterns.push("page-data/**")
+		template.globPatterns.push("icons/**")
 		template.additionalManifestEntries = []
 		for (const p of data.pages) {
 			template.additionalManifestEntries.push({
