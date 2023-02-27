@@ -12,7 +12,7 @@ const swOptions: Config = {
 	makeWorkboxConfig: (template, data) => {
 		template.inlineWorkboxRuntime = true
 		template.navigateFallback = "/app-shell"
-		
+
 		template.globPatterns = [...data.otherFiles]
 		for (const p of data.pages) {
 			template.globPatterns.push(...p.dependencies)
@@ -45,9 +45,9 @@ const plugins = customizeDefaultPlugins(
 			theme_color: `#a2466c`,
 			display: `standalone`,
 			icon_options: {
-			  // For all the options available,
-			  // please see the section "Additional Resources" below.
-			  purpose: `any maskable`,
+				// For all the options available,
+				// please see the section "Additional Resources" below.
+				purpose: `any maskable`,
 			},
 		}),
 		makeLayoutPlugin("./src/Layout.tsx"),
@@ -64,12 +64,6 @@ const plugins = customizeDefaultPlugins(
 		},
 	]
 )
-const config = makeConfig(
-	{
-		title: `Teawithsand's ABook Player PWA`,
-		siteUrl: `https://abook.teawithsand.com`,
-	},
-	[...plugins]
-)
+const config = makeConfig({}, [...plugins])
 
 export default config
