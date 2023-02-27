@@ -4,8 +4,32 @@ import {
 	makeLayoutPlugin,
 	makeManifestPlugin,
 	makeSelfPlugin,
-	makeOfflinePlugin,
 } from "@teawithsand/tws-gatsby-plugin"
+import { Config } from "@teawithsand/tws-gatsby-plugin-sw"
+
+const swOptions: Config = {
+	appendScript: null,
+	makeWorkboxConfig: (template, data) => {
+		template.inlineWorkboxRuntime = true
+		template.navigateFallback = "/app-shell"
+		
+		template.globPatterns = [...data.otherFiles]
+		for (const p of data.pages) {
+			template.globPatterns.push(...p.dependencies)
+		}
+		template.globPatterns.push("page-data/**")
+		template.additionalManifestEntries = []
+		for (const p of data.pages) {
+			template.additionalManifestEntries.push({
+				url: p.path,
+				revision: p.indexHtmlHash,
+			})
+		}
+		template.cacheId = "palm-abooks-pwa/app-cache"
+		return template
+	},
+	precachePages: ["/**/*", "/*"],
+}
 
 const plugins = customizeDefaultPlugins(
 	[
@@ -19,6 +43,11 @@ const plugins = customizeDefaultPlugins(
 			background_color: `#f7f0eb`,
 			theme_color: `#a2466c`,
 			display: `standalone`,
+			icon_options: {
+			  // For all the options available,
+			  // please see the section "Additional Resources" below.
+			  purpose: `any maskable`,
+			},
 		}),
 		makeLayoutPlugin("./src/Layout.tsx"),
 	],
@@ -28,72 +57,10 @@ const plugins = customizeDefaultPlugins(
 		}),
 	],
 	[
-		makeOfflinePlugin({
-			cacheId: "palm-abooks-pwa-app-cache",
-			workboxConfigModifier: (wbc) => {
-				wbc.globPatterns = [
-					"**/*.{js,css,html,json}",
-				]
-				return wbc
-			}
-		}),
-
-		/*
 		{
-			resolve: "gatsby-plugin-offline",
-			options: {
-				precachePages: ["*", "** /*", "/ *"],
-				workboxConfig: {
-					importWorkboxFrom: `local`,
-					cacheId: "palm-abooks-pwa-app-cache",
-					// Don't cache-bust JS or CSS files, and anything in the static directory,
-					// since these files have unique URLs and their contents will never change
-					dontCacheBustURLsMatching: /(\.js$|\.css$|static\/)/,
-					globPatterns: [
-						"** / *.{js,css,html}",
-						//  " ** /icon-prefix-magic*",
-					],
-					runtimeCaching: [
-						{
-							// Use cacheFirst since these don't need to be revalidated (same RegExp
-							// and same reason as above)
-							urlPattern: /(\.js$|\.css$|static\/)/,
-							handler: `CacheFirst`,
-						},
-						{
-							// page-data.json files, static query results and app-data.json
-							// are not content hashed
-							urlPattern: /^https?:.*\/page-data\/.*\.json/,
-							handler: `StaleWhileRevalidate`,
-						},
-						{
-							// Add runtime caching of various other page resources
-							// These are not critical and can be stale-while-revalidate
-							// Also: most of them is cache-busted anyway
-							urlPattern:
-								/^https?:.*\.(png|jpg|jpeg|webp|svg|gif|tiff|js|woff|woff2|json|css)$/,
-							handler: `StaleWhileRevalidate`,
-						},
-						{
-							// Google Fonts CSS (doesn't end in .css so we need to specify it)
-							urlPattern:
-								/^https?:\/\/fonts\.googleapis\.com\/css/,
-							handler: `StaleWhileRevalidate`,
-						},
-
-						{
-							// Use cacheFirst since these don't need to be revalidated (same RegExp
-							// and same reason as above)
-							urlPattern: /^https?:.*\/page-data\/.*\.json/,
-							handler: `NetworkFirst`,
-						},
-					],
-					skipWaiting: true,
-					clientsClaim: true,
-				},
-			},
-		}
-		*/
+			resolve: "@teawithsand/tws-gatsby-plugin-sw",
+			options: swOptions,
+		},
 	]
 )
 const config = makeConfig(
@@ -101,9 +68,7 @@ const config = makeConfig(
 		title: `Teawithsand's ABook Player PWA`,
 		siteUrl: `https://abook.teawithsand.com`,
 	},
-	[
-		...plugins,
-	]
+	[...plugins]
 )
 
 export default config
