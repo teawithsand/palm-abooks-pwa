@@ -1,5 +1,3 @@
-import { PeerManager } from "@app/components/filetransfer/PeerManager"
-import { ReceiverConnOpener } from "@app/components/filetransfer/receiver/ReceiverConnOpener"
 import { ReceiverConnRegistrySpy } from "@app/components/filetransfer/receiver/ReceiverConnRegistrySpy"
 import { ReceiverContextProvider } from "@app/components/filetransfer/receiver/ReceiverContextProvider"
 import { ReceiverStateController } from "@app/components/filetransfer/receiver/ReceiverStateController"

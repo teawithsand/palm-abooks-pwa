@@ -20,18 +20,17 @@ export const PwaInstallBanner = () => {
 					href="#"
 					onClick={(e) => {
 						e.preventDefault()
-                        app.installPromptManager.triggerPromptIfAvailable()
+						app.installPromptManager.triggerPromptIfAvailable()
 					}}
 				>
 					Click here banner to install it as PWA and add it to your
 					home screen.
-				</a>
-                {" "}
-                <a
+				</a>{" "}
+				<a
 					href="#"
 					onClick={(e) => {
 						e.preventDefault()
-                        app.installPromptManager.dismiss()
+						app.installPromptManager.dismiss()
 					}}
 				>
 					Or click this text in order to dismiss this alert.
