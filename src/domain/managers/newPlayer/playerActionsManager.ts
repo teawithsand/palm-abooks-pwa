@@ -54,11 +54,13 @@ export class PlayerActionManager {
 
 	private mediaSessionManager = MediaSessionApiHelper.instance
 	private initMediaSession = () => {
-		this.mediaSessionManager.setSupportedActions([
+		this.mediaSessionManager.setActiveActions([
 			"play",
 			"pause",
 			"previoustrack",
 			"nexttrack",
+			"seekforward",
+			"seekbackward",
 		])
 		this.mediaSessionManager.eventBus.addSubscriber((event) => {
 			if (event.type === MediaSessionEventType.PAUSE) {
@@ -81,19 +83,23 @@ export class PlayerActionManager {
 						false
 					)
 				} else if (event.type === MediaSessionEventType.SEEK_FORWARD) {
+					// TODO(teawithsand): use by parameter here
+
 					this.executeSeekAction(
 						config.seekActions.mediaSession,
 						false
 					)
 				} else if (event.type === MediaSessionEventType.SEEK_BACKWARD) {
+					// TODO(teawithsand): use by parameter here
+
 					this.executeSeekAction(
 						config.seekActions.mediaSession,
 						true
 					)
+				} else if (event.type === MediaSessionEventType.SEEK_TO) {
+					// TODO(teawithsand): support for seek to event
 				}
 			}
-
-			// TODO(teawithsand): here support for the rest of events
 		})
 	}
 
