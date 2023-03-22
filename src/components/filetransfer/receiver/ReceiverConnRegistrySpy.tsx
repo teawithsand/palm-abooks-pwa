@@ -223,7 +223,7 @@ const ReceiverConnSpy = (props: {
 
 	let entries: ReceiverFileListEntry[] | null = useMemo(() => {
 		if (!headers) return null
-		
+
 		return headers.map((h, i) => {
 			let doneFraction = 0
 			if (doneEntries.length > i) {
@@ -286,7 +286,7 @@ const ReceiverConnSpy = (props: {
 					<ReceiverDownloadAll entries={doneEntries} />
 				</>
 			) : null}
-				{doneEntries && status === ReceiverAdapterConnStatus.DONE ? (
+			{doneEntries && status === ReceiverAdapterConnStatus.DONE ? (
 				<>
 					<Header>Save files to existing ABook</Header>
 					<ReceiverAppendToAbook entries={doneEntries} />

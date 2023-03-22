@@ -11,7 +11,9 @@ import { Lock, MutexLockAdapter, getNowTimestamp } from "@teawithsand/tws-stl"
 import { isSsr } from "@teawithsand/tws-stl-react"
 
 // TODO(teawithsand): make some better initialization trick
-const GLOBAL_SAVE_LOCK: Lock = isSsr() ? null as any as Lock : new Lock(new MutexLockAdapter())
+const GLOBAL_SAVE_LOCK: Lock = isSsr()
+	? (null as any as Lock)
+	: new Lock(new MutexLockAdapter())
 
 export function objectEquals(x: any, y: any): boolean {
 	"use strict"

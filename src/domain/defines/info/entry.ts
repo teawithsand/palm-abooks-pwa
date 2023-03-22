@@ -25,7 +25,7 @@ export type PlayableEntryPlaybackInfo =
 			fileName: string | null
 			abookTitle: string | null
 			abookName: string | null
-            artwork: {
+			artwork: {
 				src: string
 				sizes: string
 				type: string

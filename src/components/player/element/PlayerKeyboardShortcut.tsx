@@ -17,6 +17,6 @@ export const PlayerKeyboardShortcut = () => {
 			window.removeEventListener("keydown", listener)
 		}
 	}, [playerActionsManager])
-	
+
 	return <></>
 }

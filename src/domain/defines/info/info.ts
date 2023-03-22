@@ -9,7 +9,7 @@ type CommonPlaybackInfo = {
 	speed: number
 	isPlaying: boolean
 
-    entryInfo: PlayableEntryPlaybackInfo
+	entryInfo: PlayableEntryPlaybackInfo
 }
 
 export type PlaybackInfo =

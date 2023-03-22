@@ -20,7 +20,9 @@ export interface AppTranslation {
 		unknown: string
 	}
 	abook: {
-		formatFileEntryDisposition: (disposition: FileEntryDisposition) => string
+		formatFileEntryDisposition: (
+			disposition: FileEntryDisposition
+		) => string
 	}
 	navbar: {
 		pageTitle: string

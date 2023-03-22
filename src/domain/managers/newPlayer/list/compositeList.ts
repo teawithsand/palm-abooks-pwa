@@ -83,7 +83,7 @@ export class CompositePlayerEntryList implements PlayerEntryList {
 		const isLoadingMetadata = lists.some(
 			(v) => v.stateBus.lastEvent.isLoadingMetadata
 		)
-		
+
 		return {
 			entriesBag: new PlayerEntriesBag(entries),
 			isLoadingMetadata,

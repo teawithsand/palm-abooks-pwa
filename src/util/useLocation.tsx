@@ -23,7 +23,8 @@ export const wrapLocationProvider = <
 	Component: React.FC<T>
 ) => {
 	return (props: T) => {
-		const location = useMemo(() => { // is it redundant to useMemo? Is URLSearchParams parsing expensive?
+		const location = useMemo(() => {
+			// is it redundant to useMemo? Is URLSearchParams parsing expensive?
 			return {
 				pathname: props.location.pathname,
 				search: new URLSearchParams(props.location.search),

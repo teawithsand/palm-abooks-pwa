@@ -19,7 +19,7 @@ export interface AppPaths extends Paths {
 	abookReorderEntriesPath: (id: string) => string
 	abookLocalEntriesAddPath: (id: string) => string
 	abookEntriesDeletePath: (id: string) => string
-	
+
 	receiveFilesPath: string
 	sendFilesPath: string
 
@@ -59,7 +59,7 @@ const paths: AppPaths = {
 	playerUiPath: "/player",
 	playerPlaylistPath: "/player/playlist",
 	playerOptionsPath: "/player/options",
-	playerPlayLocal: "/player/play-local"
+	playerPlayLocal: "/player/play-local",
 }
 
 const config: UseLanguagePrefixedPathsConfig = {

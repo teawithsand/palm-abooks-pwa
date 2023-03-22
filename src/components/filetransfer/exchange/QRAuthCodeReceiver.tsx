@@ -30,13 +30,19 @@ export const QRAuthCodeReceiver = (props: {
 		[onToken, setLastResultText]
 	)
 
-	const config = useMemo(() => ({
-		fps: 30,
-	}), [])
+	const config = useMemo(
+		() => ({
+			fps: 30,
+		}),
+		[]
+	)
 
-	const onFailure = useCallback((errorMessage: string) => {
-		setLastResultText(errorMessage)
-	}, [setLastResultText])
+	const onFailure = useCallback(
+		(errorMessage: string) => {
+			setLastResultText(errorMessage)
+		},
+		[setLastResultText]
+	)
 
 	return (
 		<Container>

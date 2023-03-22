@@ -1,4 +1,3 @@
-
 export enum StoredSeekBackStrategyType {
 	NONE = 0,
 	LINEAR = 1,

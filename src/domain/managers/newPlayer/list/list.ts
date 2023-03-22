@@ -3,7 +3,7 @@ import { StickySubscribable } from "@teawithsand/tws-stl"
 
 export type PlayerEntryListState = {
 	/**
-	 * @deprecated lists ids are used no more. 
+	 * @deprecated lists ids are used no more.
 	 */
 	id: string
 	entriesBag: PlayerEntriesBag
@@ -13,7 +13,7 @@ export type PlayerEntryListState = {
 
 export interface PlayerEntryList {
 	/**
-	 * @deprecated lists ids are used no more. 
+	 * @deprecated lists ids are used no more.
 	 */
 	readonly id: string
 	readonly stateBus: StickySubscribable<PlayerEntryListState>

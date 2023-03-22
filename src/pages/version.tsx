@@ -54,10 +54,7 @@ const AppInfoPage = () => {
 						https://teawithsand.com/contact
 					</a>
 				</p>
-				<p>
-					This app is free and ad free, so enjoy using
-					it.
-				</p>
+				<p>This app is free and ad free, so enjoy using it.</p>
 			</div>
 		</PageContainer>
 	)

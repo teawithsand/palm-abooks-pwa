@@ -1,6 +1,6 @@
 import { Serializer } from "@app/util/transform"
 
-export const DEFAULT_SLEEP_CONFIG: SleepConfig =  {
+export const DEFAULT_SLEEP_CONFIG: SleepConfig = {
 	baseDuration: 30 * 60 * 1000 - 10 * 1000,
 	shakeResetsSleep: false,
 	turnVolumeDownDuration: 10 * 1000,

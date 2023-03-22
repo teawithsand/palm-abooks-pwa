@@ -38,7 +38,9 @@ export const ReceiverDownloadAll = (props: {
 				<Form.Label>Prefix</Form.Label>
 				<Form.Control
 					value={prefix}
-					placeholder={"Prefix for names of all downloaded files(optional)."}
+					placeholder={
+						"Prefix for names of all downloaded files(optional)."
+					}
 					onChange={(e) => {
 						setPrefix(e.target.value)
 					}}

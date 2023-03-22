@@ -22,7 +22,7 @@ export type PlayerEntryListManagerLists = {
 	 * It contains all entries of playerListState.
 	 */
 	full: PlayerEntryList
-	
+
 	/**
 	 * List of entries that are available to player. This one is queried when requesting playable entry by id.
 	 *

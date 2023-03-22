@@ -1,6 +1,6 @@
 /**
  * Transformers transforms T to E.
- * 
+ *
  * @deprecated to be replaced with tws-config serializer framework.
  */
 export interface Transformer<T, E> {

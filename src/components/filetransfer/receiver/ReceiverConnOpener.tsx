@@ -6,7 +6,7 @@ import {
 import {
 	ReceiverAdapterConnStage,
 	useFileTransferStateManager,
-	useReceiverStateManager
+	useReceiverStateManager,
 } from "@app/domain/filetransfer"
 import { useStickySubscribable } from "@teawithsand/tws-stl-react"
 import produce from "immer"

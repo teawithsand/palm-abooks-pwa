@@ -25,5 +25,5 @@ export const usePlayerSourceUrl = (
 		}
 	}, [source])
 
-    return url
+	return url
 }

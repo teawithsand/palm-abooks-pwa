@@ -16,9 +16,7 @@ const InnerPage = () => {
 
 	return (
 		<AbookMetadataEdit
-			abook={
-				abook?? throwExpression(new Error(`Unreachable code`))
-			}
+			abook={abook ?? throwExpression(new Error(`Unreachable code`))}
 		/>
 	)
 }

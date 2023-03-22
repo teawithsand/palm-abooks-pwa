@@ -5,7 +5,7 @@ import { MediaSessionApiHelper } from "@teawithsand/tws-stl"
 export class MediaSessionManager {
 	constructor(playerManager: NewPlayerManager) {
 		// note: button actions right now are handled in playerActionsManager. this is to-be-refactored
-		
+
 		playerManager.bus.addSubscriber((state) => {
 			const isNoneState =
 				state.playerEntryListManagerState.listState.entriesBag.isEmpty

@@ -32,8 +32,9 @@ export const FilesFinalField = (props: {
 	const stats = useStickySubscribable(app.storageSizeManager.storageStatsBus)
 
 	const typeSpec: string =
-		(typeof rawTypeSpec === "string" ? rawTypeSpec : rawTypeSpec?.join(",")) ??
-		abookFilesMimesAndExtensions.join(",")
+		(typeof rawTypeSpec === "string"
+			? rawTypeSpec
+			: rawTypeSpec?.join(",")) ?? abookFilesMimesAndExtensions.join(",")
 
 	return (
 		<>
