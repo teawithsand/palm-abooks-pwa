@@ -1,10 +1,35 @@
 import { PlayerEntryListMetadataType } from "@app/domain/managers/newPlayer/list/metadata"
 import { NewPlayerManager } from "@app/domain/managers/newPlayer/player/playerManager"
+import { IntervalHelper } from "@app/util/IntervalHelper"
 import { MediaSessionApiHelper } from "@teawithsand/tws-stl"
 
+const ActionsToActivate: MediaSessionAction[] = [
+	"play",
+	"pause",
+	"previoustrack",
+	"nexttrack",
+	"seekforward",
+	"seekbackward",
+]
+
 export class MediaSessionManager {
+	private intervalHelper = new IntervalHelper(10000)
 	constructor(playerManager: NewPlayerManager) {
-		// note: button actions right now are handled in playerActionsManager. this is to-be-refactored
+		MediaSessionApiHelper.instance.setActiveActions(ActionsToActivate)
+		const results = MediaSessionApiHelper.instance.getActivationResults()
+		if ([...Object.values(results)].some((e) => e !== null)) {
+			console.warn(
+				"Filed to activate some media session event handlers",
+				results
+			)
+		}
+
+		this.intervalHelper.bus.addSubscriber(() => {
+			MediaSessionApiHelper.instance.setActiveActions([])
+			MediaSessionApiHelper.instance.setActiveActions(ActionsToActivate)
+			MediaSessionApiHelper.instance.clearPlaybackStateCache()
+			MediaSessionApiHelper.instance.clearMetadataCache()
+		})
 
 		playerManager.bus.addSubscriber((state) => {
 			const isNoneState =
@@ -16,6 +41,7 @@ export class MediaSessionManager {
 					? "playing"
 					: "paused"
 			)
+			
 			MediaSessionApiHelper.instance.setPositionState({
 				duration: state.playerState.duration !== null ? state.playerState.duration / 1000 : 0,
 				position: (state.playerState.position ?? 0) / 1000,
