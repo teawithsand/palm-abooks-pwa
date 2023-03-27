@@ -2660,15 +2660,12 @@
     immer "^9"
     localforage "^1"
 
-"@teawithsand/tws-gatsby-plugin-sw@^0.0.17":
-  version "0.0.17"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-gatsby-plugin-sw/-/tws-gatsby-plugin-sw-0.0.17.tgz#0577896ba808a17245b176d3d76f0247b972c072"
-  integrity sha512-PkbVMD+DHmyNg2ss/RNGe71HsPQmdbeUxJHmqjZw5U1zjSeUIJxTTtX3UBgWRSoah319j4dh8G3qEbvLkQfluQ==
+"@teawithsand/tws-gatsby-plugin-sw@^0.0.19":
+  version "0.0.19"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-gatsby-plugin-sw/-/tws-gatsby-plugin-sw-0.0.19.tgz#8e7075770918b775d3e6dcae3f07c99afa44933f"
+  integrity sha512-SrpeWEJv9HE98XMiuBefKJqUesuB3SlFrf3G2lY2sPHnTSsJwMcumVPV+OPh8pta/5k7fd3qsk44q4mB0VK9Ig==
   dependencies:
-    "@svgr/webpack" "^6.5.1"
-    dotenv "^16.0.3"
     md5 "^2.3.0"
-    tsconfig-paths-webpack-plugin "^3.5.2"
     typescript "^4.9.5"
     workbox-build "^6.5.4"
 
