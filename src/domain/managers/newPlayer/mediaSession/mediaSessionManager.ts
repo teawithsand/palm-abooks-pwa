@@ -17,8 +17,8 @@ export class MediaSessionManager {
 					: "paused"
 			)
 			MediaSessionApiHelper.instance.setPositionState({
-				duration: state.playerState.duration,
-				position: state.playerState.position ?? 0,
+				duration: state.playerState.duration !== null ? state.playerState.duration / 1000 : 0,
+				position: (state.playerState.position ?? 0) / 1000,
 				playbackRate: state.playerState.config.speed,
 			})
 
