@@ -4,6 +4,7 @@ import {
 	makeLayoutPlugin,
 	makeManifestPlugin,
 	makeSelfPlugin,
+	loadConfig,
 } from "@teawithsand/tws-gatsby-plugin"
 import { Config } from "@teawithsand/tws-gatsby-plugin-sw"
 
@@ -49,7 +50,7 @@ const plugins = customizeDefaultPlugins(
 			name: `PalmABooks PWA`,
 			short_name: `PalmABooks`,
 			description: "It plays and stores user-provided ABooks.",
-			start_url: `/?version=0.0.6`,
+			start_url: `/?version=${loadConfig().version}`,
 			background_color: `#f7f0eb`,
 			theme_color: `#a2466c`,
 			display: `standalone`,
