@@ -3213,10 +3213,10 @@
   resolved "http://verdaccio:4873/@teawithsand%2ftws-stl/-/tws-stl-0.0.9.tgz"
   integrity sha512-pGJuL4mJjI+3E/iPnvewjNUOLtSmR7T977hzGDRG8oFKg5mwjV7pV7AyFCz6USzN6tipKx2TliHh7QwxS6I6+g==
 
-"@teawithsand/tws-trans@^0.1.4":
-  version "0.1.4"
-  resolved "http://verdaccio:4873/@teawithsand%2ftws-trans/-/tws-trans-0.1.4.tgz#7f750e16d118bba0c9b07d7259cf4af5b5fa3c26"
-  integrity sha512-00cimBc7TYMTVZDBALOYa6dDhadWMMk2Km2cpYQa3Adoa7ZEKB5xlKKgK6O4TS+SbUSCIa3cIi1TBke8jfrPhw==
+"@teawithsand/tws-trans@^0.1.5":
+  version "0.1.5"
+  resolved "http://verdaccio:4873/@teawithsand%2ftws-trans/-/tws-trans-0.1.5.tgz#7324bc3b21e424abc130c0401e23b71e4c5da04c"
+  integrity sha512-AdLrPRg+QamGZSsNXdMls0RNvuBgnxb9DUlhiHFkjrVAADdm9cinZ2W85NZeZQugyLGjevY+tYYHKtxupWJzOQ==
   dependencies:
     "@teawithsand/tws-stl" "^0.0.9"
     "@teawithsand/tws-stl-react" "^0.0.4"

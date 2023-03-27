@@ -27,7 +27,7 @@
 		"@teawithsand/tws-qr": "^0.0.2",
 		"@teawithsand/tws-stl": "^0.0.25",
 		"@teawithsand/tws-stl-react": "^0.0.9",
-		"@teawithsand/tws-trans": "^0.1.4",
+		"@teawithsand/tws-trans": "^0.1.5",
 		"@teawithsand/tws-ui": "^0.0.10",
 		"babel-plugin-styled-components": "^2.0.7",
 		"babel-preset-gatsby": "^3.0.0",
