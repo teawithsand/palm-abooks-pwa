@@ -1,3 +1,4 @@
+import { makePeer } from "@app/components/filetransfer/useToken"
 import {
 	FileTransferStateManager,
 	FileTransferStateManagerContext,
@@ -5,7 +6,6 @@ import {
 	ReceiverStateManagerContext,
 } from "@app/domain/filetransfer"
 import { useAppManager } from "@app/domain/managers/app"
-import { PeerJSIPeer } from "@teawithsand/tws-peer"
 import React, { ReactNode, useEffect, useState } from "react"
 
 export const ReceiverContextProvider = (props: { children?: ReactNode }) => {
@@ -19,7 +19,10 @@ export const ReceiverContextProvider = (props: { children?: ReactNode }) => {
 
 	useEffect(() => {
 		setFileTransferStateManager(
-			new FileTransferStateManager(new PeerJSIPeer(), configManager)
+			new FileTransferStateManager(
+				makePeer(),
+				configManager
+			)
 		)
 	}, [configManager])
 

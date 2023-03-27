@@ -120,7 +120,6 @@ const ReceiverConnSpy = (props: {
 
 	const {
 		isClosed,
-		initData: { auth },
 		state: {
 			status,
 			totalDoneFraction,
@@ -129,7 +128,6 @@ const ReceiverConnSpy = (props: {
 			doneEntries,
 			currentEntryDoneFraction,
 		},
-		config: { stage },
 		error,
 	} = state
 
@@ -280,13 +278,13 @@ const ReceiverConnSpy = (props: {
 					<ReceiverFileList entries={entries} />
 				</>
 			) : null}
-			{doneEntries && status === ReceiverAdapterConnStatus.DONE ? (
+			{status === ReceiverAdapterConnStatus.DONE ? (
 				<>
 					<Header>Download all files</Header>
 					<ReceiverDownloadAll entries={doneEntries} />
 				</>
 			) : null}
-			{doneEntries && status === ReceiverAdapterConnStatus.DONE ? (
+			{status === ReceiverAdapterConnStatus.DONE ? (
 				<>
 					<Header>Save files to existing ABook</Header>
 					<ReceiverAppendToAbook entries={doneEntries} />
