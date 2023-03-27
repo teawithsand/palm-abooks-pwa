@@ -1,3 +1,4 @@
+import { makeAbookNavigationHash } from "@app/components/util/useAbookId"
 import {
 	Paths,
 	useLanguagePrefixedPaths,
@@ -36,22 +37,22 @@ const paths: AppPaths = {
 	versionPath: "/version",
 	abookShowPath: (id: string) => {
 		// try using hash instead, so it works better with cache
-		return `/abook/show?id=${encodeURIComponent(id)}`
+		return `/abook/show#${makeAbookNavigationHash(id)}`
 	},
 	abookEditMetadataPath: (id: string) => {
-		return `/abook/edit-metadata?id=${encodeURIComponent(id)}`
+		return `/abook/edit-metadata#${makeAbookNavigationHash(id)}`
 	},
 	abookDeletePath: (id: string) => {
-		return `/abook/delete?id=${encodeURIComponent(id)}`
+		return `/abook/delete#${makeAbookNavigationHash(id)}`
 	},
 	abookReorderEntriesPath: (id: string) => {
-		return `/abook/reorder-entries?id=${encodeURIComponent(id)}`
+		return `/abook/reorder-entries#${makeAbookNavigationHash(id)}`
 	},
 	abookLocalEntriesAddPath: (id: string) => {
-		return `/abook/local-entries-add?id=${encodeURIComponent(id)}`
+		return `/abook/local-entries-add#${makeAbookNavigationHash(id)}`
 	},
 	abookEntriesDeletePath: (id: string) => {
-		return `/abook/entries-delete?id=${encodeURIComponent(id)}`
+		return `/abook/entries-delete#${makeAbookNavigationHash(id)}`
 	},
 	receiveFilesPath: "/remote/receive",
 	sendFilesPath: "/remote/send",
