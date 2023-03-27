@@ -420,7 +420,8 @@ export class PlayerActionManager {
 				player: playableList,
 				presentation: playableList,
 			},
-			entries.length ? entries[0].id : null,
+			playableList.stateBus.lastEvent.entriesBag.findByIndex(0)?.id ??
+				null,
 			new PlayerEntryListMetadata({
 				type: PlayerEntryListMetadataType.ABOOK,
 				abook,
