@@ -237,6 +237,9 @@ export class ReceiverConnAdapter
 					break
 				}
 			}
+		} catch (e) {
+			console.error("Error while receiving", e)
+			throw e
 		} finally {
 			configAwaiter.close()
 			conn.close()

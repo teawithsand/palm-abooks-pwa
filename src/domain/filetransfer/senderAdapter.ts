@@ -226,6 +226,9 @@ export class SenderConnAdapter
 					break
 				}
 			}
+		} catch(e) {
+			console.error("Error while sending files", e)
+			throw e
 		} finally {
 			configAwaiter.close()
 			conn.close()
