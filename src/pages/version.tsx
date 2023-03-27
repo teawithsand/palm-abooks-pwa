@@ -27,10 +27,11 @@ const Author = styled.div`
 
 const AppInfoPage = () => {
 	const info = useAppTranslationSelector((trans) => trans.info)
+	const version = useAppTranslationSelector(trans => trans.config.version)
 	return (
 		<PageContainer>
 			<Title>PalmABooks PWA</Title>
-			<Version>Version: 0.0.1-alpha</Version>
+			<Version>Version: {version}</Version>
 			<Author>
 				By <a href={info.autorPageUrl}>Teawithsand</a>
 			</Author>
