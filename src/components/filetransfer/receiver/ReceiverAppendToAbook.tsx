@@ -77,8 +77,8 @@ export const ReceiverAppendToAbook = (props: {
 					}}
 				>
 					<option>Pick ABook</option>
-					{abooks.map((v) => (
-						<option value={v.id}>{v.displayName}</option>
+					{abooks.map((v, i) => (
+						<option key={i} value={v.id}>{v.displayName}</option>
 					))}
 				</Form.Select>
 				{pickedAbook ? (
