@@ -198,8 +198,11 @@ export class ReceiverConnAdapter
 				)
 			}
 
-			await helper.exchangeDone()
-			// magic on receiving is done. It should ve validated.
+			try {
+				await helper.exchangeDone()
+			} catch (e) {
+				// pass; ignore errors in closing exchange
+			}
 
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
@@ -238,6 +241,14 @@ export class ReceiverConnAdapter
 				}
 			}
 		} catch (e) {
+			updateState((oldState) =>
+				produce(oldState, (draft) => {
+					draft.status = ReceiverAdapterConnStatus.DONE
+					draft.totalDoneFraction = 1
+					draft.currentEntryDoneFraction = 0
+				})
+			)
+
 			console.error("Error while receiving", e)
 			throw e
 		} finally {

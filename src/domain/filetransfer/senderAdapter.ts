@@ -191,7 +191,11 @@ export class SenderConnAdapter
 				)
 			}
 
-			await helper.exchangeDone()
+			try {
+				await helper.exchangeDone()
+			} catch (e) {
+				// pass; ignore errors in closing exchange
+			}
 
 			updateState((oldState) =>
 				produce(oldState, (draft) => {
@@ -226,7 +230,13 @@ export class SenderConnAdapter
 					break
 				}
 			}
-		} catch(e) {
+		} catch (e) {
+			updateState((oldState) =>
+				produce(oldState, (draft) => {
+					draft.status = SenderAdapterConnStatus.DONE
+				})
+			)
+
 			console.error("Error while sending files", e)
 			throw e
 		} finally {
