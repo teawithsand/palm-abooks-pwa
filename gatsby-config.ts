@@ -27,6 +27,15 @@ const swOptions: Config = {
 			})
 		}
 		template.cacheId = "palm-abooks-pwa/app-cache"
+		template.globIgnores = [
+			"**/node_modules/**/*",
+			"*.gz",
+			".gz",
+			"*/**/*.gz",
+			"**/*.gz",
+			"/*.gz",
+		]
+
 		return template
 	},
 	precachePages: ["/**/*", "/*"],
@@ -40,7 +49,7 @@ const plugins = customizeDefaultPlugins(
 			name: `PalmABooks PWA`,
 			short_name: `PalmABooks`,
 			description: "It plays and stores user-provided ABooks.",
-			start_url: `/?version=0.0.4`,
+			start_url: `/?version=0.0.6`,
 			background_color: `#f7f0eb`,
 			theme_color: `#a2466c`,
 			display: `standalone`,
@@ -49,7 +58,7 @@ const plugins = customizeDefaultPlugins(
 				// please see the section "Additional Resources" below.
 				purpose: `any maskable`,
 			},
-		}),
+		} as any),
 		makeLayoutPlugin("./src/Layout.tsx"),
 	],
 	[
