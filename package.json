@@ -25,7 +25,7 @@
 		"@teawithsand/tws-peer": "^0.2.2-b1",
 		"@teawithsand/tws-player": "^0.2.0",
 		"@teawithsand/tws-qr": "^0.0.2",
-		"@teawithsand/tws-stl": "^0.0.24",
+		"@teawithsand/tws-stl": "^0.0.25",
 		"@teawithsand/tws-stl-react": "^0.0.9",
 		"@teawithsand/tws-trans": "^0.1.4",
 		"@teawithsand/tws-ui": "^0.0.10",
