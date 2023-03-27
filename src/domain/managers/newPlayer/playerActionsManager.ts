@@ -62,6 +62,13 @@ export class PlayerActionManager {
 			"seekforward",
 			"seekbackward",
 		])
+		const results = this.mediaSessionManager.getActivationResults()
+		if ([...Object.values(results)].some((e) => e !== null)) {
+			console.warn(
+				"Filed to activate some media session event handlers",
+				results
+			)
+		}
 		this.mediaSessionManager.eventBus.addSubscriber((event) => {
 			if (event.type === MediaSessionEventType.PAUSE) {
 				this.setIsPlaying(false)

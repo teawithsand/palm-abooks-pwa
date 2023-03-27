@@ -40,7 +40,7 @@ const plugins = customizeDefaultPlugins(
 			name: `PalmABooks PWA`,
 			short_name: `PalmABooks`,
 			description: "It plays and stores user-provided ABooks.",
-			start_url: `/`,
+			start_url: `/?version=0.0.4`,
 			background_color: `#f7f0eb`,
 			theme_color: `#a2466c`,
 			display: `standalone`,
